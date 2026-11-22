@@ -190,6 +190,35 @@
     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" ' +
     'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>';
 
+  // Each evidence item may carry data-stance: how it bears on the subcategory's description.
+  const STANCES = {
+    for: { label: "For", title: "Supports the subcategory description" },
+    against: { label: "Against", title: "Contradicts the subcategory description" },
+    neutral: { label: "Neutral", title: "Context, or points both ways" },
+  };
+  const STANCE_ORDER = ["for", "against", "neutral"];
+
+  // Sort items for, against, neutral (keeping their order within a group) and say so above the list.
+  function sortAndSummarizeByStance(ul) {
+    const items = [...ul.children];
+    if (!items.some((li) => STANCES[li.dataset.stance])) return;
+    const rank = (li) => {
+      const i = STANCE_ORDER.indexOf(li.dataset.stance);
+      return i === -1 ? STANCE_ORDER.length : i;
+    };
+    items
+      .map((li, i) => ({ li, i }))
+      .sort((a, b) => rank(a.li) - rank(b.li) || a.i - b.i)
+      .forEach(({ li }) => ul.append(li));
+    const counts = STANCE_ORDER.map((s) => `${items.filter((li) => li.dataset.stance === s).length} ${s}`);
+    ul.before(
+      el("p", {
+        class: "stance-summary",
+        text: `Each item is tagged for, against or neutral toward the description above, and sorted in that order: ${counts.join(" · ")}.`,
+      })
+    );
+  }
+
   function decoratePanel(panel) {
     // The JSON uses h4 for Evidence and Gaps; on this page they sit under an h2 card title.
     panel.querySelectorAll("h4").forEach((h) => {
@@ -200,11 +229,15 @@
       a.target = "_blank";
       a.rel = "noopener noreferrer";
     });
+    panel.querySelectorAll("ul.evidence").forEach(sortAndSummarizeByStance);
     panel.querySelectorAll("ul.evidence > li").forEach((li) => {
       const conf = li.dataset.confidence;
+      const stance = li.dataset.stance;
       const old = li.querySelector(":scope > span.confidence");
       if (old) old.remove();
       const meta = el("span", { class: "item-meta" });
+      if (STANCES[stance])
+        meta.append(el("span", { class: `stance ${stance}`, title: STANCES[stance].title, text: STANCES[stance].label }));
       if (conf) meta.append(el("span", { class: `badge ${conf}`, text: `${conf} confidence` }));
       if (li.dataset.source)
         meta.append(el("span", { class: "src-tag", title: li.dataset.source, text: shortSource(li.dataset.source) }));

@@ -39,6 +39,21 @@ def test_arrow_button_opens_and_closes_the_panel(page: Page):
     expect(panel(page, "P-1")).to_be_hidden()
 
 
+def test_evidence_is_tagged_and_sorted_for_against_neutral(page: Page):
+    page.goto("/people-risk.html?dataset=ghcn-daily#P-1")
+
+    p = panel(page, "P-1")
+    expect(p.get_by_text(re.compile(r"tagged for, against or neutral .*\d+ for · \d+ against · \d+ neutral\."))).to_be_visible()
+    items = "ul.evidence > li"
+    expect(p.locator(f"{items} .stance").first).to_have_text(re.compile(r"^(For|Against|Neutral)$"))
+    # Every item has a tag, and no item comes after one that should sort below it.
+    # (Locator checks, not all_text_contents(): that call crashes this page in Playwright's Firefox.)
+    expect(p.locator(f"{items}:not(:has(.stance))")).to_have_count(0)
+    expect(p.locator(f"{items}:has(.stance.against) ~ li:has(.stance.for)")).to_have_count(0)
+    expect(p.locator(f"{items}:has(.stance.neutral) ~ li:has(.stance.for)")).to_have_count(0)
+    expect(p.locator(f"{items}:has(.stance.neutral) ~ li:has(.stance.against)")).to_have_count(0)
+
+
 def test_clicking_the_card_header_opens_the_panel(page: Page):
     page.goto("/people-risk.html?dataset=ghcn-daily")
 
