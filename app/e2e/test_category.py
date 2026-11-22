@@ -85,6 +85,14 @@ def test_evidence_links_open_in_a_new_tab(page: Page):
 
 
 def test_subcategory_with_no_evidence_says_so(page: Page):
+    # Every GHCN-Daily subcategory has evidence now, so serve the data with RRS-2 emptied.
+    def empty_rrs2(route):
+        body = route.fetch().text()
+        body = re.sub(r'"RRS-2": "<div class=\\"rrs-2\\">.*?</div>"',
+                      r'"RRS-2": "<div class=\\"rrs-2\\"></div>"', body, count=1)
+        route.fulfill(body=body, content_type="application/javascript")
+
+    page.route("**/data/rstar-data.js", empty_rrs2)
     page.goto("/repository-resilience.html?dataset=ghcn-daily")
 
     expect(page.get_by_role("listitem").filter(has=page.get_by_role("heading", name=re.compile(r"^RRS-2 ")))
