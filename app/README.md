@@ -61,9 +61,9 @@ cd /Users/claude/SIDE_WORK/NYCE_project/Rstar_precipitation-relationships/app &&
 Failed tests leave a trace and a screenshot in `app/test-results/`. Open a trace with
 `../.work/venv/bin/playwright show-trace <path>/trace.zip`.
 
-**Known issue (2026-11-22):** Firefox fails to launch on this account. The Playwright Firefox build loads
-Homebrew's `libnss3` (`/opt/homebrew/Cellar/nss/...`) and stops with "Symbol not found: _PR_GMTParameters".
-WebKit works.
+**`DYLD_LIBRARY_PATH` and Firefox:** if `DYLD_LIBRARY_PATH` includes `/opt/homebrew/lib`, Playwright's
+Firefox loads Homebrew's `libnss3` instead of its own and fails with "Symbol not found: _PR_GMTParameters".
+`e2e/conftest.py` removes that variable before the browsers start, so the tests work either way.
 
 ## Files
 

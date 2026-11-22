@@ -1,4 +1,5 @@
 """Serve app/ on 127.0.0.1 for the e2e tests and point Playwright's base_url at it."""
+import os
 import socket
 import subprocess
 import sys
@@ -8,6 +9,11 @@ from pathlib import Path
 import pytest
 
 APP_DIR = Path(__file__).resolve().parents[1]
+
+# ~/.zshrc exports DYLD_LIBRARY_PATH=/opt/homebrew/lib. That overrides Firefox's own @rpath lookup, so
+# Playwright's Firefox loads Homebrew's libnss3 and fails with "Symbol not found: _PR_GMTParameters".
+# Drop it before pytest-playwright starts its driver, which the browsers inherit their environment from.
+os.environ.pop("DYLD_LIBRARY_PATH", None)
 
 
 def _free_port():
