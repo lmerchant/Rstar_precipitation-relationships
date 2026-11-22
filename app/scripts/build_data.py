@@ -1,0 +1,136 @@
+"""Build app/data/rstar-data.js for the R* categorization viewer.
+
+Reads the R* definitions (rstar_definitions/*.md), the point values and
+group weights (docs/rstar_relationship_graph/rstar_graphs.md), dataset
+names (datasets_metadata/json/) and the categorization JSON files
+(data-rstar-categories/datasets/<dataset>/*.json), and writes them as one
+JavaScript file the pages load with a <script> tag. That keeps the site
+working when opened straight from disk (file://), where fetch() is blocked.
+
+Usage (from anywhere):
+    python3 app/scripts/build_data.py
+"""
+import json
+import re
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[2]
+OUT = ROOT / "app" / "data" / "rstar-data.js"
+
+# Category key -> (definition file, page file, id prefix, score variable).
+CATEGORIES = [
+    ("people_risk", "p-rstar_people_risk_queries.md", "people-risk.html", "P", "p"),
+    ("data_risk", "d-rstar-data_risk_queries.md", "data-risk.html", "D", "d"),
+    ("dep_infra_resilience", "dirs-rstar_dependent_infrastructure_resilience_queries.md",
+     "dependent-infrastructure.html", "DIRS", "dirs"),
+    ("repo_resilience", "rrs-rstar_repository_resilience_queries.md",
+     "repository-resilience.html", "RRS", "rrs"),
+]
+
+# Short names for the cards; the full title comes from each file's H1.
+SHORT_TITLES = {
+    "people_risk": "People risk",
+    "data_risk": "Data risk",
+    "dep_infra_resilience": "Dependent infrastructure resilience",
+    "repo_resilience": "Repository resilience",
+}
+
+
+def clean(text):
+    """Collapse a markdown block into one paragraph of plain text."""
+    return " ".join(line.strip() for line in text.strip().splitlines() if line.strip())
+
+
+def section(text, heading_re):
+    """Return the text after a heading line up to the next heading of the same or higher level."""
+    m = re.search(heading_re, text, flags=re.M)
+    if not m:
+        return ""
+    level = len(m.group(0)) - len(m.group(0).lstrip("#"))
+    rest = text[m.end():]
+    stop = re.search(rf"^#{{1,{level}}} ", rest, flags=re.M)
+    return rest[: stop.start()] if stop else rest
+
+
+def parse_definitions(path):
+    text = path.read_text(encoding="utf-8")
+    defined = clean(section(text, r"^## .*defined\s*$"))
+    subs_text = section(text, r"^## Subcategories\s*$")
+    subs = []
+    for m in re.finditer(r"^### (\S+)\s*$", subs_text, flags=re.M):
+        sid = m.group(1)
+        block = section(subs_text[m.start():], rf"^### {re.escape(sid)}\s*$")
+        desc_lines = [l.strip() for l in section(block, r"^#### Description\s*$").strip().splitlines()]
+        desc_lines = [l for l in desc_lines if l]
+        title = desc_lines[0] if desc_lines else sid
+        description = " ".join(desc_lines[1:])
+        how = clean(section(block, r"^#### How to find\s*$"))
+        subs.append({"id": sid, "title": title, "description": description, "how_to_find": how})
+    return defined, subs
+
+
+def parse_weights(path):
+    text = path.read_text(encoding="utf-8")
+    points = {f"{v.upper()}-{n}": int(p)
+              for v, n, p in re.findall(r"^(p|d|rrs|dirs)_(\d+)\s*=\s*\{0,\s*(\d+)\}", text, flags=re.M)}
+    group = {v: float(w) for v, w in re.findall(r"(p|d|rrs|dirs)_total\)?\s*\*\s*([\d.]+)", text)}
+    return points, group
+
+
+def dataset_name(folder):
+    meta = ROOT / "datasets_metadata" / "json" / f"{folder}_dataset-metadata.json"
+    if not meta.exists():
+        return folder, {}
+    dash = json.loads(meta.read_text(encoding="utf-8")).get("dashboard", {})
+    keep = ["name", "data_archive", "doi", "curator", "update_status", "period_of_record",
+            "spatial_coverage", "temporal_frequency", "precipitation_basis"]
+    return dash.get("name", folder), {k: dash.get(k, "") for k in keep}
+
+
+def main():
+    points, group = parse_weights(ROOT / "docs" / "rstar_relationship_graph" / "rstar_graphs.md")
+    categories = []
+    for key, deffile, page, prefix, var in CATEGORIES:
+        path = ROOT / "rstar_definitions" / deffile
+        defined, subs = parse_definitions(path)
+        h1 = re.search(r"^# (.+)$", path.read_text(encoding="utf-8"), flags=re.M)
+        for s in subs:
+            s["points"] = points.get(s["id"])
+        categories.append({
+            "key": key,
+            "prefix": prefix,
+            "title": SHORT_TITLES[key],
+            "heading": h1.group(1).strip() if h1 else SHORT_TITLES[key],
+            "page": page,
+            "definition": defined,
+            "weight": group.get(var),
+            "subcategories": subs,
+            "source_file": f"rstar_definitions/{deffile}",
+        })
+
+    datasets = []
+    ds_root = ROOT / "data-rstar-categories" / "datasets"
+    for folder in sorted(p for p in ds_root.iterdir() if p.is_dir()):
+        files = sorted(folder.glob("*.json"))
+        name, meta = dataset_name(folder.name)
+        entry = {"id": folder.name, "name": name, "meta": meta, "file": None, "categorizations": None}
+        if files:
+            entry["file"] = str(files[0].relative_to(ROOT))
+            entry["categorizations"] = json.loads(files[0].read_text(encoding="utf-8"))
+        datasets.append(entry)
+
+    data = {"categories": categories, "datasets": datasets}
+    OUT.parent.mkdir(parents=True, exist_ok=True)
+    OUT.write_text(
+        "// GENERATED by app/scripts/build_data.py. Do not edit by hand; re-run the script.\n"
+        "window.RSTAR_DATA = " + json.dumps(data, indent=1, ensure_ascii=False) + ";\n",
+        encoding="utf-8",
+    )
+    n_subs = sum(len(c["subcategories"]) for c in categories)
+    done = [d["id"] for d in datasets if d["categorizations"]]
+    print(f"Wrote {OUT.relative_to(ROOT)}: {len(categories)} categories, {n_subs} subcategories, "
+          f"{len(datasets)} datasets ({len(done)} categorized: {', '.join(done) or 'none'}).")
+
+
+if __name__ == "__main__":
+    main()
