@@ -21,6 +21,7 @@ __pycache__/
 .venv/
 venv/
 .ipynb_checkpoints/
+.pytest_cache/
 
 # Node / front-end app (app/)
 node_modules/
