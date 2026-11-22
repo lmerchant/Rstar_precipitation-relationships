@@ -4,17 +4,29 @@ The app/ folder will be used to create an app using web research information on 
 
 ## File locations
 
-The folder data-rstar-query results contains web research on precipitation datasets, their data repositories, and instruments used to measure precipitation.
+The folder data-rstar-query-results/ contains web research on precipitation datasets (about-datasets/), their data repositories (archives/), and instruments used to measure precipitation (instruments/).
 
-The folder data-rstar-categories will be used to store reformatted web research into subcategories of information for each dataset.
+The folder data-rstar-categories/datasets/ stores the web research reformatted into subcategories, one JSON file per dataset in a folder named by dataset id (for example ghcn-daily/).
 
-The folder daasets_metadata contains metadata about each dataset.
+The folder datasets-gap-queries/ stores, for each dataset, the gaps note (what the research never searched, per subcategory), the gap query files for new web searches, and the run sheet for rewriting and running them.
+
+The folder scripts/categorize/ holds the script for each dataset (build_<id>.py) that holds the hand-sorted evidence and writes its category JSON.
+
+The folder datasets_metadata/json/ contains metadata about each dataset.
+
+The folder app/ contains the website that shows the categorizations; app/scripts/build_data.py rebuilds its data.
 
 The folder docs/ will be for me to add documentation for the project.
 
 The folder notes/ is for Claude to store project notes and plans.
 
-The folder rstar_definitions contains definitions of subcategories to divide and reformat the web research into.
+The folder rstar_definitions/ contains definitions of subcategories to divide and reformat the web research into.
+
+## Creating categories from web research
+
+For creating categories applying @/Users/claude/SIDE_WORK/NYCE_project/Rstar_precipitation-relationships/docs/create_rstar_node_files.md, you can use all files in /Users/claude/SIDE_WORK/NYCE_project/Rstar_precipitation-relationships/data-rstar-query-results
+
+Follow the steps and prompts in docs/categorizing-web-searches_README.md for categorizing a dataset, adding it to the website, writing gap queries, and adding new research.
 
 
 ## Handoff doc

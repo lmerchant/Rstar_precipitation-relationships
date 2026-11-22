@@ -25,11 +25,12 @@ dataset to see whether the subcategory definitions need more context.
 
 | Piece | State |
 |---|---|
-| GHCN-Daily categorization | Done (first pass): `data-rstar-categories/datasets/ghcn-daily/ghcn-daily_rstar-categories.json` |
+| GHCN-Daily categorization | Done (second pass, 2026-11-22; uses the NCEI and rain-gauge runs too): `data-rstar-categories/datasets/ghcn-daily/ghcn-daily_rstar-categories.json`. No subcategory is empty |
+| GHCN-Daily research gaps | `datasets-gap-queries/ghcn-daily_categorization-gaps.md`: what was never searched, per subcategory. **The user will write new web queries from it** |
 | GPCP Daily, PERSIANN-CDR Daily, IMERG Late Run | Research exists in `data-rstar-query-results/about-datasets/`; not categorized |
 | Feedback on the first pass | `docs/claude_feedback/first_pass_to_categorize.md`. **Waiting on the user's answers** (see below) |
 | Categorization viewer | Done: static site in `app/` (landing page plus 4 category pages) |
-| e2e tests | 32 pass (16 tests × Firefox and WebKit), Python Playwright |
+| e2e tests | 34 pass (17 tests × Firefox and WebKit), Python Playwright. The empty-subcategory test now empties RRS-2 by intercepting `rstar-data.js`. Avoid `all_text_contents()`: it crashes this page in Playwright's Firefox |
 | Final graph app | Not started |
 
 ## Categorization format
@@ -41,22 +42,26 @@ Follows `docs/create_rstar_node_files.md`:
   subcategory keys (`P-1` … `RRS-5`).
 - **Each value** is HTML: `<div class="p-1">` containing:
   - `<h4>Evidence</h4><ul class="evidence">`, where each `<li>` has `data-confidence` (high, moderate or
-    low) and `data-source` (the research run folder);
+    low), `data-source` (the research run folder) and `data-stance` (`for`, `against` or `neutral`: how the
+    item bears on the subcategory description; items are sorted in that order, and the viewer shows a tag and
+    re-sorts them);
   - then `<h4>Gaps</h4><ul class="gaps">`.
 - **Empty subcategory:** a bare `<div class="rrs-2"></div>`.
 - **Inferences** made during categorization are labelled "inference" and given low confidence.
-- **Source material:** the `answer_*.md` file in each run folder under
-  `data-rstar-query-results/about-datasets/<dataset>/`.
-- **How the GHCN-Daily file was made:** written by hand through a throwaway script (not kept). For a new
-  dataset, read all its answer files and write the JSON the same way.
+- **Source material:** any `answer_*.md` file in `data-rstar-query-results/` that bears on the dataset (CLAUDE.md
+  allows all of it): the dataset's own runs in `about-datasets/<dataset>/`, plus the relevant `archives/` and
+  `instruments/` runs.
+- **How the GHCN-Daily file was made:** hand-sorted evidence in `scripts/categorize/build_ghcn-daily.py`
+  (tracked in git; moved from `.work/` on 2026-11-22); run it to rewrite the JSON. For a new dataset, copy that script, read all the answer files and
+  write a gaps note in `datasets-gap-queries/`.
 
 ## Open questions for the user
 
 From `docs/claude_feedback/first_pass_to_categorize.md`. Check whether the user has answered them before
 categorizing another dataset.
 
-1. Should RRS and DIRS also use `data-rstar-query-results/archives/` and `instruments/`? Those folders
-   probably hold the missing evidence for RRS-2, RRS-3 and DIRS-1.
+1. ~~Should RRS and DIRS also use `archives/` and `instruments/`?~~ Answered yes (CLAUDE.md, 2026-11-22).
+   They didn't fill RRS-2, RRS-3 or DIRS-1: those topics were never searched (see the gaps note).
 2. Should `repo_resilience` be split by repository (NCEI, AWS, Google), or stay pooled?
 3. Should there be a data-quality subcategory? QC and processing evidence has no home in D-1 to D-5 now.
 4. Should evidence shared between subcategories be repeated, or cross-referenced ("see D-1")?
@@ -70,7 +75,7 @@ Other issues raised in the feedback:
   "no resilience" for RRS.
 - **DIRS-1's "How to find" text** is about who does processing, not calibration.
 - **The research never asked some questions:** succession plans, ages or ORCID, calibration, checksums,
-  disaster recovery plans.
+  disaster recovery plans. Listed per subcategory, with suggested searches, in the GHCN-Daily gaps note.
 - **Research file mix-ups:** two GHCN-Daily runs are both named "pt3", and the answers' cross-links point
   to `answer.md` files that don't exist.
 
@@ -122,8 +127,12 @@ Plan: `notes/app-categorization-viewer-plan.md`. Details: `app/README.md`.
 
 ## Next steps
 
-1. **Get the user's answers to the open questions,** then revise the GHCN-Daily JSON if needed (for
-   example, pull in the archives and instruments research, or split RRS by repository).
+**How-to for the user:** `docs/categorizing-web-searches_README.md` has the prompts for categorizing a dataset,
+adding it to the website, writing gap queries and adding new research. Follow it for the other datasets.
+
+1. **When the user's new GHCN-Daily queries come back,** add their evidence to
+   `scripts/categorize/build_ghcn-daily.py`, re-run it and `app/scripts/build_data.py`, and update the gaps note.
+   Open questions 2–6 still need answers (for example, splitting RRS by repository).
 2. **Categorize the next datasets:** GPCP Daily, PERSIANN-CDR Daily, IMERG Late Run. Each needs a folder in
    `data-rstar-categories/datasets/`; `imerg-late-run/` doesn't exist yet. Re-run `build_data.py`
    afterwards.
