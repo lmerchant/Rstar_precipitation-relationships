@@ -18,6 +18,7 @@ window.RSTAR_DATA = {
      "title": "No documented succession plan",
      "description": "No written plan identifies a successor or outlines knowledge transfer steps for critical roles",
      "how_to_find": "Search for the number of people in a dataset group and how long it has existed to get an estimate of how many people are available to be a successor. Look for a succession plan, but also look for documentation of knowledge needed to keep taking measurements, process the data, and run the group.",
+     "what_counts": "A written succession plan, or documentation that would let someone new take over: how the measurements are taken, how the data are processed and how the group is run. The size of the team and how long it has existed also show whether someone could step in.",
      "points": 35
     },
     {
@@ -25,6 +26,7 @@ window.RSTAR_DATA = {
      "title": "Key personnel retirement-eligible",
      "description": "One or more people critical to production or QC eligible to retire within 2 years",
      "how_to_find": "Search for people in charge of the dataset group and data processing. Search for how QC is done and by who. Look for staffing numbers and mentions of retirements. If find people, find when they started working with the dataset and if they've published papers (get ORCID), what is the earliest year, to get an estimate of their age.",
+     "what_counts": "Who leads the dataset and who processes and quality-controls it, how many staff there are, and any announced retirements. When ages aren't published, the year a person started on the dataset or published their first paper gives a rough idea of how close they are to retiring.",
      "points": 25
     },
     {
@@ -32,6 +34,7 @@ window.RSTAR_DATA = {
      "title": "Critical undocumented knowledge",
      "description": "Processing, calibration, or QC expertise held by individual(s) but not captured in documentation or code",
      "how_to_find": "Want to know if a person stops working with the dataset, will another person be able to continue making the dataset. Search to find publically available software, dataset processing documentation, or code to process the dataset and peform QC. Want information on whether there is no documentation on how to process the dataset or there is.",
+     "what_counts": "Whether the processing and quality-control steps are written down, in public code, software, processing documents or methods papers. If they are, someone new could keep the dataset going after a person leaves. If not, the knowledge sits with individuals.",
      "points": 20
     },
     {
@@ -39,6 +42,7 @@ window.RSTAR_DATA = {
      "title": "Single person is point of failure",
      "description": "Loss of one individual would halt production, QC, or distribution",
      "how_to_find": "Search for people in charge of the dataset group and data processing. Search for how quality control (QC) is done and by who. Look for staffing numbers and mentions of retirements or layoffs that would impact the dataset from being measured and/or processed.",
+     "what_counts": "Who runs the dataset's production, quality control and distribution, and how many people share each job. Also staffing numbers, retirements or layoffs that would stop the data being measured or processed if one person left.",
      "points": 15
     }
    ],
@@ -61,6 +65,7 @@ window.RSTAR_DATA = {
      "title": "Active or threatened program termination/defunding",
      "description": "The program producing or hosting this dataset has been cut, is under active budget threat, or has lost its legislative mandate",
      "how_to_find": "Search for the group(s) or program(s) that produces the dataset and look for funding threats and cuts from 2025-present. And do the same for the program that is in charge of hosting and serving the dataset.",
+     "what_counts": "Funding cuts, budget threats or a lost mandate, from 2025 to the present, for the program that produces the dataset and for the program that hosts and serves it.",
      "points": 30
     },
     {
@@ -68,6 +73,7 @@ window.RSTAR_DATA = {
      "title": "Storage system end-of-life or single point of failure",
      "description": "Data resides on infrastructure that is aging out, unsupported, or has no failover — a single system going down means data goes offline.",
      "how_to_find": "Want to know if the dataset is in danger of not being accessible and served in the near future. Search for how the data is stored and served (group computers, the cloud, data repository). Is the dataset only served from one organization. Include all information related to infrastructure around the dataset.",
+     "what_counts": "How and where the data are stored and served (the producer's own computers, the cloud or a data repository), whether only one organization serves them, and any sign that the storage is aging, unsupported or has no backup system to take over.",
      "points": 25
     },
     {
@@ -75,6 +81,7 @@ window.RSTAR_DATA = {
      "title": "Access infrastructure fragile or unfunded",
      "description": "The portal, API, or distribution system serving users is grant-funded, maintained by a single developer, or at risk of going dark",
      "how_to_find": "Search for the dataset endpoints (data repositories, hosting platforms, group website) and determine the funding and staffing of them. Search if there are any threats to the funding or staff cuts or layoffs. Want to know if the dataset will be available uninterrupted in the near future. Have there been interruptions in the past that suggest it could happen again.",
+     "what_counts": "Who funds and staffs the places users get the data from (data repositories, hosting platforms, the producer's website), any threatened cuts or layoffs there, and past outages that suggest access could be interrupted again.",
      "points": 20
     },
     {
@@ -82,6 +89,7 @@ window.RSTAR_DATA = {
      "title": "Format obsolescence",
      "description": "Data stored in proprietary or legacy formats whose reader tools are unmaintained or vendor-dependent",
      "how_to_find": "Search for all the formats that data is served in and check if they are in a FAIR format. Is proprietary software need to process the data or use the data?",
+     "what_counts": "The file formats the data come in, whether they are open and widely supported (in line with the FAIR principles), and whether reading or using the data needs proprietary or unmaintained software.",
      "points": 15
     },
     {
@@ -89,6 +97,7 @@ window.RSTAR_DATA = {
      "title": "Political sensitivity",
      "description": "Dataset subject to active suppression, alteration pressure, or interference that could result in records being removed, modified, or access-restricted for non-scientific reasons",
      "how_to_find": "Search for political threats to the dataset funding and staffing. If a dataset is in the news for funding cuts or termination, it's important information to know if the dataset will continue to be accessible in the near future.",
+     "what_counts": "News of political pressure on the dataset: funding or staff cuts, threatened termination, or pressure to remove, change or restrict the records for reasons other than science.",
      "points": 10
     }
    ],
@@ -111,6 +120,7 @@ window.RSTAR_DATA = {
      "title": "Calibration facility dependency",
      "description": "Dataset quality or continuity depends on an external calibration service, reference standard lab, or inter-comparison program that could be disrupted",
      "how_to_find": "List the instruments whose measurements reach this dataset (for a compilation, those of each contributing network). Find who calibrates them and against what standard: a national standards lab, a manufacturer, a field support centre, a WMO instrument centre, or a reference sensor (for example GMI for satellite products). Is that calibration done by the group that takes the measurements, or by an outside service that could be cut?",
+     "what_counts": "The instruments whose measurements go into the dataset, who calibrates them and against what standard (a national standards lab, the manufacturer, a field support centre, a WMO instrument centre or a reference satellite sensor), and whether that calibration is done in-house or by an outside service that could be cut.",
      "points": 25
     },
     {
@@ -118,6 +128,7 @@ window.RSTAR_DATA = {
      "title": "Observation network or sensor platform at risk",
      "description": "Upstream sensors, ground stations, buoys, or satellite instruments that feed this dataset are aging out, losing funding, or operating past design life",
      "how_to_find": "From the dataset's own documentation (source flags, input lists), list the networks, stations and satellite instruments that feed it, and how much each supplies. For each, look for end-of-life dates, funding cuts, closures or staff losses that would stop or thin its observations.",
+     "what_counts": "The networks, stations and satellite instruments that feed the dataset and how much each supplies, plus any end-of-life dates, funding cuts, closures or staff losses that would stop or thin out their observations.",
      "points": 20
     },
     {
@@ -125,6 +136,7 @@ window.RSTAR_DATA = {
      "title": "Upstream data supply chain at risk",
      "description": "Dataset depends on external data feeds (reanalysis inputs, ancillary fields, reference datasets) that are themselves vulnerable to disruption",
      "how_to_find": "Find every other dataset or feed this dataset is built from or processed with (source compilations, reanalysis or model fields, ancillary or reference data), and the route each arrives by (for example WMO exchange or an agency feed). Is any of them stopping, changing or delayed?",
+     "what_counts": "The other datasets and data feeds this one is built from or processed with (source compilations, model or reanalysis fields, reference data), how each one arrives, and whether any of them is stopping, changing or running late.",
      "points": 20
     },
     {
@@ -132,6 +144,7 @@ window.RSTAR_DATA = {
      "title": "External processing infrastructure dependency",
      "description": "Specialized computing, software, or lab facilities not controlled by the data steward are required to produce or update this dataset",
      "how_to_find": "Find who processes and quality-controls this dataset, and on what systems. Is it done by the producer on its own systems, or does it rely on outside groups, contracted or commercial computing, or third-party software? The repository's general IT and cloud moves count only if a source says this dataset's processing moves with them.",
+     "what_counts": "Who processes and quality-controls the dataset, and on what systems: the producer's own, or outside groups, contracted or commercial computing, or third-party software. The repository's general IT or cloud moves count only when a source says this dataset's processing moves with them.",
      "points": 20
     },
     {
@@ -139,6 +152,7 @@ window.RSTAR_DATA = {
      "title": "No alternative supplier",
      "description": "If the primary external dependency fails, no backup source, workaround, or substitute exists to maintain data quality or continuity",
      "how_to_find": "For each dependency found under DIRS-1 to DIRS-4, look for a backup: a second source, a successor instrument or mission, a substitute feed, or the dataset's own fallback (such as a source priority). Also look for other datasets that could stand in for this one if it stopped, and say how much of it each could replace (region, period, update rate, quality control).",
+     "what_counts": "A backup for each dependency in DIRS-1 to DIRS-4: a second source, a successor instrument or mission, a substitute feed, or the dataset's own fallback. Also other datasets that could stand in for this one if it stopped, and how much of it each could replace.",
      "points": 15
     }
    ],
@@ -161,6 +175,7 @@ window.RSTAR_DATA = {
      "title": "Geographic redundancy",
      "description": "≥2 geographically independent sites hold verified copies",
      "how_to_find": "Find the data repository or location where the dataset is stored and being served. Looking for evidence of geographic redundancy that the data is stored in two different geographic places. Search for multiple data endpoints (mirrors, data repository(s), different organizations serving the same data).",
+     "what_counts": "Copies of the dataset held in at least two places that are geographically independent: mirrors, other data repositories, or other organizations serving the same data.",
      "points": 25
     },
     {
@@ -168,6 +183,7 @@ window.RSTAR_DATA = {
      "title": "Regular backup integrity verification",
      "description": "Checksum checks quarterly or more frequently",
      "how_to_find": "Find the data repository or location where the dataset is stored and being served. Search for the data repository operations plan or a CoreTrustSeal plan. Search for a mention of dataset checksum checks.",
+     "what_counts": "A repository operations plan or certification (such as CoreTrustSeal) that describes checking the stored files against checksums, and how often that happens. Quarterly or more often meets the bar.",
      "points": 20
     },
     {
@@ -175,6 +191,7 @@ window.RSTAR_DATA = {
      "title": "Disaster recovery plan tested",
      "description": "Tested within the past 2 years with documented results",
      "how_to_find": "Find the data repository or location where the dataset is stored and being served. Search for a data repository operations plan or a CoreTrustSeal plan that describes what they will do if there is an interruption of service, if they can't serve data for an extended period of time. Do they have a documented plan and do they have steps of how to implement it.",
+     "what_counts": "A documented disaster recovery plan for the repository, with the steps it would take if it could not serve data for a long time, and a record of the plan being tested in the past two years.",
      "points": 20
     },
     {
@@ -182,6 +199,7 @@ window.RSTAR_DATA = {
      "title": "Stable institutional funding",
      "description": "No imminent political, budgetary, or administrative threat to operations",
      "how_to_find": "Find the data repository or location where the dataset is stored and being served. Search for threats in the news and any funding changes from 2025-present. Is there evidence the funding is sufficient or are there budget and funding cuts coming?",
+     "what_counts": "News and budget records from 2025 to the present on the repository's funding: whether it is enough to keep running, or whether cuts or other political or administrative threats are coming.",
      "points": 20
     },
     {
@@ -189,6 +207,7 @@ window.RSTAR_DATA = {
      "title": "Track record through prior disruption",
      "description": "Repository has survived at least one major funding or leadership disruption without data loss",
      "how_to_find": "Find the data repository or location where the dataset is stored and being served. Search for a funding decrease or interruption, and then search the number of data holdings in the data repository before and after a funding decrease or interruption. Were there noticable changes such as delays in ingesting and serving datasets?",
+     "what_counts": "A past funding cut or leadership change at the repository and how it came through: whether any data were lost, and whether ingesting new datasets or serving existing ones slowed down afterwards.",
      "points": 15
     }
    ],

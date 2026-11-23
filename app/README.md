@@ -2,7 +2,7 @@
 
 A static site for reading the R* categorizations of each dataset. It has a landing page with a key to the tags and
 scoring, the dataset's R* score (total, four category scores and a "Score details" panel) and the four categories, and
-one page per category. On a category page, each subcategory card shows its description, "How to find" text, score
+one page per category. On a category page, each subcategory card shows its description, "What counts as evidence" text, score
 (a number or NA, with the reason) and status, and opens to show the evidence sorted into it.
 
 Scores come from `data-score` on each subcategory's div in the category JSON (written by
@@ -28,7 +28,8 @@ You can also open `app/index.html` straight from disk. The data is loaded with a
 
 The pages read `data/rstar-data.js`, which is generated. Re-run the build after changing any of:
 
-- `rstar_definitions/*.md` (titles, descriptions, "How to find" text; the first paragraph of a "... defined"
+- `rstar_definitions/*.md` (titles, descriptions, "What counts as evidence" text, which is the reader's version of
+  the "How to find" search instructions and is the one the site shows; the first paragraph of a "... defined"
   section is the short definition on the landing page, and any later paragraphs show only on the category page)
 - `data-rstar-categories/datasets/<dataset>/*.json` (the categorizations)
 - `docs/scoring/how_to_score_rstar.md` (point values and group weights)
@@ -92,5 +93,5 @@ Firefox loads Homebrew's `libnss3` instead of its own and fails with "Symbol not
 - **Cards**: click anywhere on a card's header, or the arrow button, to open it. Expand all and Collapse all
   are above the list.
 - **Deep links**: `people-risk.html?dataset=ghcn-daily#P-3` opens P-3 directly.
-- **Evidence items** show a confidence badge and the research run they came from (hover for the full folder
-  name). Links open in a new tab.
+- **Evidence items** show a stance tag, a confidence badge and (RRS) the repository. The research run each came
+  from stays in the JSON's `data-source` but isn't shown. Links open in a new tab.

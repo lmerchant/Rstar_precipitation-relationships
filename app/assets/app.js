@@ -73,11 +73,6 @@
     return cov.gaps ? `${e} · ${cov.gaps} gap${cov.gaps === 1 ? "" : "s"}` : e;
   }
 
-  // Short label for a research run folder, e.g. 2026-11-19_ghcn-daily-about-pt1 -> about-pt1.
-  function shortSource(folder) {
-    return folder.replace(/^\d{4}-\d{2}-\d{2}_/, "").replace(new RegExp("^" + dataset.id + "-"), "");
-  }
-
   // ------------------------------------------------------------- scores
   // Scores come from data-score on each subcategory's div (docs/scoring/how_to_score_rstar.md);
   // build_data.py adds the group totals and R*. "NA" means a person has to decide.
@@ -385,8 +380,6 @@
       if (STANCES[stance])
         meta.append(el("span", { class: `stance ${stance}`, title: STANCES[stance].title, text: STANCES[stance].label }));
       if (conf) meta.append(el("span", { class: `badge ${conf}`, text: `${conf} confidence` }));
-      if (li.dataset.source)
-        meta.append(el("span", { class: "src-tag", title: li.dataset.source, text: shortSource(li.dataset.source) }));
       if (li.dataset.repository)
         meta.append(el("span", { class: "repo-tag", text: `Repository: ${li.dataset.repository}` }));
       li.append(meta);
@@ -457,7 +450,7 @@
         ]),
         el("div", { class: "sub-text" }, [
           el("div", {}, [el("h3", { text: "Description" }), el("p", { text: s.description || "—" })]),
-          el("div", {}, [el("h3", { text: "How to find" }), el("p", { text: s.how_to_find || "—" })]),
+          el("div", {}, [el("h3", { text: "What counts as evidence" }), el("p", { text: s.what_counts || "—" })]),
         ]),
         scoreLine(s),
         el("p", { class: "coverage" }, [

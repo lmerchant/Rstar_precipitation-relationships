@@ -12,11 +12,13 @@ def panel(page: Page, sub_id: str):
     return page.get_by_role("region", name=re.compile(rf"^{re.escape(sub_id)} "))
 
 
-def test_cards_show_description_and_how_to_find_and_start_closed(page: Page, console_errors):
+def test_cards_show_description_and_what_counts_and_start_closed(page: Page, console_errors):
     page.goto("/people-risk.html?dataset=ghcn-daily")
 
     expect(page.get_by_role("heading", level=2, name=re.compile(r"^P-\d "))).to_have_count(4)
-    expect(page.get_by_role("heading", level=3, name="How to find")).to_have_count(4)
+    expect(page.get_by_role("heading", level=3, name="What counts as evidence")).to_have_count(4)
+    expect(page.get_by_text("A written succession plan, or documentation")).to_be_visible()
+    expect(page.get_by_role("heading", name="How to find")).to_have_count(0)
     expect(page.get_by_text("No written plan identifies a successor")).to_be_visible()
     expect(page.get_by_role("button", name=re.compile(r"^Show categorization for P-"))).to_have_count(4)
     expect(page.get_by_role("region")).to_have_count(0)
@@ -53,6 +55,8 @@ def test_evidence_is_tagged_and_sorted_for_against_context(page: Page):
     expect(p.locator(f"{items}:has(.stance.context) ~ li:has(.stance.for)")).to_have_count(0)
     expect(p.locator(f"{items}:has(.stance.context) ~ li:has(.stance.against)")).to_have_count(0)
     expect(p.get_by_text("Neutral", exact=True)).to_have_count(0)
+    # The research run folder names mean nothing to readers, so items don't show them.
+    expect(p.get_by_text(re.compile(r"^(about|repository|people|infrastructure)-pt\d+$"))).to_have_count(0)
 
 
 def test_each_card_shows_its_score_and_why(page: Page):

@@ -68,7 +68,10 @@ def parse_definitions(path):
         title = desc_lines[0] if desc_lines else sid
         description = " ".join(desc_lines[1:])
         how = clean(section(block, r"^#### How to find\s*$"))
-        subs.append({"id": sid, "title": title, "description": description, "how_to_find": how})
+        # "What counts as evidence" is the reader's version of "How to find" (the search instructions).
+        counts = clean(section(block, r"^#### What counts as evidence\s*$"))
+        subs.append({"id": sid, "title": title, "description": description, "how_to_find": how,
+                     "what_counts": counts})
     return defined, subs
 
 
