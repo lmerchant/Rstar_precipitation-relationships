@@ -1,7 +1,7 @@
 # Handoff
 
 Notes for the next session: what the project is for, where things stand, and what to do next.
-Last updated 2026-11-22. Update this file before compacting a session and at the end of every session
+Last updated 2026-11-23. Update this file before compacting a session and at the end of every session
 (see CLAUDE.md).
 
 ## Goal
@@ -32,6 +32,10 @@ dataset to see whether the subcategory definitions need more context.
 | Categorization viewer | Done: static site in `app/` (landing page plus 4 category pages) |
 | e2e tests | 34 pass (17 tests × Firefox and WebKit), Python Playwright. The empty-subcategory test now empties RRS-2 by intercepting `rstar-data.js`. Avoid `all_text_contents()`: it crashes this page in Playwright's Firefox |
 | Final graph app | Not started |
+| Five-part query plan | Written 2026-11-23: `notes/dataset-query-5-part-plan.md`. It gives five research runs per dataset, plus shared runs per repository (A1 threats, A2 resilience) and per instrument family (A4). Templates are in `Rstar_query_results/queries/dataset_queries/about_dataset_queries/templates/`, and the A2 template is in `archive_queries/general_archive_queries/` |
+| GHCN-Daily gap runs | Done in `Rstar_query_results/web_search_results/`: pt7 (repository, 2026-11-22) and pt8 (infrastructure, 2026-11-23); IMERG inputs-pt6 also ran. None is copied into `data-rstar-query-results/` yet. Still to run: pt6 (people) and the NCEI A2 run (`Rstar_query_results/queries/archive_queries/archive_specific_queries/A2_Rstar_query-noaa_ncei.md`, written 2026-11-23 and not yet rewritten), which replaces pt9 |
+| Supplemental queries for GPCP, IMERG, PERSIANN-CDR | Written 2026-11-23 from coverage checks (not categorizations): `datasets-gap-queries/supplemental-queries-run-sheet.md`, three `<id>_coverage-gaps.md` notes, one `pt7_people-production` query per dataset, plus repository runs `A2_Rstar_query-nasa_gesdisc_pps.md` and `A2_Rstar_query-uci_chrs.md` in `Rstar_query_results/queries/archive_queries/archive_specific_queries/`. Not rewritten or run yet. Categorize each dataset once, after these come back |
+| Archive plan and CoCoRaHS | `notes/archive-query-plan.md`: three kinds of repository (shared archive: A1 + A2; producer's own data site: A2 only; copy: no run), a register of repositories, and CoCoRaHS worked through (5 dataset parts + A2; the user chose to research it as a dataset and its archive). Repository questions stay in separate A1/A2 runs. A general A1 template is in `archive_queries/general_archive_queries/`. CoCoRaHS's six queries are written (2026-11-23): Parts 1–5 and a run sheet in `Rstar_query_results/queries/dataset_queries/about_dataset_queries/cocorahs/`, and `A2_Rstar_query-cocorahs.md`. Dataset id `cocorahs`; it needs a `datasets_metadata/json/` file before categorizing |
 
 ## Categorization format
 
