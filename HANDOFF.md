@@ -34,7 +34,7 @@ PERSIANN-CDR Daily are waiting on supplemental research, and CoCoRaHS is a new d
 | Feedback on the first pass | `docs/claude_feedback/first_pass_to_categorize.md`. All answered (see Open questions) |
 | Categorization rules | `docs/claude_feedback/rstar-categorization-decisions.md`, the master copy the user edits (2026-11-23). All its changes are applied. No Word copies are kept in the repo (they went out of sync); the user makes one with pandoc when needed |
 | Categorization viewer | Done: static site in `app/` (landing page with key and R* scores, plus 4 category pages with card scores) |
-| e2e tests | 46 pass (23 tests × Firefox and WebKit; 2026-11-23), Python Playwright. The empty-subcategory test now empties RRS-2 by intercepting `rstar-data.js`. Avoid `all_text_contents()`: it crashes this page in Playwright's Firefox |
+| e2e tests | 46 pass (23 tests × Firefox and WebKit; rerun 2026-11-23 after the "What counts as evidence" change), Python Playwright. The empty-subcategory test now empties RRS-2 by intercepting `rstar-data.js`. Avoid `all_text_contents()`: it crashes this page in Playwright's Firefox |
 | Final graph app | Not started |
 | Query plans and templates | `notes/dataset-query-5-part-plan.md` (five parts per dataset) and `notes/archive-query-plan.md` (three kinds of repository, and a register of repositories). Templates in `Rstar_query_results/queries/` (see Research queries) |
 | Guide for sharing | `docs/rstar-query-templates-guide.md` (2026-11-23): the query design, files, how to adapt it to other climate data, and starter prompts. Written for a friend of the user who will get the files in a new GitHub repo the user is making |
@@ -163,8 +163,14 @@ Plan: `notes/app-categorization-viewer-plan.md`. Details: `app/README.md`.
 - **Pages:** `index.html` (dataset selector, a key to the tags and scoring, dataset details with the
   producer-is-repository sentence, the R* score section with a "Score details" panel, and 4 category cards with
   coverage chips), plus one page per category. On a category page each subcategory card shows its Description,
-  "How to find", its score and why, its status (RRS cards: the repositories), and opens to show the evidence.
+  "What counts as evidence", its score and why, its status (RRS cards: the repositories), and opens to show the evidence.
   - Deep links work: `people-risk.html?dataset=ghcn-daily#P-3`.
+  - **"What counts as evidence" (2026-11-23):** each subcategory in `rstar_definitions/` now has a
+    `#### What counts as evidence` section, a reader's version of `#### How to find`. The site shows it in place of
+    "How to find", which stays as the search instructions for queries and categorizing. Edit both together when a
+    definition changes.
+  - **No research run names (2026-11-23):** evidence items no longer show the run folder ("repository-pt7"); readers
+    don't know the files. It is still in each item's `data-source` in the JSON.
 - **Viewing:** after each big change, give the user this command (CLAUDE.md):
   `cd /Users/claude/SIDE_WORK/NYCE_project/Rstar_precipitation-relationships/app && python3 -m http.server 3000 --bind 127.0.0.1`,
   then http://127.0.0.1:3000/.
