@@ -27,3 +27,20 @@ Save the results as a JSON file in the folder data-rstar-categories/datasets/ an
 
 The JSON file will have four top level keys people_risk, data_risk, dep_infra_resilience, and repo_resilience. Then for the people_risk key, there will be JSON with the keys P-1, P-2, P-3, and P-4, and a similar pattern for the other subcategories. For each subcategory key, there will be a value containing the reformatted text as html inside a div with a class using the lowercase name of the subcategory key, e.g. `<div class="p-1">`.
 
+
+### Tags, scores and the dataset key (added 2026-11-23)
+
+The rules for filing evidence are in `docs/claude_feedback/rstar-categorization-decisions.md`, and
+`scripts/categorize/rstar_common.py` writes this format.
+
+- **Subcategory div:** `<div class="p-1" data-score="35" data-score-basis="for-only" data-status="found">`.
+  - `data-score` is the points, 0 or `NA` (see `docs/scoring/how_to_score_rstar.md`).
+  - `data-score-basis` says why: `for-only`, `against-only`, `both` or `none`.
+  - `data-status` is `found` when there is any evidence; otherwise the strongest gap status.
+  - RRS divs also have `data-repositories`, the dataset's repositories and their roles.
+- **Evidence item:** `<li data-stance="for" data-confidence="high" data-source="<run folder>">`.
+  - `data-stance` is `for`, `against` or `context` (formerly `neutral`).
+  - RRS items also have `data-repository`, the repository the item is about.
+- **Gap item:** `<li data-status="not-public">`, with status `searched-none-found`, `not-public` or `not-searched`.
+- **`dataset` key** (a fifth top-level key): `producer`, `producer_is_repository` (true or false) and `repositories`,
+  a list of `{"name", "role"}` with role `parent`, `child` or `producer site`.

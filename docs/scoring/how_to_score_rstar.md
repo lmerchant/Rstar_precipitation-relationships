@@ -29,7 +29,20 @@ For example, d_total is the total score of the Data Risk major category where ea
 
 ### subcategory scores
 
-If the evidence is tilted towards "for" for a subcategory, the score for the subcategory is the max value in the subcategory set of values, otherwise the score is the min value which is 0.
+A subcategory's score comes from its evidence items. Only high- and moderate-confidence "for" and "against" items set it. Low-confidence items stay in the evidence, tagged low, but are left out of the score, and "context" items are ignored.
+
+| High or moderate evidence | Score |
+| --- | --- |
+| "For" items and no "against" items | the max value in the subcategory set of values |
+| "Against" items and no "for" items | the min value, which is 0 |
+| Both "for" and "against" items | NA |
+| None: only context, only low confidence, or no evidence | NA |
+
+NA means there is not enough information to decide, and a person must choose the score (they may know things a web search can't find). A major category total is NA if any of its subcategories is NA, and R* is NA if any major category total is NA.
+
+For RRS, "for" means the repository is resilient, so a full RRS score lowers R* through (100 - rrs_total).
+
+The score is stored in each dataset's category JSON (`data-score` on the subcategory's div), written by `scripts/categorize/rstar_common.py`. The rules for filing evidence are in `docs/claude_feedback/rstar-categorization-decisions.md`.
 
 ### Data risk score values
 

@@ -4,6 +4,8 @@
 
 Vulnerability created when critical institutional knowledge resides in a small number of individuals. When a lead data curator retires without a documented succession plan, or a wave of RIFs eliminates the team that knows how to run a specialized processing chain, the data may still technically exist while becoming operationally inaccessible. That kind of loss is invisible to systems that only track files and metadata.
 
+P covers the people who produce this dataset: its own team, including contractors, at the producer. Staff losses at the wider agency, or at a source network, are context here unless a source names this team. Losses at a source network can still count in DIRS-2.
+
 ## Subcategories
 
 ### P-1

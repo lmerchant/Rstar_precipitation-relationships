@@ -4,6 +4,8 @@
 
 Probability of loss through technical failure, policy disruption, or infrastructure degradation. Includes storage system vulnerabilities, format obsolescence, access infrastructure dependencies, and the direct effects of program terminations or defunding.
 
+D covers the dataset as a product and the places that serve it: the programs that produce and host it, where it is stored and how users reach it (including the repository going offline), its formats, and political pressure on it. Because the dataset is served by its repository, repository facts count in D-2 and D-3 as well as in RRS.
+
 ## Subcategories
 
 ### D-1

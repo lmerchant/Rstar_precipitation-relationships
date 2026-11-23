@@ -11,7 +11,8 @@ Each step has a prompt to paste into a Claude Code session in this project. Repl
 1. **Research.** Run `/my:broad-web-research` queries about the dataset (in their own sessions). Copy each run folder
    into `data-rstar-query-results/`.
 2. **Categorize and publish** (Prompt 1). Claude sorts the research into the 19 subcategories as evidence. It tags each
-   item For, Against or Neutral, writes the JSON, adds it to the website and writes a gaps note.
+   item For, Against or Context, gives each gap a status, scores each subcategory, writes the JSON, adds it to the
+   website and writes a gaps note.
 3. **Write gap queries** (Prompt 2). Claude turns the gaps note into one draft query per R* category, plus a run sheet.
 4. **Rewrite the queries** (Prompt 3), all in one session with `/my:rewrite-research-query`.
 5. **Run each query** in its own session (Prompt 4), then copy the results back.
@@ -54,21 +55,22 @@ Categorize the <DATASET NAME> dataset (id <id>) following docs/create_rstar_node
 
 Research to use: every answer_*.md in data-rstar-query-results/about-datasets/<id>/, plus the runs in data-rstar-query-results/archives/ and data-rstar-query-results/instruments/ that bear on this dataset's repositories, instruments and platforms (say which you used and which you left out, and why).
 
-Follow the GHCN-Daily pattern (scripts/categorize/build_ghcn-daily.py and data-rstar-categories/datasets/ghcn-daily/):
-- Copy the GHCN-Daily script to scripts/categorize/build_<id>.py and write the evidence by hand into it. Don't reuse the GHCN-Daily evidence.
-- One JSON file: data-rstar-categories/datasets/<id>/<id>_rstar-categories.json, with the four top keys and 19 subcategory keys. Each value is a <div class="p-1"> holding an Evidence list and a Gaps list.
-- Each evidence item has data-confidence (high, moderate or low), data-source (the run folder name) and data-stance: "for" if it supports the subcategory description, "against" if it contradicts it, "neutral" for context or mixed evidence. Remember the RRS descriptions are worded as good things, so "for" there means evidence of resilience. Sort each list for, against, neutral.
+Follow the filing rules in docs/claude_feedback/rstar-categorization-decisions.md and the "Counts / doesn't count" section of docs/categorizing-web-searches_README.md, and the GHCN-Daily pattern (scripts/categorize/build_ghcn-daily.py, scripts/categorize/rstar_common.py and data-rstar-categories/datasets/ghcn-daily/):
+- Copy the GHCN-Daily script to scripts/categorize/build_<id>.py and write the evidence by hand into it. Don't reuse the GHCN-Daily evidence. The script calls write_categories() in rstar_common.py, which writes and scores the JSON.
+- One JSON file: data-rstar-categories/datasets/<id>/<id>_rstar-categories.json, with the four top keys, 19 subcategory keys and a "dataset" key (producer, whether it is also the repository, and the repositories with their roles: parent, child or producer site). Each subcategory value is a <div class="p-1"> holding an Evidence list and a Gaps list, with its score.
+- Each evidence item has a confidence (high, moderate or low), a source (the run folder name) and a stance: "for" if it supports the subcategory description, "against" if it contradicts it, "context" if it is not directly tied to the dataset (its own name, source list, input list or team) or doesn't show the description true or false. RRS descriptions are worded as good things, so "for" there means evidence of resilience. Each RRS item also names its repository. Each gap gets a status: searched and none found, not public, or not searched.
 - Keep links to the sources. Label your own inferences as inferences, with low confidence. Include low-confidence evidence if it is relevant; leave out text that fits no subcategory.
 
 Then:
 - Write datasets-gap-queries/<id>_categorization-gaps.md, following the GHCN-Daily gaps note: what was used, a coverage table, and for each subcategory what the research never searched, with possible searches.
 - Run python3 app/scripts/build_data.py, check the dataset's pages in the browser preview, and run the e2e tests in the Terminal panel. If a test depends on GHCN-Daily data that changed, fix the test, not the data.
-- Tell me the for/against/neutral calls I should double-check, and give me the command to start the server.
+- Tell me the for/against/context calls I should double-check and the resulting scores, and give me the command to start the server.
 ```
 
 **What you get:**
 - the JSON;
-- the dataset on the website, with stance tags and evidence sorted For, then Against, then Neutral;
+- the dataset on the website, with stance tags, evidence sorted For, then Against, then Context, and a score (a
+  number or NA) on each subcategory, each category and R*;
 - a gaps note;
 - a list of judgment calls to review.
 
@@ -131,10 +133,10 @@ Use this when new runs (gap queries or anything else) are in `data-rstar-query-r
 
 ```text
 New research for <DATASET NAME> (id <id>) is in <run folder(s)>. Add it to the categories following docs/categorizing-web-searches_README.md:
-- Read each new answer_*.md, add its evidence to scripts/categorize/build_<id>.py with data-confidence, data-source and data-stance (for, against or neutral toward each subcategory description), and remove evidence the new research shows is wrong or out of date.
+- Read each new answer_*.md, add its evidence to scripts/categorize/build_<id>.py with a confidence, source and stance (for, against or context toward each subcategory description, following docs/claude_feedback/rstar-categorization-decisions.md), a repository for RRS items and a status for each gap, and remove evidence the new research shows is wrong or out of date.
 - Re-run the script and python3 app/scripts/build_data.py, check the pages in the browser preview, and run the e2e tests in the Terminal panel.
 - Update datasets-gap-queries/<id>_categorization-gaps.md: which gaps are now filled, what is still missing, and the new evidence counts.
-- Tell me which subcategories changed and the stance calls to double-check, and give me the command to start the server.
+- Tell me which subcategories and scores changed and the stance calls to double-check, and give me the command to start the server.
 ```
 
 ## Prompt 6 (optional): first research queries for a new dataset
@@ -160,6 +162,43 @@ Write draft web research queries for a new dataset, <DATASET NAME> (id <id>, pro
 I'm starting a new session. Update HANDOFF.md and any docs that changed, then commit on the develop branch.
 ```
 
+## Counts / doesn't count
+
+Worked examples of where the line falls in each subcategory, for whoever categorizes. They apply the rules in
+[rstar-categorization-decisions.md](claude_feedback/rstar-categorization-decisions.md), using a station compilation
+(GHCN-Daily) and a satellite product (IMERG Late Run). IMERG isn't categorized yet, so its examples come from its
+coverage note (`datasets-gap-queries/imerg-late-run_coverage-gaps.md`) and show where a fact would go.
+
+**The rules in short:**
+- A fact counts as "for" or "against" only if a source names the dataset, or something on its source list, input list
+  or team. Anything one step removed is context.
+- Facts about the agency that runs a source count. Facts about the repository count in D-2, D-3 and RRS.
+- Proposed cuts count like enacted ones while pending; a rejected proposal is context.
+- Events before 2025 are context in D-1 and RRS-4, but count in RRS-5.
+- Repeat a fact in every subcategory it bears on.
+
+| Code | Counts | Doesn't count (context, or goes elsewhere) |
+| --- | --- | --- |
+| P-1 | GHCN-Daily: Durre, one of two named PIs, left in April 2025 with no named successor. IMERG: a search aimed at the IMERG or PPS team finds a succession plan, or none | NCEI's 58 departures in 2025, with no GHCN-Daily team member named (context). NASA or Goddard workforce totals (context) |
+| P-2 | A named team member's estimated eligibility (Menne). Estimates are inferences, so low confidence: listed, but they don't set the score | NCEI-wide retirements (context) |
+| P-3 | GHCN-Daily's processing code is not published and it is "not currently under Configuration Management". IMERG: whether PPS runbooks or X-CAL tables are documented | Third-party file readers: they help users read the files, not rebuild the dataset (context) |
+| P-4 | Menne is the one named federal scientist; the hands-on staff are contractors. IMERG: who runs the Late Run day to day at PPS | Automation that is NCEI-wide, with no GHCN-Daily statement (context). GHCN-Daily's own "will continue to update automatically" does count (against) |
+| D-1 | NCEI's FY2027 request, 25% below base: the NCEI line pays for GHCN-Daily, and the request is pending. IMERG: a pending cut to GPM mission funding | NCEI's FY2026 request cut, which Congress rejected (context). Budget history before 2025 (context) |
+| D-2 | NCEI's offsite tape copy is 12.5 miles from Asheville (a repository fact). IMERG: GES DISC is cloud-only after its on-premises services ended | GSA's listing of NCEI's building, which was withdrawn (context). The Data Rescue Project snapshot: not a repository (context) |
+| D-3 | The 404s across `/pub/data/ghcn/` during the November 2026 move. The AWS and BigQuery copies rest on contracts with no published end | An outage at a third-party copy such as dynamical.org (context: not a repository) |
+| D-4 | No GHCN-Daily route passes all four FAIR tests (no CF names, no licence on NCEI's routes) | A third party's reformatted copy (Zarr, Earth Engine): not the dataset's own format (context) |
+| D-5 | A UCS blog ties GHCN's disruption to actions against NOAA. The Data Rescue Project archived GHCN-Daily | The Senate's "at least 20 datasets" decommissioned, none named. Project 2025 on NOAA (context) |
+| DIRS-1 | ASOS technicians down by at least 16% (NWS runs ASOS, a source). USCRN's eight-person calibration team, whose lab is proposed for closure for FY2027. IMERG: X-CAL intercalibration to GMI; PPS's MetOp-C calibration-file error (November 2026) | WMO's Regional Instrument Centres thinning, and NIST's calibration staff, with no tie to GHCN-Daily (context). NCEI's own QC tests: QC that shows no risk is context |
+| DIRS-2 | Any source that stops, whatever its size: ASOS sites moving to AWOS-C; the COOP right-sizing proposal. IMERG: AMSR2 (2 Sep 2026), SSMIS (30 Sep 2026) and S-NPP ATMS (2 Nov 2026) ended | Still open: whether one station closing counts, or only a whole network. Until decided, a source that stops counts |
+| DIRS-3 | GSOD, an input feed, ended in August 2025. Canada's feed was lost from 2024 to 2026. IMERG: CPC merged IR, GEOS FP, the JMA forecast, Autosnow and PDIR-Now | The National Mesonet cut, which Congress rejected (context) |
+| DIRS-4 | Outside processing a source names: CoCoRaHS QC at Colorado State. IMERG: PDIR-Now from UC Irvine's CHRS | NCEI's archive moving to AWS: repository IT, so D-2, unless a source says GHCN-Daily's processing moves too |
+| DIRS-5 | No full substitute for GSOD; HadISD stopped with ISD. IMERG: whether CPC IR or GEOS FP has a substitute | A mirror of the same dataset is not a substitute: it goes in RRS-1 |
+| RRS-1 | GHCN-Daily: NCEI (parent), AWS and BigQuery (children); each cloud copy sits in one region. IMERG: GES DISC (parent) and PPS's own site | The Data Rescue snapshot, dynamical.org's Zarr and Google Earth Engine: not repositories (context) |
+| RRS-2 | NCEI checks checksums when a file is pulled, not on a quarterly schedule (against) | The superghcnd diff files track data changes, not storage integrity. NOAA's archive order sets no checksum frequency (context) |
+| RRS-3 | OIG found the cloud platform's moderate tier doesn't test contingency plans at alternate sites (against) | NESDIS's 2014 attack on a different system (context). NCEI's plan exists but "cannot be shared": a found item (context) plus a "not public" gap |
+| RRS-4 | NCEI's FY2027 request, pending (against). No guaranteed term for the cloud copies (against) | Budgets before 2025 (context) |
+| RRS-5 | NCEI's recovery from Hurricane Helene in 2024; shutdowns with no data loss | Restored source feeds: a production track record, not the repository's (context) |
+
 ## Lessons from GHCN-Daily
 
 - **Use all the research,** not only the dataset's own folder. The archive and instrument runs fill the repository and
@@ -173,7 +212,7 @@ I'm starting a new session. Update HANDOFF.md and any docs that changed, then co
 
   Prompt 6 asks for them up front.
 - **Stance depends on wording.** P, D and DIRS are risks, so "For" points to risk. RRS is resilience, so "For" points to
-  resilience. A subcategory with only "not searched" evidence ends up all Neutral, which is correct.
+  resilience. A subcategory with only context evidence scores NA, which is correct: a person decides it.
 - **Check names and facts Claude adds.** Ask Claude to mark anything that didn't come from the research. For example, the
   research named Rennie and Stevens by surname only.
 - **Website checks:** after a rebuild, the browser may serve the old script; do a hard refresh (Cmd-Shift-R). Run the
