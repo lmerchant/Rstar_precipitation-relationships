@@ -14,7 +14,8 @@ with 19 subcategories in all.
 2. That research is sorted into the 19 subcategories as evidence (`data-rstar-categories/`).
 3. A person reads the evidence and decides each subcategory: true, false, unknown or partly known.
 4. The final app in `app/` shows a weighted network graph and/or knowledge graph of R* scores and dataset
-   relationships. Ideas and the scoring formula are in `docs/rstar_relationship_graph/rstar_graphs.md`:
+   relationships. Ideas are in `docs/rstar_relationship_graph/rstar_graphs.md`; the scoring formula and point values are in
+   `docs/scoring/how_to_score_rstar.md` (which `app/scripts/build_data.py` reads):
    - R* = 0.40 D + 0.30 P + 0.20 (100 − RRS) + 0.10 DIRS;
    - each subcategory is worth 0 or a fixed number of points, and 0 when the evidence is missing.
 
@@ -25,8 +26,8 @@ PERSIANN-CDR Daily are waiting on supplemental research, and CoCoRaHS is a new d
 
 | Piece | State |
 |---|---|
-| GHCN-Daily categorization | Done (second pass, 2026-11-22; uses the NCEI and rain-gauge runs too): `data-rstar-categories/datasets/ghcn-daily/ghcn-daily_rstar-categories.json`. No subcategory is empty |
-| GHCN-Daily research gaps | `datasets-gap-queries/ghcn-daily_categorization-gaps.md`. Gap queries pt6–pt9 are written; pt7 and pt8 have run (see Research queue) |
+| GHCN-Daily categorization | Done (third pass, 2026-11-23: 210 items; adds gap runs pt6–pt9 and the NCEI A2 run): `data-rstar-categories/datasets/ghcn-daily/ghcn-daily_rstar-categories.json`. No subcategory is empty |
+| GHCN-Daily research gaps | `datasets-gap-queries/ghcn-daily_categorization-gaps.md`. All four gap runs (pt6–pt9) and the NCEI A2 run are back and copied; the note's "After the gap runs" section says what each filled and what is left (mostly unpublished, so by hand or FOIA) |
 | GPCP Daily, PERSIANN-CDR Daily, IMERG Late Run | Research exists; not categorized. Coverage notes and supplemental queries written 2026-11-23 (see Research queue) |
 | CoCoRaHS (new dataset, id `cocorahs`) | Six queries written 2026-11-23, none run. Needs a `datasets_metadata/json/` file before categorizing |
 | Feedback on the first pass | `docs/claude_feedback/first_pass_to_categorize.md`. **Waiting on the user's answers** (see below) |
@@ -60,13 +61,12 @@ project's `data-rstar-query-results/`.
 
 | Query | Where | State |
 |---|---|---|
-| GHCN-Daily pt7 (repository), pt8 (infrastructure) | ran 2026-11-22, 2026-11-23 | Not yet copied into `data-rstar-query-results/` |
-| GHCN-Daily pt6 (people) | `datasets-gap-queries/ghcn-daily_gap-queries/` | Rewritten; to run |
-| NCEI A2 (replaces GHCN-Daily pt9) | `Rstar_query_results/.../archive_specific_queries/A2_Rstar_query-noaa_ncei.md` | To rewrite and run. Serves GHCN-Daily, GPCP, PERSIANN-CDR and CoCoRaHS's copy |
+| GHCN-Daily pt6 (people), pt7 (repository), pt8 (infrastructure), pt9 (repository resilience) | `data-rstar-query-results/about-datasets/ghcn-daily/` | Ran 2026-11-22 to 2026-11-23; copied |
+| NCEI A2 | `data-rstar-query-results/archives/noaa-ncei/2026-11-23_A2_Rstar_query-noaa_ncei/` | Ran 2026-11-23; copied. Serves GHCN-Daily, GPCP, PERSIANN-CDR and CoCoRaHS's copy (noted in their coverage notes) |
 | GPCP, IMERG, PERSIANN-CDR pt7 (people and production) | `datasets-gap-queries/<id>_gap-queries/`; run sheet `datasets-gap-queries/supplemental-queries-run-sheet.md` | To rewrite and run. PERSIANN-CDR's before IMERG's (shared CHRS people) |
 | NASA GES DISC + PPS A2; UC Irvine CHRS A2 | `Rstar_query_results/.../archive_specific_queries/` | To rewrite and run |
 | CoCoRaHS Parts 1–5 and its data-site A2 | `Rstar_query_results/queries/dataset_queries/about_dataset_queries/cocorahs/` (with `cocorahs-run-sheet.md`) and `A2_Rstar_query-cocorahs.md` | To rewrite and run. Part 3's names (Doesken, Reges, Schumacher) are from Claude's knowledge, to confirm |
-| IMERG inputs-pt6 | ran 2026-11-21 | Not yet copied into `data-rstar-query-results/` |
+| IMERG inputs-pt6 | `data-rstar-query-results/about-datasets/imerg-late-run/` | Copied 2026-11-23 (answer, query, record only). Rechecked: its leftover gaps were added to IMERG's coverage note and pt7 query |
 
 The coverage notes (`datasets-gap-queries/<id>_coverage-gaps.md`) are not categorizations. Categorize each dataset once,
 after its gap runs come back.
@@ -90,10 +90,15 @@ Follows `docs/create_rstar_node_files.md`:
   allows all of it): the dataset's own runs in `about-datasets/<dataset>/`, plus the relevant `archives/` and
   `instruments/` runs.
 - **How the GHCN-Daily file was made:** hand-sorted evidence in `scripts/categorize/build_ghcn-daily.py`
-  (tracked in git; moved from `.work/` on 2026-11-22); run it to rewrite the JSON. For a new dataset, copy that script, read all the answer files and
+  (tracked in git; moved from `.work/` on 2026-11-22); run it to rewrite the JSON. Each evidence item is a tuple
+  `(confidence, run, text, stance)`, stance `"F"`, `"A"` or `"N"` (since the third pass). For a new dataset, copy that script, read all the answer files and
   write a gaps note in `datasets-gap-queries/`.
 
 ## Open questions for the user
+
+**Discussion doc (2026-11-23):** `docs/claude_feedback/why-rstar-categories-are-hard-to-apply.md` (copy of the Claude
+Doc at https://claude.ai/artifact/Q5rmmJHnFzAtNLHsubpZKW) sets out what makes the categories hard to apply, with
+suggestions and questions the user plans to take to a colleague. It overlaps questions 2–6 below.
 
 From `docs/claude_feedback/first_pass_to_categorize.md`. Check whether the user has answered them before
 categorizing another dataset.
@@ -111,7 +116,14 @@ Other issues raised in the feedback:
 
 - **Unknown scores unevenly.** Missing evidence scores 0, which reads as "no risk" for P, D and DIRS but
   "no resilience" for RRS.
-- **DIRS-1's "How to find" text** is about who does processing, not calibration.
+- ~~**DIRS-1's "How to find" text** is about who does processing, not calibration.~~ Fixed 2026-11-23: the DIRS
+  definitions now say DIRS covers only what the dataset needs to be produced (its networks, calibration, input
+  feeds and processing), not the repository (that is D-2, D-3 and RRS), and each "How to find" was rewritten to
+  match. GHCN-Daily's DIRS-4 lost four NCEI-wide items as a result. The viewer shows extra paragraphs of a
+  "... defined" section (`definition_more`) on the category page only.
+- **Decided 2026-11-23:** DIRS-5 also counts substitutes for the dataset itself (its "How to find" says so), so
+  GHCN-Daily's HadISD, Berkeley Earth and ECA&D/C3S/WIS2 items stay.
+- **Still to decide:** whether D-2 and D-3 should be scoped away from the repository the same way as DIRS.
 - **The research never asked some questions:** succession plans, ages or ORCID, calibration, checksums,
   disaster recovery plans. Listed per subcategory, with suggested searches, in the GHCN-Daily gaps note.
 - **Research file mix-ups:** two GHCN-Daily runs are both named "pt3", and the answers' cross-links point
@@ -170,11 +182,10 @@ Plan: `notes/app-categorization-viewer-plan.md`. Details: `app/README.md`.
 **How-to for the user:** `docs/categorizing-web-searches_README.md` has the prompts for categorizing a dataset,
 adding it to the website, writing gap queries and adding new research. Follow it for the other datasets.
 
-1. **Copy finished runs into `data-rstar-query-results/`** as they come back (GHCN-Daily pt7 and pt8 and IMERG
-   inputs-pt6 are waiting): dataset runs into `about-datasets/<id>/`, repository runs into `archives/<repository>/`.
-2. **Add GHCN-Daily's new evidence** (pt6, pt7, pt8 and the NCEI A2 run) to `scripts/categorize/build_ghcn-daily.py`,
-   re-run it and `app/scripts/build_data.py`, and update the gaps note. Open questions 2–6 still need answers (for
-   example, splitting RRS by repository; the repository runs now make a per-repository split possible).
+1. **Copy finished runs into `data-rstar-query-results/`** as they come back (all runs so far are copied): dataset runs into `about-datasets/<id>/`, repository runs into `archives/<repository>/`.
+2. **Review GHCN-Daily's third-pass stance calls** (listed in the session that made them; the main ones are P-2's
+   retirement estimates and RRS-1's single-region items). Open questions 2–6 still need answers (for example,
+   splitting RRS by repository; the repository runs now make a per-repository split possible).
 3. **Categorize GPCP Daily, PERSIANN-CDR Daily and IMERG Late Run** once their pt7 and repository runs are back, using
    their coverage notes. Each needs a folder in `data-rstar-categories/datasets/` (`imerg-late-run/` doesn't exist
    yet) and a `scripts/categorize/build_<id>.py`. Re-run `build_data.py` afterwards.
