@@ -39,3 +39,6 @@ blob-report/
 .vscode/
 .idea/
 *.swp
+
+# Word copies made with pandoc from the Markdown docs (kept out so they never go out of sync)
+*.docx

@@ -32,7 +32,7 @@ PERSIANN-CDR Daily are waiting on supplemental research, and CoCoRaHS is a new d
 | GPCP Daily, PERSIANN-CDR Daily, IMERG Late Run | Research exists; not categorized. Coverage notes and supplemental queries written 2026-11-23 (see Research queue) |
 | CoCoRaHS (new dataset, id `cocorahs`) | Six queries written 2026-11-23, none run. Needs a `datasets_metadata/json/` file before categorizing |
 | Feedback on the first pass | `docs/claude_feedback/first_pass_to_categorize.md`. All answered (see Open questions) |
-| Categorization rules | `docs/claude_feedback/rstar-categorization-decisions.md`, the master copy the user edits (2026-11-23). All its changes are applied. The user exports a Word copy (`docs/R categorization decisions.docx`) for a colleague; that copy predates the GHCN-Daily re-sort, so it says 16 NA and P-2 at 25 (now 17 NA, P-2 NA) |
+| Categorization rules | `docs/claude_feedback/rstar-categorization-decisions.md`, the master copy the user edits (2026-11-23). All its changes are applied. No Word copies are kept in the repo (they went out of sync); the user makes one with pandoc when needed |
 | Categorization viewer | Done: static site in `app/` (landing page with key and R* scores, plus 4 category pages with card scores) |
 | e2e tests | 46 pass (23 tests × Firefox and WebKit; 2026-11-23), Python Playwright. The empty-subcategory test now empties RRS-2 by intercepting `rstar-data.js`. Avoid `all_text_contents()`: it crashes this page in Playwright's Firefox |
 | Final graph app | Not started |
@@ -111,7 +111,8 @@ suggestions and questions the user plans to take to a colleague. It overlaps que
 
 **The current rules are in `docs/claude_feedback/rstar-categorization-decisions.md`.** That local file is the master
 copy: the user edits only it (the Claude Doc https://claude.ai/artifact/ESJV1iYjXaoWyHjgEyZ6X6 is no longer updated)
-and exports a Word copy for a colleague. Read it before categorizing. All its changes were made on 2026-11-23:
+and makes Word or other copies with pandoc when needed (no .docx files are kept in the repo, so nothing goes out of
+sync). Read it before categorizing. All its changes were made on 2026-11-23:
 scope sentences in the P, D and RRS definitions; the NA scoring rule in `docs/scoring/how_to_score_rstar.md`;
 "neutral" renamed "context"; gap statuses; repositories on RRS items; scores in the JSON; GHCN-Daily re-sorted; the
 website's score section, key, producer sentence, card scores and repository labels; the "Counts / doesn't count" guide.

@@ -1,8 +1,9 @@
 # R* categorization decisions
 
 As of 2026-11-23. **This local file is the current version**: make every change here. It started as the Claude Doc
-[R* categorization decisions](https://claude.ai/artifact/ESJV1iYjXaoWyHjgEyZ6X6), which is no longer updated. The Word
-copy for colleagues is exported separately, so check it matches this file before sending it.
+[R* categorization decisions](https://claude.ai/artifact/ESJV1iYjXaoWyHjgEyZ6X6), which is no longer updated. No Word
+copy is kept in the repo; make one when needed, for example
+`pandoc rstar-categorization-decisions.md -o rstar-categorization-decisions.docx` (run in this folder).
 
 ## Purpose
 
