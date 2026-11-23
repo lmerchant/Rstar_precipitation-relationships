@@ -18,24 +18,58 @@ with 19 subcategories in all.
    - R* = 0.40 D + 0.30 P + 0.20 (100 − RRS) + 0.10 DIRS;
    - each subcategory is worth 0 or a fixed number of points, and 0 when the evidence is missing.
 
-The user is still deciding what the final app will be. For now, the categorization is being tested on one
-dataset to see whether the subcategory definitions need more context.
+The user is still deciding what the final app will be. GHCN-Daily is categorized; GPCP Daily, IMERG Late Run and
+PERSIANN-CDR Daily are waiting on supplemental research, and CoCoRaHS is a new dataset not yet researched.
 
 ## Where things stand
 
 | Piece | State |
 |---|---|
 | GHCN-Daily categorization | Done (second pass, 2026-11-22; uses the NCEI and rain-gauge runs too): `data-rstar-categories/datasets/ghcn-daily/ghcn-daily_rstar-categories.json`. No subcategory is empty |
-| GHCN-Daily research gaps | `datasets-gap-queries/ghcn-daily_categorization-gaps.md`: what was never searched, per subcategory. **The user will write new web queries from it** |
-| GPCP Daily, PERSIANN-CDR Daily, IMERG Late Run | Research exists in `data-rstar-query-results/about-datasets/`; not categorized |
+| GHCN-Daily research gaps | `datasets-gap-queries/ghcn-daily_categorization-gaps.md`. Gap queries pt6–pt9 are written; pt7 and pt8 have run (see Research queue) |
+| GPCP Daily, PERSIANN-CDR Daily, IMERG Late Run | Research exists; not categorized. Coverage notes and supplemental queries written 2026-11-23 (see Research queue) |
+| CoCoRaHS (new dataset, id `cocorahs`) | Six queries written 2026-11-23, none run. Needs a `datasets_metadata/json/` file before categorizing |
 | Feedback on the first pass | `docs/claude_feedback/first_pass_to_categorize.md`. **Waiting on the user's answers** (see below) |
 | Categorization viewer | Done: static site in `app/` (landing page plus 4 category pages) |
 | e2e tests | 34 pass (17 tests × Firefox and WebKit), Python Playwright. The empty-subcategory test now empties RRS-2 by intercepting `rstar-data.js`. Avoid `all_text_contents()`: it crashes this page in Playwright's Firefox |
 | Final graph app | Not started |
-| Five-part query plan | Written 2026-11-23: `notes/dataset-query-5-part-plan.md`. It gives five research runs per dataset, plus shared runs per repository (A1 threats, A2 resilience) and per instrument family (A4). Templates are in `Rstar_query_results/queries/dataset_queries/about_dataset_queries/templates/`, and the A2 template is in `archive_queries/general_archive_queries/` |
-| GHCN-Daily gap runs | Done in `Rstar_query_results/web_search_results/`: pt7 (repository, 2026-11-22) and pt8 (infrastructure, 2026-11-23); IMERG inputs-pt6 also ran. None is copied into `data-rstar-query-results/` yet. Still to run: pt6 (people) and the NCEI A2 run (`Rstar_query_results/queries/archive_queries/archive_specific_queries/A2_Rstar_query-noaa_ncei.md`, written 2026-11-23 and not yet rewritten), which replaces pt9 |
-| Supplemental queries for GPCP, IMERG, PERSIANN-CDR | Written 2026-11-23 from coverage checks (not categorizations): `datasets-gap-queries/supplemental-queries-run-sheet.md`, three `<id>_coverage-gaps.md` notes, one `pt7_people-production` query per dataset, plus repository runs `A2_Rstar_query-nasa_gesdisc_pps.md` and `A2_Rstar_query-uci_chrs.md` in `Rstar_query_results/queries/archive_queries/archive_specific_queries/`. Not rewritten or run yet. Categorize each dataset once, after these come back |
-| Archive plan and CoCoRaHS | `notes/archive-query-plan.md`: three kinds of repository (shared archive: A1 + A2; producer's own data site: A2 only; copy: no run), a register of repositories, and CoCoRaHS worked through (5 dataset parts + A2; the user chose to research it as a dataset and its archive). Repository questions stay in separate A1/A2 runs. A general A1 template is in `archive_queries/general_archive_queries/`. CoCoRaHS's six queries are written (2026-11-23): Parts 1–5 and a run sheet in `Rstar_query_results/queries/dataset_queries/about_dataset_queries/cocorahs/`, and `A2_Rstar_query-cocorahs.md`. Dataset id `cocorahs`; it needs a `datasets_metadata/json/` file before categorizing |
+| Query plans and templates | `notes/dataset-query-5-part-plan.md` (five parts per dataset) and `notes/archive-query-plan.md` (three kinds of repository, and a register of repositories). Templates in `Rstar_query_results/queries/` (see Research queries) |
+| Guide for sharing | `docs/rstar-query-templates-guide.md` (2026-11-23): the query design, files, how to adapt it to other climate data, and starter prompts. Written for a friend of the user who will get the files in a new GitHub repo the user is making |
+
+
+## Research queries
+
+**Two projects.** Queries and research runs live in `/Users/claude/SIDE_WORK/NYCE_project/Rstar_query_results`
+(its own git repo, also on `develop`). Runs save to its `web_search_results/`; the user copies finished runs into this
+project's `data-rstar-query-results/`.
+
+**The design** (details in the two notes):
+- **Five parts per dataset:** 1 overview, 2 QC/calibration/code/formats, 3 people and funding route (standard tier);
+  4 threats and news, 5 threats to inputs (deep tier). Parts 1–3 keep threat words out so they stay standard.
+- **Repositories:** shared archive gets A1 threats + A2 resilience, once; a producer's own data site gets A2 only (its
+  threats are in the dataset's Part 4); copies get no run.
+- **Runs stop at the token ceiling** (about 80% of it), not the time limit.
+- **Each query tags findings** with subcategory codes and a supports/contradicts stance.
+
+**Templates** (in `Rstar_query_results/queries/`):
+- `dataset_queries/about_dataset_queries/templates/template-dataset-about_Rstar_query_pt1_overview.md` … `pt5_inputs.md`;
+- `archive_queries/general_archive_queries/A1_Rstar_query_template-repository-threats.md` and
+  `A2_Rstar_query_template-repository-resilience.md`.
+
+**Research queue** (none of these is rewritten unless noted; the user runs them):
+
+| Query | Where | State |
+|---|---|---|
+| GHCN-Daily pt7 (repository), pt8 (infrastructure) | ran 2026-11-22, 2026-11-23 | Not yet copied into `data-rstar-query-results/` |
+| GHCN-Daily pt6 (people) | `datasets-gap-queries/ghcn-daily_gap-queries/` | Rewritten; to run |
+| NCEI A2 (replaces GHCN-Daily pt9) | `Rstar_query_results/.../archive_specific_queries/A2_Rstar_query-noaa_ncei.md` | To rewrite and run. Serves GHCN-Daily, GPCP, PERSIANN-CDR and CoCoRaHS's copy |
+| GPCP, IMERG, PERSIANN-CDR pt7 (people and production) | `datasets-gap-queries/<id>_gap-queries/`; run sheet `datasets-gap-queries/supplemental-queries-run-sheet.md` | To rewrite and run. PERSIANN-CDR's before IMERG's (shared CHRS people) |
+| NASA GES DISC + PPS A2; UC Irvine CHRS A2 | `Rstar_query_results/.../archive_specific_queries/` | To rewrite and run |
+| CoCoRaHS Parts 1–5 and its data-site A2 | `Rstar_query_results/queries/dataset_queries/about_dataset_queries/cocorahs/` (with `cocorahs-run-sheet.md`) and `A2_Rstar_query-cocorahs.md` | To rewrite and run. Part 3's names (Doesken, Reges, Schumacher) are from Claude's knowledge, to confirm |
+| IMERG inputs-pt6 | ran 2026-11-21 | Not yet copied into `data-rstar-query-results/` |
+
+The coverage notes (`datasets-gap-queries/<id>_coverage-gaps.md`) are not categorizations. Categorize each dataset once,
+after its gap runs come back.
 
 ## Categorization format
 
@@ -128,20 +162,26 @@ Plan: `notes/app-categorization-viewer-plan.md`. Details: `app/README.md`.
 - `.work/` holds the venv, logs and debug scripts, and is git-ignored. `notes/` is for Claude's plans.
   `docs/` is the user's.
 - Use `trash`, never `rm`.
+- `Rstar_query_results` is a separate git repo (also on `develop`) for queries and research runs. Commit query files
+  there and project files here, each in its own commit.
 
 ## Next steps
 
 **How-to for the user:** `docs/categorizing-web-searches_README.md` has the prompts for categorizing a dataset,
 adding it to the website, writing gap queries and adding new research. Follow it for the other datasets.
 
-1. **When the user's new GHCN-Daily queries come back,** add their evidence to
-   `scripts/categorize/build_ghcn-daily.py`, re-run it and `app/scripts/build_data.py`, and update the gaps note.
-   Open questions 2–6 still need answers (for example, splitting RRS by repository).
-2. **Categorize the next datasets:** GPCP Daily, PERSIANN-CDR Daily, IMERG Late Run. Each needs a folder in
-   `data-rstar-categories/datasets/`; `imerg-late-run/` doesn't exist yet. Re-run `build_data.py`
-   afterwards.
-3. **Maybe add a scoring step:** the user picks 0 or the point value for each subcategory, and the app
+1. **Copy finished runs into `data-rstar-query-results/`** as they come back (GHCN-Daily pt7 and pt8 and IMERG
+   inputs-pt6 are waiting): dataset runs into `about-datasets/<id>/`, repository runs into `archives/<repository>/`.
+2. **Add GHCN-Daily's new evidence** (pt6, pt7, pt8 and the NCEI A2 run) to `scripts/categorize/build_ghcn-daily.py`,
+   re-run it and `app/scripts/build_data.py`, and update the gaps note. Open questions 2–6 still need answers (for
+   example, splitting RRS by repository; the repository runs now make a per-repository split possible).
+3. **Categorize GPCP Daily, PERSIANN-CDR Daily and IMERG Late Run** once their pt7 and repository runs are back, using
+   their coverage notes. Each needs a folder in `data-rstar-categories/datasets/` (`imerg-late-run/` doesn't exist
+   yet) and a `scripts/categorize/build_<id>.py`. Re-run `build_data.py` afterwards.
+4. **Research and categorize CoCoRaHS** from its run sheet; add its metadata file first.
+5. **Keep the repository register in `notes/archive-query-plan.md` current** when a new dataset names a new host.
+6. **Maybe add a scoring step:** the user picks 0 or the point value for each subcategory, and the app
    computes R*. The viewer plan lists this, plus confidence filters and a side-by-side dataset view, as
    later ideas.
-4. **Design the network graph and knowledge graph app** from `docs/rstar_relationship_graph/rstar_graphs.md`.
-5. **Keep the e2e tests passing in both browsers** as the viewer changes.
+7. **Design the network graph and knowledge graph app** from `docs/rstar_relationship_graph/rstar_graphs.md`.
+8. **Keep the e2e tests passing in both browsers** as the viewer changes.
