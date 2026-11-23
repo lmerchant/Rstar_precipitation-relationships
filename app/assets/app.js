@@ -78,6 +78,38 @@
     return folder.replace(/^\d{4}-\d{2}-\d{2}_/, "").replace(new RegExp("^" + dataset.id + "-"), "");
   }
 
+  // ------------------------------------------------------------- scores
+  // Scores come from data-score on each subcategory's div (docs/scoring/how_to_score_rstar.md);
+  // build_data.py adds the group totals and R*. "NA" means a person has to decide.
+  const STATUS_LABELS = {
+    found: "Found",
+    "searched-none-found": "Searched, none found",
+    "not-public": "Not public",
+    "not-searched": "Not searched",
+  };
+  const BASIS_TEXT = {
+    "for-only": "High or moderate “for” evidence and no “against” evidence: full points.",
+    "against-only": "High or moderate “against” evidence and no “for” evidence: 0.",
+    both: "Both “for” and “against” evidence (high or moderate): needs a decision.",
+    none: "No high or moderate “for” or “against” evidence: needs a decision.",
+  };
+
+  function isNA(v) {
+    return v === "NA" || v === null || v === undefined;
+  }
+
+  function scoreValue(v, extraClass) {
+    return el("span", { class: `score-value ${isNA(v) ? "na" : "num"} ${extraClass || ""}`.trim(), text: isNA(v) ? "NA" : String(v) });
+  }
+
+  function subScore(subId) {
+    return dataset.scores ? dataset.scores.subcategories[subId] : null;
+  }
+
+  function datasetInfo() {
+    return (dataset.categorizations && dataset.categorizations.dataset) || null;
+  }
+
   // ------------------------------------------------------------- header
   function renderHeader() {
     const current = body.dataset.category;
@@ -125,6 +157,7 @@
       ["Period", m.period_of_record],
       ["Updates", m.update_status],
     ].filter(([, v]) => v);
+    const info = datasetInfo();
     return el("section", { class: "dataset-strip", "aria-label": "Dataset details" }, [
       el("h2", { text: dataset.name }),
       dataset.categorizations
@@ -133,6 +166,117 @@
       fields.length
         ? el("dl", {}, fields.map(([k, v]) => el("div", {}, [el("dt", { text: k }), el("dd", { text: v })])))
         : null,
+      info && info.producer_is_repository
+        ? el("p", { class: "same-org" }, [
+            el("strong", { text: "The producer and repository are the same organization" }),
+            `: ${info.producer}. Its funding and staff facts appear in several subcategories.`,
+          ])
+        : null,
+    ]);
+  }
+
+  // The key: what the tags mean and how scores are set.
+  function keySection() {
+    const table = (caption, head, rows) =>
+      el("table", { class: "key-table" }, [
+        el("caption", { text: caption }),
+        el("thead", {}, el("tr", {}, head.map((h) => el("th", { scope: "col", text: h })))),
+        el("tbody", {}, rows.map((r) => el("tr", {}, r.map((c, i) => el(i === 0 ? "th" : "td", i === 0 ? { scope: "row", text: c } : { text: c }))))),
+      ]);
+    return el("section", { class: "key", "aria-labelledby": "key-title" }, [
+      el("h2", { id: "key-title", text: "How to read the tags and scores" }),
+      el("div", { class: "key-grid" }, [
+        table("Tags on each evidence item", ["Tag", "Values", "Meaning"], [
+          ["Stance", "For, Against, Context", "How the item bears on the subcategory description. Context is background that is not directly tied to the dataset, or doesn't show the description true or false."],
+          ["Confidence", "High, moderate, low", "How well the source supports the item. Inferences are always low."],
+          ["Status", "Found; searched, none found; not public; not searched", "Every evidence item is found. Each gap gets one of the other three."],
+          ["Repository", "Repository name", "Repository resilience items only: which repository the item is about."],
+        ]),
+        table("How a subcategory is scored", ["High or moderate evidence", "Score"], [
+          ["“For” items and no “against” items", "Full points"],
+          ["“Against” items and no “for” items", "0"],
+          ["Both “for” and “against” items", "NA"],
+          ["None: only context, only low confidence, or no evidence", "NA"],
+        ]),
+      ]),
+      el("p", {
+        class: "key-note",
+        text:
+          "Low-confidence and context items stay in the evidence but don't set a score. NA means there isn't enough " +
+          "information and a person has to decide. A category total is NA if any of its subcategories is NA, and R* is " +
+          "NA if any category total is NA. For repository resilience, “for” means resilient, so a higher score lowers R*.",
+      }),
+    ]);
+  }
+
+  // R* and the four category totals, with a panel listing every subcategory score.
+  function scoreSection() {
+    const s = dataset.scores;
+    if (!s) return null;
+    const tiles = [
+      el("div", { class: "score-tile total" }, [
+        el("span", { class: "score-label", text: "R*" }),
+        scoreValue(s.rstar, "big"),
+        el("span", { class: "score-note", text: "0.40 D + 0.30 P + 0.20 (100 − RRS) + 0.10 DIRS" }),
+      ]),
+      ...DATA.categories.map((cat) => {
+        const g = s.groups[cat.key];
+        return el("div", { class: "score-tile" }, [
+          el("span", { class: "score-label", text: cat.title }),
+          scoreValue(g.total),
+          el("span", {
+            class: "score-note",
+            text: `${g.scored} of ${g.of} subcategories scored · out of ${g.max_points} points`,
+          }),
+        ]);
+      }),
+    ];
+
+    const tables = DATA.categories.map((cat) =>
+      el("table", { class: "score-table" }, [
+        el("caption", {}, [cat.title, " · total ", scoreValue(s.groups[cat.key].total, "small")]),
+        el("thead", {}, el("tr", {}, ["Subcategory", "Statement", "Points", "Score"].map((h) => el("th", { scope: "col", text: h })))),
+        el(
+          "tbody",
+          {},
+          cat.subcategories.map((sub) => {
+            const e = s.subcategories[sub.id] || {};
+            return el("tr", {}, [
+              el("th", { scope: "row" }, el("a", { href: withDataset(`${cat.page}#${sub.id}`), text: sub.id })),
+              el("td", { text: sub.title }),
+              el("td", { text: sub.points != null ? String(sub.points) : "—" }),
+              el("td", { title: BASIS_TEXT[e.basis] || "" }, scoreValue(e.score, "small")),
+            ]);
+          })
+        ),
+      ])
+    );
+
+    const details = el("div", { class: "score-details", id: "score-details", role: "region", "aria-labelledby": "score-details-btn", hidden: true }, tables);
+    const btn = el("button", {
+      class: "details-toggle",
+      id: "score-details-btn",
+      type: "button",
+      "aria-expanded": "false",
+      "aria-controls": "score-details",
+    });
+    btn.innerHTML = CHEVRON;
+    btn.append(el("span", { text: "Score details" }));
+    btn.addEventListener("click", () => {
+      const open = btn.getAttribute("aria-expanded") !== "true";
+      btn.setAttribute("aria-expanded", String(open));
+      details.hidden = !open;
+    });
+
+    return el("section", { class: "score-panel", "aria-labelledby": "score-title" }, [
+      el("h2", { id: "score-title", text: `R* score for ${dataset.name}` }),
+      el("p", {
+        class: "score-intro",
+        text: "Scores worked out from the web research evidence. NA marks a score a person still has to decide.",
+      }),
+      el("div", { class: "score-row" }, tiles),
+      btn,
+      details,
     ]);
   }
 
@@ -173,7 +317,9 @@
           "Web research on each dataset, sorted into the R* subcategories. Pick a category to read " +
           "the evidence behind each subcategory, or click a subcategory chip to jump straight to it.",
       }),
+      keySection(),
       datasetStrip(),
+      scoreSection(),
       el("div", { class: "cat-grid" }, cards),
       el("p", { class: "legend" }, [
         el("span", {}, [el("span", { class: "dot filled" }), "4+ evidence items"]),
@@ -194,11 +340,11 @@
   const STANCES = {
     for: { label: "For", title: "Supports the subcategory description" },
     against: { label: "Against", title: "Contradicts the subcategory description" },
-    neutral: { label: "Neutral", title: "Context, or points both ways" },
+    context: { label: "Context", title: "Background: not directly tied to the dataset, or doesn't show the description true or false" },
   };
-  const STANCE_ORDER = ["for", "against", "neutral"];
+  const STANCE_ORDER = ["for", "against", "context"];
 
-  // Sort items for, against, neutral (keeping their order within a group) and say so above the list.
+  // Sort items for, against, context (keeping their order within a group) and say so above the list.
   function sortAndSummarizeByStance(ul) {
     const items = [...ul.children];
     if (!items.some((li) => STANCES[li.dataset.stance])) return;
@@ -214,7 +360,7 @@
     ul.before(
       el("p", {
         class: "stance-summary",
-        text: `Each item is tagged for, against or neutral toward the description above, and sorted in that order: ${counts.join(" · ")}.`,
+        text: `Each item is tagged for, against or context toward the description above, and sorted in that order: ${counts.join(" · ")}.`,
       })
     );
   }
@@ -241,7 +387,13 @@
       if (conf) meta.append(el("span", { class: `badge ${conf}`, text: `${conf} confidence` }));
       if (li.dataset.source)
         meta.append(el("span", { class: "src-tag", title: li.dataset.source, text: shortSource(li.dataset.source) }));
+      if (li.dataset.repository)
+        meta.append(el("span", { class: "repo-tag", text: `Repository: ${li.dataset.repository}` }));
       li.append(meta);
+    });
+    panel.querySelectorAll("ul.gaps > li").forEach((li) => {
+      const label = STATUS_LABELS[li.dataset.status];
+      if (label) li.append(" ", el("span", { class: `gap-status ${li.dataset.status}`, text: label }));
     });
   }
 
@@ -252,6 +404,30 @@
     btn.setAttribute("aria-label", `${open ? "Hide" : "Show"} categorization for ${card.id}`);
     panel.hidden = !open;
     card.classList.toggle("is-open", open);
+  }
+
+  function scoreLine(s) {
+    const e = subScore(s.id);
+    if (!e) return null;
+    const max = s.points != null ? ` of ${s.points}` : "";
+    return el("p", { class: "score-line" }, [
+      el("span", { class: `score-badge ${isNA(e.score) ? "na" : "num"}` }, [
+        "Score ",
+        el("strong", { text: isNA(e.score) ? "NA" : `${e.score}${max}` }),
+      ]),
+      el("span", { class: "score-why", text: BASIS_TEXT[e.basis] || "" }),
+    ]);
+  }
+
+  function repositoryLine() {
+    const info = datasetInfo();
+    if (!info || !info.repositories || !info.repositories.length) return null;
+    const n = info.repositories.length;
+    return el("p", { class: "repo-line" }, [
+      el("strong", { text: n === 1 ? "One repository" : `${n} repositories` }),
+      `: ${info.repositories.map((r) => `${r.name} (${r.role})`).join("; ")}.`,
+      n > 1 ? " The score is pooled across them." : "",
+    ]);
   }
 
   function subCard(cat, s) {
@@ -283,7 +459,13 @@
           el("div", {}, [el("h3", { text: "Description" }), el("p", { text: s.description || "—" })]),
           el("div", {}, [el("h3", { text: "How to find" }), el("p", { text: s.how_to_find || "—" })]),
         ]),
-        el("p", { class: "coverage" }, [el("span", { class: `dot ${cov.status}`, "aria-hidden": "true" }), coverageText(cov)]),
+        scoreLine(s),
+        el("p", { class: "coverage" }, [
+          el("span", { class: `dot ${cov.status}`, "aria-hidden": "true" }),
+          coverageText(cov),
+          subScore(s.id) && STATUS_LABELS[subScore(s.id).status] ? ` · Status: ${STATUS_LABELS[subScore(s.id).status]}` : null,
+        ]),
+        cat.key === "repo_resilience" ? repositoryLine() : null,
       ]),
       toggle,
     ]);

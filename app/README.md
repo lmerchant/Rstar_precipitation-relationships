@@ -1,8 +1,13 @@
 # R* categorization viewer
 
-A static site for reading the R* categorizations of each dataset. It has a landing page with the four
-categories, and one page per category. On a category page, each subcategory card shows its description and
-"How to find" text, and opens to show the evidence sorted into it.
+A static site for reading the R* categorizations of each dataset. It has a landing page with a key to the tags and
+scoring, the dataset's R* score (total, four category scores and a "Score details" panel) and the four categories, and
+one page per category. On a category page, each subcategory card shows its description, "How to find" text, score
+(a number or NA, with the reason) and status, and opens to show the evidence sorted into it.
+
+Scores come from `data-score` on each subcategory's div in the category JSON (written by
+`scripts/categorize/rstar_common.py`); `scripts/build_data.py` adds the category totals and R*. A total is NA if any
+of its subcategories is NA, and R* is NA if any total is.
 
 The design plan is in [`notes/app-categorization-viewer-plan.md`](../notes/app-categorization-viewer-plan.md).
 

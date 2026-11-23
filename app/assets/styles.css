@@ -20,6 +20,11 @@
   --evidence-bg: #f6faff;
   --against: #6b3fa0;
   --against-bg: #efe7f8;
+  --na-bg: #000000;
+  --na-text: #ffffff;
+  --na-border: #000000;
+  --score-bg: #1f5fae;
+  --score-text: #ffffff;
   --shadow: 0 1px 2px rgba(20, 30, 45, 0.06), 0 2px 8px rgba(20, 30, 45, 0.05);
   --radius: 10px;
   --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
@@ -48,6 +53,11 @@
     --evidence-bg: #1e2633;
     --against: #c9a8f0;
     --against-bg: #2f2540;
+    --na-bg: #000000;
+    --na-text: #ffffff;
+    --na-border: #e6eaf0;
+    --score-bg: #7fb0ec;
+    --score-text: #0b1420;
     --shadow: none;
   }
 }
@@ -169,10 +179,56 @@ h2 { font-size: 1.2rem; margin: 0 0 8px; }
 .stance { font-size: 0.74rem; font-weight: 700; border-radius: 999px; padding: 0 8px; border: 1px solid currentColor; }
 .stance.for { color: var(--accent); background: var(--accent-soft); }
 .stance.against { color: var(--against); background: var(--against-bg); }
-.stance.neutral { color: var(--muted); background: var(--surface-2); }
+.stance.context { color: var(--muted); background: var(--surface-2); }
 .stance-summary { margin: 0 0 8px; font-size: 0.85rem; color: var(--muted); max-width: 90ch; }
 .src-tag { font: 0.74rem var(--mono); color: var(--muted); border: 1px solid var(--border); border-radius: 999px; padding: 0 8px; }
 .panel-empty { margin: 0; color: var(--muted); font-style: italic; }
+
+/* Key: tags and scoring ------------------------------------------- */
+.key { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 18px; margin-bottom: 24px; box-shadow: var(--shadow); }
+.key-grid { display: grid; grid-template-columns: 3fr 2fr; gap: 16px 24px; align-items: start; }
+.key-table, .score-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+.key-table caption, .score-table caption { text-align: left; font-weight: 650; margin-bottom: 6px; }
+.key-table th, .key-table td, .score-table th, .score-table td { text-align: left; vertical-align: top; padding: 6px 8px; border-top: 1px solid var(--border); }
+.key-table thead th, .score-table thead th { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); border-top: none; }
+.key-table tbody th { font-weight: 650; white-space: nowrap; }
+.key-note { margin: 12px 0 0; font-size: 0.88rem; color: var(--muted); max-width: 90ch; }
+
+.same-org { margin: 12px 0 0; padding: 8px 12px; border-left: 4px solid var(--accent); background: var(--accent-soft); border-radius: 6px; font-size: 0.95rem; }
+
+/* Scores ------------------------------------------------------------ */
+.score-value { display: inline-block; min-width: 2.6em; text-align: center; font: 700 1.25rem/1.3 var(--font); border-radius: 6px; padding: 2px 10px; border: 2px solid transparent; }
+.score-value.num { background: var(--score-bg); color: var(--score-text); }
+.score-value.na { background: var(--na-bg); color: var(--na-text); border-color: var(--na-border); }
+.score-value.big { font-size: 1.75rem; }
+.score-value.small { font-size: 0.9rem; min-width: 2.4em; padding: 0 8px; }
+.score-panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 18px; margin-bottom: 24px; box-shadow: var(--shadow); }
+.score-intro { margin: 0 0 12px; color: var(--muted); font-size: 0.93rem; }
+.score-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 160px), 1fr)); gap: 12px; margin-bottom: 12px; }
+.score-tile { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface-2); }
+.score-tile.total { border-color: var(--text); }
+.score-label { font-weight: 650; font-size: 0.92rem; }
+.score-note { font-size: 0.8rem; color: var(--muted); }
+.details-toggle { display: inline-flex; align-items: center; gap: 8px; font: inherit; font-weight: 600; color: var(--accent); background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 6px 12px; cursor: pointer; }
+.details-toggle:hover { background: var(--accent-soft); }
+.details-toggle svg { width: 18px; height: 18px; transition: transform 0.2s ease; }
+.details-toggle[aria-expanded="true"] svg { transform: rotate(180deg); }
+.score-details { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 440px), 1fr)); gap: 16px 24px; margin-top: 14px; }
+.score-details > table { min-width: 0; }
+.score-details[hidden] { display: none; }
+.score-table td:nth-child(3) { white-space: nowrap; }
+
+.score-line { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; margin: 12px 0 0; }
+.score-badge { display: inline-flex; align-items: baseline; gap: 6px; font-size: 0.95rem; font-weight: 600; border-radius: 6px; padding: 3px 12px; border: 2px solid transparent; }
+.score-badge strong { font-size: 1.15rem; }
+.score-badge.num { background: var(--score-bg); color: var(--score-text); }
+.score-badge.na { background: var(--na-bg); color: var(--na-text); border-color: var(--na-border); }
+.score-why { font-size: 0.86rem; color: var(--text); }
+.repo-line { margin: 8px 0 0; font-size: 0.88rem; }
+.repo-tag { font-size: 0.74rem; color: var(--text); border: 1px solid var(--border); background: var(--surface-2); border-radius: 999px; padding: 0 8px; }
+.gap-status { font-size: 0.74rem; font-weight: 600; color: var(--text); border: 1px solid var(--border); border-radius: 999px; padding: 0 8px; white-space: nowrap; }
+.gap-status.not-public { border-color: var(--moderate); color: var(--moderate); }
+.gap-status.not-searched { border-style: dashed; }
 
 .site-footer { color: var(--muted); font-size: 0.82rem; padding-top: 8px; padding-bottom: 28px; }
 
@@ -183,10 +239,15 @@ h2 { font-size: 1.2rem; margin: 0 0 8px; }
   .toggle { align-self: start; }
   .sub-panel { padding: 12px 14px 16px; }
   .brand { margin-right: 0; width: 100%; }
+  .key-grid { grid-template-columns: 1fr; }
+  .score-panel, .key { padding: 12px; }
+  .score-table th, .score-table td { padding: 6px 4px; }
+  .score-table thead th { letter-spacing: 0; text-transform: none; }
+  .key-table tbody th { white-space: normal; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .toggle svg { transition: none; }
+  .toggle svg, .details-toggle svg { transition: none; }
 }
 
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }

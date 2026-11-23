@@ -3,7 +3,8 @@
 Reads the R* definitions (rstar_definitions/*.md), the point values and
 group weights (docs/scoring/how_to_score_rstar.md), dataset
 names (datasets_metadata/json/) and the categorization JSON files
-(data-rstar-categories/datasets/<dataset>/*.json), and writes them as one
+(data-rstar-categories/datasets/<dataset>/*.json), works out each dataset's group
+totals and R* from the subcategory scores in that JSON, and writes them as one
 JavaScript file the pages load with a <script> tag. That keeps the site
 working when opened straight from disk (file://), where fetch() is blocked.
 
@@ -89,6 +90,46 @@ def dataset_name(folder):
     return dash.get("name", folder), {k: dash.get(k, "") for k in keep}
 
 
+DIV_ATTRS = re.compile(r'^<div class="[^"]+"([^>]*)>')
+
+
+def sub_score(html):
+    """The subcategory's score from its div: an int, or "NA" (also when the div has no score)."""
+    m = DIV_ATTRS.match(html or "")
+    attrs = dict(re.findall(r'(data-[\w-]+)="([^"]*)"', m.group(1))) if m else {}
+    raw = attrs.get("data-score", "NA")
+    return {
+        "score": int(raw) if raw.isdigit() else "NA",
+        "basis": attrs.get("data-score-basis", "none"),
+        "status": attrs.get("data-status", ""),
+    }
+
+
+def dataset_scores(categorizations, categories):
+    """Group totals and R*. A total is NA if any of its subcategories is NA; R* is NA if any total is."""
+    subs, groups = {}, {}
+    for cat in categories:
+        entries = [sub_score(categorizations.get(cat["key"], {}).get(s["id"])) for s in cat["subcategories"]]
+        for s, e in zip(cat["subcategories"], entries):
+            subs[s["id"]] = e
+        known = [e["score"] for e in entries if e["score"] != "NA"]
+        groups[cat["key"]] = {
+            "total": sum(known) if len(known) == len(entries) else "NA",
+            "scored": len(known),
+            "of": len(entries),
+            "known_points": sum(known),
+            "max_points": sum(s["points"] or 0 for s in cat["subcategories"]),
+        }
+    if all(g["total"] != "NA" for g in groups.values()):
+        t = {c["key"]: groups[c["key"]]["total"] for c in categories}
+        w = {c["key"]: c["weight"] for c in categories}
+        rstar = round(sum(
+            w[k] * (100 - t[k] if k == "repo_resilience" else t[k]) for k in t), 1)
+    else:
+        rstar = "NA"
+    return {"rstar": rstar, "groups": groups, "subcategories": subs}
+
+
 def main():
     points, group = parse_weights(ROOT / "docs" / "scoring" / "how_to_score_rstar.md")
     categories = []
@@ -116,10 +157,12 @@ def main():
     for folder in sorted(p for p in ds_root.iterdir() if p.is_dir()):
         files = sorted(folder.glob("*.json"))
         name, meta = dataset_name(folder.name)
-        entry = {"id": folder.name, "name": name, "meta": meta, "file": None, "categorizations": None}
+        entry = {"id": folder.name, "name": name, "meta": meta, "file": None, "categorizations": None,
+                 "scores": None}
         if files:
             entry["file"] = str(files[0].relative_to(ROOT))
             entry["categorizations"] = json.loads(files[0].read_text(encoding="utf-8"))
+            entry["scores"] = dataset_scores(entry["categorizations"], categories)
         datasets.append(entry)
 
     data = {"categories": categories, "datasets": datasets}
@@ -131,6 +174,10 @@ def main():
     )
     n_subs = sum(len(c["subcategories"]) for c in categories)
     done = [d["id"] for d in datasets if d["categorizations"]]
+    for d in datasets:
+        if d["scores"]:
+            na = sum(1 for e in d["scores"]["subcategories"].values() if e["score"] == "NA")
+            print(f'{d["id"]}: R* {d["scores"]["rstar"]}, {na} of {len(d["scores"]["subcategories"])} subcategories NA')
     print(f"Wrote {OUT.relative_to(ROOT)}: {len(categories)} categories, {n_subs} subcategories, "
           f"{len(datasets)} datasets ({len(done)} categorized: {', '.join(done) or 'none'}).")
 

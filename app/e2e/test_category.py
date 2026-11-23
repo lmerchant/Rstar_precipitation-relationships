@@ -39,19 +39,45 @@ def test_arrow_button_opens_and_closes_the_panel(page: Page):
     expect(panel(page, "P-1")).to_be_hidden()
 
 
-def test_evidence_is_tagged_and_sorted_for_against_neutral(page: Page):
+def test_evidence_is_tagged_and_sorted_for_against_context(page: Page):
     page.goto("/people-risk.html?dataset=ghcn-daily#P-1")
 
     p = panel(page, "P-1")
-    expect(p.get_by_text(re.compile(r"tagged for, against or neutral .*\d+ for · \d+ against · \d+ neutral\."))).to_be_visible()
+    expect(p.get_by_text(re.compile(r"tagged for, against or context .*\d+ for · \d+ against · \d+ context\."))).to_be_visible()
     items = "ul.evidence > li"
-    expect(p.locator(f"{items} .stance").first).to_have_text(re.compile(r"^(For|Against|Neutral)$"))
+    expect(p.locator(f"{items} .stance").first).to_have_text(re.compile(r"^(For|Against|Context)$"))
     # Every item has a tag, and no item comes after one that should sort below it.
     # (Locator checks, not all_text_contents(): that call crashes this page in Playwright's Firefox.)
     expect(p.locator(f"{items}:not(:has(.stance))")).to_have_count(0)
     expect(p.locator(f"{items}:has(.stance.against) ~ li:has(.stance.for)")).to_have_count(0)
-    expect(p.locator(f"{items}:has(.stance.neutral) ~ li:has(.stance.for)")).to_have_count(0)
-    expect(p.locator(f"{items}:has(.stance.neutral) ~ li:has(.stance.against)")).to_have_count(0)
+    expect(p.locator(f"{items}:has(.stance.context) ~ li:has(.stance.for)")).to_have_count(0)
+    expect(p.locator(f"{items}:has(.stance.context) ~ li:has(.stance.against)")).to_have_count(0)
+    expect(p.get_by_text("Neutral", exact=True)).to_have_count(0)
+
+
+def test_each_card_shows_its_score_and_why(page: Page):
+    page.goto("/repository-resilience.html?dataset=ghcn-daily")
+
+    rrs2 = page.get_by_role("listitem").filter(has=page.get_by_role("heading", name=re.compile(r"^RRS-2 ")))
+    expect(rrs2.get_by_text("Score 0 of 20")).to_be_visible()
+    expect(rrs2.get_by_text(re.compile(r"“against” evidence and no “for” evidence: 0"))).to_be_visible()
+    rrs1 = page.get_by_role("listitem").filter(has=page.get_by_role("heading", name=re.compile(r"^RRS-1 ")))
+    expect(rrs1.get_by_text("Score NA")).to_be_visible()
+    expect(rrs1.get_by_text(re.compile(r"Both “for” and “against” evidence"))).to_be_visible()
+
+
+def test_repository_cards_name_the_repositories(page: Page):
+    page.goto("/repository-resilience.html?dataset=ghcn-daily")
+
+    expect(page.get_by_text(re.compile(r"^3 repositories: NOAA NCEI archive \(parent\)"))).to_have_count(5)
+
+
+def test_gaps_have_a_status_and_rrs_items_a_repository(page: Page):
+    page.goto("/repository-resilience.html?dataset=ghcn-daily#RRS-2")
+
+    p = panel(page, "RRS-2")
+    expect(p.get_by_role("listitem").filter(has_text="SOP 60-6-015")).to_contain_text("Not public")
+    expect(p.get_by_text("Repository: NCEI").first).to_be_visible()
 
 
 def test_clicking_the_card_header_opens_the_panel(page: Page):
@@ -103,7 +129,7 @@ def test_subcategory_with_no_evidence_says_so(page: Page):
     # Every GHCN-Daily subcategory has evidence now, so serve the data with RRS-2 emptied.
     def empty_rrs2(route):
         body = route.fetch().text()
-        body = re.sub(r'"RRS-2": "<div class=\\"rrs-2\\">.*?</div>"',
+        body = re.sub(r'"RRS-2": "<div class=\\"rrs-2\\"[^>]*>.*?</div>"',
                       r'"RRS-2": "<div class=\\"rrs-2\\"></div>"', body, count=1)
         route.fulfill(body=body, content_type="application/javascript")
 
