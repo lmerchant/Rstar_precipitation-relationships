@@ -12,12 +12,13 @@ with 19 subcategories in all.
 
 1. Web research on each dataset, its repositories and its instruments is saved in `data-rstar-query-results/`.
 2. That research is sorted into the 19 subcategories as evidence (`data-rstar-categories/`).
-3. A person reads the evidence and decides each subcategory: true, false, unknown or partly known.
+3. Each subcategory gets a score from its evidence (full points, 0 or NA); a person decides the NA ones.
 4. The final app in `app/` shows a weighted network graph and/or knowledge graph of R* scores and dataset
    relationships. Ideas are in `docs/rstar_relationship_graph/rstar_graphs.md`; the scoring formula and point values are in
    `docs/scoring/how_to_score_rstar.md` (which `app/scripts/build_data.py` reads):
    - R* = 0.40 D + 0.30 P + 0.20 (100 − RRS) + 0.10 DIRS;
-   - each subcategory is worth 0 or a fixed number of points, and 0 when the evidence is missing.
+   - each subcategory is worth 0 or a fixed number of points, or NA when the evidence doesn't settle it (then the
+     category total and R* are NA too, and a person decides).
 
 The user is still deciding what the final app will be. GHCN-Daily is categorized; GPCP Daily, IMERG Late Run and
 PERSIANN-CDR Daily are waiting on supplemental research, and CoCoRaHS is a new dataset not yet researched.
@@ -26,13 +27,14 @@ PERSIANN-CDR Daily are waiting on supplemental research, and CoCoRaHS is a new d
 
 | Piece | State |
 |---|---|
-| GHCN-Daily categorization | Done (third pass, 2026-11-23: 210 items; adds gap runs pt6–pt9 and the NCEI A2 run): `data-rstar-categories/datasets/ghcn-daily/ghcn-daily_rstar-categories.json`. No subcategory is empty |
+| GHCN-Daily categorization | Done (fourth pass, 2026-11-23: 210 items, re-sorted under the decisions doc's rules, with scores): `data-rstar-categories/datasets/ghcn-daily/ghcn-daily_rstar-categories.json`. 17 subcategories NA, RRS-2 and RRS-3 at 0, R* NA |
 | GHCN-Daily research gaps | `datasets-gap-queries/ghcn-daily_categorization-gaps.md`. All four gap runs (pt6–pt9) and the NCEI A2 run are back and copied; the note's "After the gap runs" section says what each filled and what is left (mostly unpublished, so by hand or FOIA) |
 | GPCP Daily, PERSIANN-CDR Daily, IMERG Late Run | Research exists; not categorized. Coverage notes and supplemental queries written 2026-11-23 (see Research queue) |
 | CoCoRaHS (new dataset, id `cocorahs`) | Six queries written 2026-11-23, none run. Needs a `datasets_metadata/json/` file before categorizing |
-| Feedback on the first pass | `docs/claude_feedback/first_pass_to_categorize.md`. **Waiting on the user's answers** (see below) |
-| Categorization viewer | Done: static site in `app/` (landing page plus 4 category pages) |
-| e2e tests | 34 pass (17 tests × Firefox and WebKit), Python Playwright. The empty-subcategory test now empties RRS-2 by intercepting `rstar-data.js`. Avoid `all_text_contents()`: it crashes this page in Playwright's Firefox |
+| Feedback on the first pass | `docs/claude_feedback/first_pass_to_categorize.md`. All answered (see Open questions) |
+| Categorization rules | `docs/claude_feedback/rstar-categorization-decisions.md`, the master copy the user edits (2026-11-23). All its changes are applied. The user exports a Word copy (`docs/R categorization decisions.docx`) for a colleague; that copy predates the GHCN-Daily re-sort, so it says 16 NA and P-2 at 25 (now 17 NA, P-2 NA) |
+| Categorization viewer | Done: static site in `app/` (landing page with key and R* scores, plus 4 category pages with card scores) |
+| e2e tests | 46 pass (23 tests × Firefox and WebKit; 2026-11-23), Python Playwright. The empty-subcategory test now empties RRS-2 by intercepting `rstar-data.js`. Avoid `all_text_contents()`: it crashes this page in Playwright's Firefox |
 | Final graph app | Not started |
 | Query plans and templates | `notes/dataset-query-5-part-plan.md` (five parts per dataset) and `notes/archive-query-plan.md` (three kinds of repository, and a register of repositories). Templates in `Rstar_query_results/queries/` (see Research queries) |
 | Guide for sharing | `docs/rstar-query-templates-guide.md` (2026-11-23): the query design, files, how to adapt it to other climate data, and starter prompts. Written for a friend of the user who will get the files in a new GitHub repo the user is making |
@@ -73,32 +75,50 @@ after its gap runs come back.
 
 ## Categorization format
 
-Follows `docs/create_rstar_node_files.md`:
+Follows `docs/create_rstar_node_files.md` (its last section lists the attributes added 2026-11-23). The filing rules
+are in `docs/claude_feedback/rstar-categorization-decisions.md`; worked examples per subcategory are in the
+"Counts / doesn't count" section of `docs/categorizing-web-searches_README.md`.
 
 - **One JSON file per dataset**, in `data-rstar-categories/datasets/<dataset>/`.
 - **Top keys:** `people_risk`, `data_risk`, `dep_infra_resilience`, `repo_resilience`, each holding its
-  subcategory keys (`P-1` … `RRS-5`).
-- **Each value** is HTML: `<div class="p-1">` containing:
-  - `<h4>Evidence</h4><ul class="evidence">`, where each `<li>` has `data-confidence` (high, moderate or
-    low), `data-source` (the research run folder) and `data-stance` (`for`, `against` or `neutral`: how the
-    item bears on the subcategory description; items are sorted in that order, and the viewer shows a tag and
-    re-sorts them);
-  - then `<h4>Gaps</h4><ul class="gaps">`.
-- **Empty subcategory:** a bare `<div class="rrs-2"></div>`.
-- **Inferences** made during categorization are labelled "inference" and given low confidence.
+  subcategory keys (`P-1` … `RRS-5`), plus `dataset` (producer, `producer_is_repository`, repositories with roles).
+- **Each subcategory value** is HTML: `<div class="p-1" data-score data-score-basis data-status>` (RRS divs also
+  `data-repositories`) containing:
+  - `<h4>Evidence</h4><ul class="evidence">`: each `<li>` has `data-confidence` (high, moderate, low),
+    `data-source` (the research run folder) and `data-stance` (`for`, `against` or `context`), sorted in that order;
+    RRS items also `data-repository`;
+  - then `<h4>Gaps</h4><ul class="gaps">`: each `<li>` has `data-status` (`searched-none-found`, `not-public`,
+    `not-searched`).
+- **Scores:** only high and moderate for/against items count. For only = full points, against only = 0, otherwise NA.
+- **Inferences** are labelled "inference" and given low confidence (so they never set a score).
 - **Source material:** any `answer_*.md` file in `data-rstar-query-results/` that bears on the dataset (CLAUDE.md
   allows all of it): the dataset's own runs in `about-datasets/<dataset>/`, plus the relevant `archives/` and
   `instruments/` runs.
-- **How the GHCN-Daily file was made:** hand-sorted evidence in `scripts/categorize/build_ghcn-daily.py`
-  (tracked in git; moved from `.work/` on 2026-11-22); run it to rewrite the JSON. Each evidence item is a tuple
-  `(confidence, run, text, stance)`, stance `"F"`, `"A"` or `"N"` (since the third pass). For a new dataset, copy that script, read all the answer files and
-  write a gaps note in `datasets-gap-queries/`.
+- **How the file is made:** hand-sorted evidence in `scripts/categorize/build_<id>.py`, which calls
+  `write_categories()` in `scripts/categorize/rstar_common.py` (writing, sorting and scoring). Evidence tuples are
+  `(confidence, run, text, stance[, repository])` with stance `"F"`, `"A"` or `"C"`; gaps are `(status, text)` with
+  `"S"`, `"P"` or `"U"`. For a new dataset, copy the GHCN-Daily script, read all the answer files and write a gaps
+  note in `datasets-gap-queries/`.
 
 ## Open questions for the user
 
 **Discussion doc (2026-11-23):** `docs/claude_feedback/why-rstar-categories-are-hard-to-apply.md` (copy of the Claude
 Doc at https://claude.ai/artifact/Q5rmmJHnFzAtNLHsubpZKW) sets out what makes the categories hard to apply, with
 suggestions and questions the user plans to take to a colleague. It overlaps questions 2–6 below.
+
+**Answered and applied (2026-11-23).** The user replied under `<reply>` tags in that doc and its follow-up,
+`docs/claude_feedback/why-rstar-categories-are-hard-to-apply_follow-up.md`; both are records only.
+
+**The current rules are in `docs/claude_feedback/rstar-categorization-decisions.md`.** That local file is the master
+copy: the user edits only it (the Claude Doc https://claude.ai/artifact/ESJV1iYjXaoWyHjgEyZ6X6 is no longer updated)
+and exports a Word copy for a colleague. Read it before categorizing. All its changes were made on 2026-11-23:
+scope sentences in the P, D and RRS definitions; the NA scoring rule in `docs/scoring/how_to_score_rstar.md`;
+"neutral" renamed "context"; gap statuses; repositories on RRS items; scores in the JSON; GHCN-Daily re-sorted; the
+website's score section, key, producer sentence, card scores and repository labels; the "Counts / doesn't count" guide.
+
+**Still open (for colleagues):** whether one station closing or only a whole network counts as a "source"; whether the
+scoring decision table changes once users see mostly NA; repeating NCEI facts across subcategories; per-repository RRS.
+First-pass questions 2 to 6 below are all answered.
 
 From `docs/claude_feedback/first_pass_to_categorize.md`. Check whether the user has answered them before
 categorizing another dataset.
@@ -139,15 +159,16 @@ Plan: `notes/app-categorization-viewer-plan.md`. Details: `app/README.md`.
   - **Re-run it after changing any of those inputs:**
     `python3 app/scripts/build_data.py`.
   - The pages load the data with a `<script>` tag, so they also work opened from disk.
-- **Pages:** `index.html` (dataset selector, dataset details, 4 category cards with coverage chips), plus
-  one page per category. On a category page each subcategory card shows its Description and "How to find"
-  text and opens to show the evidence.
+- **Pages:** `index.html` (dataset selector, a key to the tags and scoring, dataset details with the
+  producer-is-repository sentence, the R* score section with a "Score details" panel, and 4 category cards with
+  coverage chips), plus one page per category. On a category page each subcategory card shows its Description,
+  "How to find", its score and why, its status (RRS cards: the repositories), and opens to show the evidence.
   - Deep links work: `people-risk.html?dataset=ghcn-daily#P-3`.
 - **Viewing:** after each big change, give the user this command (CLAUDE.md):
   `cd /Users/claude/SIDE_WORK/NYCE_project/Rstar_precipitation-relationships/app && python3 -m http.server 3000 --bind 127.0.0.1`,
   then http://127.0.0.1:3000/.
-- **Claude's own preview:** `.claude/launch.json` defines `rstar-viewer` on port 8765 for the built-in
-  browser. The built-in browser can't load the CSS and JS of a page opened from disk, so serve it.
+- **Claude's own preview:** `.claude/launch.json` defines `rstar-viewer` (port 8765) and `rstar-viewer-2` (port 8766,
+  for when another chat holds 8765) for the built-in browser. The built-in browser can't load the CSS and JS of a page opened from disk, so serve it.
 - **Accessibility:** follows the frontend-ui-engineering skill.
   - Each card's arrow is a `<button aria-expanded>` that controls a `role="region"` panel.
   - Headings go h1, then h2 (subcategory), then h3.
@@ -183,16 +204,17 @@ Plan: `notes/app-categorization-viewer-plan.md`. Details: `app/README.md`.
 adding it to the website, writing gap queries and adding new research. Follow it for the other datasets.
 
 1. **Copy finished runs into `data-rstar-query-results/`** as they come back (all runs so far are copied): dataset runs into `about-datasets/<id>/`, repository runs into `archives/<repository>/`.
-2. **Review GHCN-Daily's third-pass stance calls** (listed in the session that made them; the main ones are P-2's
-   retirement estimates and RRS-1's single-region items). Open questions 2–6 still need answers (for example,
-   splitting RRS by repository; the repository runs now make a per-repository split possible).
+2. **Review GHCN-Daily's fourth-pass stance calls** (listed in the session that made them): 15 items became
+   context, including P-2's NCEI-wide retirements (P-2 is now NA), D-1's rejected FY2026 request, five D-5 items with
+   no GHCN-Daily tie, and the Data Rescue snapshot. Also P-2's retirement estimates and RRS-1's single-region items.
 3. **Categorize GPCP Daily, PERSIANN-CDR Daily and IMERG Late Run** once their pt7 and repository runs are back, using
    their coverage notes. Each needs a folder in `data-rstar-categories/datasets/` (`imerg-late-run/` doesn't exist
    yet) and a `scripts/categorize/build_<id>.py`. Re-run `build_data.py` afterwards.
 4. **Research and categorize CoCoRaHS** from its run sheet; add its metadata file first.
 5. **Keep the repository register in `notes/archive-query-plan.md` current** when a new dataset names a new host.
-6. **Maybe add a scoring step:** the user picks 0 or the point value for each subcategory, and the app
-   computes R*. The viewer plan lists this, plus confidence filters and a side-by-side dataset view, as
-   later ideas.
-7. **Design the network graph and knowledge graph app** from `docs/rstar_relationship_graph/rstar_graphs.md`.
+6. **Build the web form for final scores:** the research scores fill it in, NA items are marked as needing a
+   decision, and the user enters the final value. The viewer plan also lists confidence filters and a side-by-side
+   dataset view as later ideas.
+7. **Design the network graph and knowledge graph app** from `docs/rstar_relationship_graph/rstar_graphs.md` An NA
+   score is drawn in black with the value NA.
 8. **Keep the e2e tests passing in both browsers** as the viewer changes.
