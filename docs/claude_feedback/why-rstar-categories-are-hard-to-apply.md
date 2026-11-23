@@ -3,6 +3,10 @@
 As of 2026-11-23. Copy of the Claude Doc [Why R* categories are hard to apply](https://claude.ai/artifact/Q5rmmJHnFzAtNLHsubpZKW);
 edits made online after this date are not in this file.
 
+The user's answers were added under each `<reply>` on 2026-11-23. This file is kept as a record. The follow-up,
+with what was decided and the remaining questions, is
+[why-rstar-categories-are-hard-to-apply_follow-up.md](why-rstar-categories-are-hard-to-apply_follow-up.md).
+
 ## Purpose
 
 The R* subcategories are easy to read but hard to apply: the same fact often fits two or three subcategories, and one
@@ -101,40 +105,160 @@ impact.
 1. **A scope sentence for every group, like the one DIRS now has.** For example: P = people on this dataset's own team;
    D = the dataset as a product (its program, formats, politics); DIRS = what it needs to be produced; RRS = each place
    that holds a copy, as an institution.
+
+<reply>
+add this
+
+
 2. **Decide where storage and access live.** Either D-2 and D-3 cover only the dataset's own primary copy and routes,
    and RRS covers the repositories; or storage and access move into RRS and D keeps program, formats and politics.
+
+<reply>
+since the dataset is served by the repository, it does depend on the repository and so the repository evidence is relevant for the data risk category. it's ok if evidence is duplicated between categories.
+
+
 3. **A "directly tied" test.** A fact counts only if a source names the dataset, or names something on its documented
    source list, input list or team. Anything one step removed (agency-wide staff losses, NIST capacity) is context,
    tagged neutral.
+
+<reply>
+yes, A fact counts only if a source names the dataset, or names something on its documented source list, input list or team. Anything one step removed (agency-wide staff losses, NIST capacity) is context, tagged neutral. I like having the context so I have relevant information to determine a score because there will be both evidence for and against.
+
+
 4. **One primary home per kind of fact, with cross-references.** Turn the overlap table above into a lookup:
    "repository funding → RRS-4; program funding → D-1", and cite rather than repeat.
+
+<reply>
+repeat the information.
+
+
 5. **Write every statement in the same direction.** Reword RRS as risks ("no verified copy at a second site"), or state
    in each RRS file that "for" means resilient. Then say what missing evidence scores in each group.
+
+<reply>
+Keep the wording of RRS. RRS is confusing because a positive score and evidence for it is not like the other categories. For the total R* score, the contribution is (100-RRS)*0.2, and so an increasing RRS score actually lowers the total risk because of the substraction part of the score (100-RRS).
+
+
 6. **Separate evidence status from stance.** Add a status to each subcategory: found, searched and none found, not
    public, or not searched. Only "found" items would tilt the score.
+
+<reply>
+Add the status. Add tags in addition to the for, against and neutral tags to indicate found, searched and none found, not public, or not searched.
+
+
 7. **Define "tilted towards for".** For example: count only high and moderate items, ignore neutral ones, and say what
    a tie scores.
+
+<reply>
+
+For the scores, ignore neutral evidence.
+
+If there is only high and moderate "for" evidence and no "against" evidence, the subcategory gets a non-zero score from the subcategory values set. If there is "against" evidence and no "for" evidence, the subcategory gets a score = 0. If there is both "for" and "against" evidence or just neutral evidence or missing evidence, the score is "NA".
+
+On the website, each subcategory card can have a Score value. The subcategory score should be very visible and not a gray color.
+
+
 8. **Thresholds for compilations.** For example, a source network counts if it supplies a set share of stations or
    values, or is a reference network.
+
+<reply>
+Explain this in more detail.
+
+
 9. **Rules for threat stage and conflicts.** Say whether a proposed cut counts as "for" or only an enacted one, and
    which source wins a conflict (for example the latest primary source).
+
+<reply>
+Both a proposed cut and an enacted one count as "for" evidence.
+
+
 10. **Score RRS per repository,** then combine (weighted by which copy users rely on), instead of one pooled verdict.
+
+<reply>
+This is a good point. For now it's a pooled verdict. So if there is more than one data repository, "for" evidence and "against" evidence should appear for each repository and the score determined on "for" and "against" evidence regardless of which repository it refers to. But add an indicator to each RRS subcategory card that there is a single repository or multiple repositories for the dataset.
+
+
 11. **Give data quality a home,** as a new D subcategory or a note outside the score.
+
+<reply>
+The R* formula is fixed and it can't be modified and no new subcategories can be added.
+
+
 12. **Add "counts / doesn't count" examples to each definition file,** including one each for a station compilation
     (GHCN-Daily) and a satellite product (IMERG).
+
+<reply>
+Explain this in more detail.
+
+
 
 ## Questions to discuss with a colleague
 
 - [ ] When the producer and the repository are the same organization, should its funding and staff count once (where?)
   or in every group they touch?
+
+<reply>
+When the producer and the repository are the same organization, its funding and staff count once as evidence. Mention that the producer and repository are the same organization.  Explain more about the question of where.
+
 - [ ] Should D-2 and D-3 be about the dataset's own storage and access, with repositories only in RRS?
+
+<reply>
+D-2 and D-3 include both the dataset and repository information because the dataset lives in the repository and this counts as infrastructure. D-2 describes data going offline and this would occur if the repository went offline.
+
+
 - [ ] How direct must a link be? Does an agency-wide loss count if no source names the dataset's team or inputs?
+
+<reply>
+I think you are talking about an agency like NOAA has a loss and at the same time, NOAA funds the dataset's team or inputs, but the numbers only refer to NOAA. Add this as "neutral" evidence and keep it as context if the dataset's team or inputs aren't directly named.
+
+Rename "neutral" evidence to "context"
+
+
 - [ ] For a compilation of about 30 sources, how big must one source be before its risk is the dataset's risk?
+
+<reply>
+Count it as a risk if it involves a source. It doesn't matter how big it is because the total dataset as it currently is defined is a composite of all the sources, so if one is at risk, the currently defined composite is at risk.
+
 - [ ] Should a proposed cut count the same as an enacted one, given that the score is all-or-nothing?
+
+<reply>
+Count the proposed count the same as an enacted one.
+
 - [ ] Should missing evidence score 0 everywhere, or be shown as "unknown" and left out of R*?
+
+<reply>
+Let's show it as NA and the R* score be NA. Then a user will know the R* value is incomplete and they can decide if it should be 0 because no web search evidence exists for that dataset. Evidence may exist through verbal communication and not show up in a web search, and the user can use that information to determine the score.
+
+There is going to be a web form that the user fills out the final score and the web search information and scores gathered from web research evidence will fill in items on that web form. And NA scores will be indicated on the web form as needing a decision. For my graph idea, I'm thinking a NA score can be designated with a color like black and have the value NA.
+
+
 - [ ] Should RRS be scored per repository, and if so how are the copies weighted?
+
+<reply>
+The RRS will be scored using all of the repositories used by the dataset. As an example, if there is only one repo, the score is just for one repository. If there are two or more, than there can be 'for' evidence for one repo and 'against' for another repo. And this results in a NA score because it needs a users input.
+
+
 - [ ] Does data quality belong in R*, and where?
+
+<reply>
+There is no data quality score, so it won't be part of R*. R* assumes the data quality is good to begin with. If there is an interruption in the data or a drop in quality, that would be evidence of a risk.
+
+
 - [ ] Is one fact in two subcategories double counting, or the right picture?
+
+<reply>
+It's OK to have one fact in multiple subcategories. The web search information can be evidence for more than one subcategory. The R* score is to give people a score to start with to judge the stability of a dataset and is not a scientifically defined formula with exact subcategory separation.
+
+
 - [ ] Would the statements be easier to apply if they were all written as risks?
 
+<reply>
+Keep them as it is. The formula was already determined. In the future, the information gathered from the web research and calculating R* scores will inform if and how the score should be recalculated.
+
+
 Open questions 2 to 6 in [first_pass_to_categorize.md](first_pass_to_categorize.md) cover some of the same ground.
+
+<reply>
+
+Include these questions when a second version of this doc is created as a follow up. Keep your questions and my replies as a record of this conversation.
+
