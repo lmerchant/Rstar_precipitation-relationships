@@ -29,68 +29,6 @@ make these R* weighted network graphs for each dataset.
 
 See the definitions in the file docs/scoring/how_to_score_rstar.md
 
-### People risk score values
-
-People risk subcategories have the format P-# defined in rstar_definitions/p-rstar-people_risk_queries.md
-
-Score values
-
-```
-Subcategory P-# can only have score values in the following sets and the min score is always 0
-
-Score sets for the subcategories of the major category People Risk where p_1 represents the score of subcategory P-1, etc. And d_total represents the total score of the People Risk major category.
-
-p_1 = {0,35}
-p_2 = {0,25}
-p_3 = {0,20}
-p_4 = {0,15}
-
-p_total = p_1 + p_2 + p_3 + p_4
-
-```
-
-### Repository resilience score values
-
-Repository resilience subcategories have the format RRS-# defined in rstar_definitions/rrs-rstar-repository_reslience_queries.md
-
-Score values
-
-```
-RRS-# can only have score values in the following sets and the min score is always 0
-
-Score sets for the subcategories of the major category Repository resilience where rrs_1 represents the score of subcategory RRS-1, etc. And rrs_total represents the total score of the Repository resilience major category.
-
-rrs_1 = {0,25}
-rrs_2 = {0,20}
-rrs_3 = {0,20}
-rrs_4 = {0,20}
-rrs_5 = {0,15}
-
-rrs_total = rrs_1 + rrs_2 + rrs_3 + rrs_4 + rrs_5
-
-```
-
-### Dependent infrastructure resilience score values
-
-Dependent infrastructure resilience subcategories have the format DIRS-# defined in rstar_definitions/dirs-rstar-dependent_infrastructure_reslience_queries.md
-
-Score values
-
-```
-DIRS-# can only have score values in the following sets and the min score is always 0
-
-Score sets for the subcategories of the major category Dependent infrastructure resilience where dirs_1 represents the score of subcategory DIRS-1, etc. And dirs_total represents the total score of the Dependent infrastructure resilience major category.
-
-dirs_1 = {0,25}
-dirs_2 = {0,20}
-dirs_3 = {0,20}
-dirs_4 = {0,20}
-dirs_5 = {0,15}
-
-dirs_total = dirs_1 + dirs_2 + dirs_3 + dirs_4 + dirs_5
-
-```
-
 
 ## Information nodes
 
