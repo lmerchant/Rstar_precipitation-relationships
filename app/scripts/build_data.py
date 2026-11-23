@@ -1,7 +1,7 @@
 """Build app/data/rstar-data.js for the R* categorization viewer.
 
 Reads the R* definitions (rstar_definitions/*.md), the point values and
-group weights (docs/rstar_relationship_graph/rstar_graphs.md), dataset
+group weights (docs/scoring/how_to_score_rstar.md), dataset
 names (datasets_metadata/json/) and the categorization JSON files
 (data-rstar-categories/datasets/<dataset>/*.json), and writes them as one
 JavaScript file the pages load with a <script> tag. That keeps the site
@@ -54,7 +54,9 @@ def section(text, heading_re):
 
 def parse_definitions(path):
     text = path.read_text(encoding="utf-8")
-    defined = clean(section(text, r"^## .*defined\s*$"))
+    # Paragraphs of the "... defined" section: the first is the short definition (landing card),
+    # the rest (for example DIRS's scope note) show only on the category page.
+    defined = [clean(p) for p in re.split(r"\n\s*\n", section(text, r"^## .*defined\s*$")) if p.strip()]
     subs_text = section(text, r"^## Subcategories\s*$")
     subs = []
     for m in re.finditer(r"^### (\S+)\s*$", subs_text, flags=re.M):
@@ -88,7 +90,7 @@ def dataset_name(folder):
 
 
 def main():
-    points, group = parse_weights(ROOT / "docs" / "rstar_relationship_graph" / "rstar_graphs.md")
+    points, group = parse_weights(ROOT / "docs" / "scoring" / "how_to_score_rstar.md")
     categories = []
     for key, deffile, page, prefix, var in CATEGORIES:
         path = ROOT / "rstar_definitions" / deffile
@@ -102,7 +104,8 @@ def main():
             "title": SHORT_TITLES[key],
             "heading": h1.group(1).strip() if h1 else SHORT_TITLES[key],
             "page": page,
-            "definition": defined,
+            "definition": defined[0] if defined else "",
+            "definition_more": defined[1:],
             "weight": group.get(var),
             "subcategories": subs,
             "source_file": f"rstar_definitions/{deffile}",

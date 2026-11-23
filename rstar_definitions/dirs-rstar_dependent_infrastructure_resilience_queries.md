@@ -4,6 +4,8 @@
 
 The invisible dependency layer — external infrastructure that datasets depend on but don’t control: calibration facilities, satellite ground stations, field observation networks, specialized instrumentation labs. When NOAA’s Global Monitoring Laboratory calibration services were threatened, every dataset whose quality assurance depends on those standards became more fragile immediately, regardless of its own hosting situation.
 
+DIRS covers what this dataset needs in order to be produced: the instruments and observing networks that make its measurements, the calibration of those instruments, the data feeds it is built from, and the processing that turns them into the dataset. It does not cover where the finished dataset is stored or served. The repository's storage, hosting, access and funding belong to D-2, D-3 and RRS. Count a repository or agency fact here only when a source ties it to this dataset's inputs or processing.
+
 ## Subcategories
 
 ### DIRS-1
@@ -16,7 +18,7 @@ Dataset quality or continuity depends on an external calibration service, refere
 
 #### How to find
 
-Find out who performs the data processing and does quality control (QC) on it. Is the data processing done by the group making the measurements or by an outside group?
+List the instruments whose measurements reach this dataset (for a compilation, those of each contributing network). Find who calibrates them and against what standard: a national standards lab, a manufacturer, a field support centre, a WMO instrument centre, or a reference sensor (for example GMI for satellite products). Is that calibration done by the group that takes the measurements, or by an outside service that could be cut?
 
 ### DIRS-2
 
@@ -28,7 +30,7 @@ Upstream sensors, ground stations, buoys, or satellite instruments that feed thi
 
 #### How to find
 
-Find out how data measurements are taken and what instruments and platforms are needed. For datasets that depend on other datasets, this is important to know if the included datasets have near future unavailability. Could be a satellite coming to the end of use or funding cuts for use of a satellite or funding cuts so that the instruments or platforms needed to measure the data will be interrupted.
+From the dataset's own documentation (source flags, input lists), list the networks, stations and satellite instruments that feed it, and how much each supplies. For each, look for end-of-life dates, funding cuts, closures or staff losses that would stop or thin its observations.
 
 ### DIRS-3
 
@@ -40,7 +42,7 @@ Dataset depends on external data feeds (reanalysis inputs, ancillary fields, ref
 
 #### How to find
 
-Find all external datasets that are used as part of the dataset or used to process the dataset. Is it a stand alone measurement or does it depend on other datasets outside of the program or group serving the dataset. Want to know what the dataset depends on and if those dependencies are in danger of not being available or have their availability interrupted.
+Find every other dataset or feed this dataset is built from or processed with (source compilations, reanalysis or model fields, ancillary or reference data), and the route each arrives by (for example WMO exchange or an agency feed). Is any of them stopping, changing or delayed?
 
 ### DIRS-4
 
@@ -52,7 +54,7 @@ Specialized computing, software, or lab facilities not controlled by the data st
 
 #### How to find
 
-Look at how the dataset is processed and if any outside groups are involved with the dataset processing. Also look for instruments needed to make the measurements but outside of the groups resources. e.g. the use of satellites to get data. Is the data processing complex and specialized resources and outside groups and facilities are needed? Is the software and code produced by the group taking the measurements or is it proprietary or comes from outside groups?
+Find who processes and quality-controls this dataset, and on what systems. Is it done by the producer on its own systems, or does it rely on outside groups, contracted or commercial computing, or third-party software? The repository's general IT and cloud moves count only if a source says this dataset's processing moves with them.
 
 ### DIRS-5
 
@@ -64,4 +66,4 @@ If the primary external dependency fails, no backup source, workaround, or subst
 
 #### How to find
 
-Check the dependencies of the data. Datasets may depend on satellite data for example and if the satellite funding is in danger or the satellite is at the end of life with no replacement, that's important information to have.
+For each dependency found under DIRS-1 to DIRS-4, look for a backup: a second source, a successor instrument or mission, a substitute feed, or the dataset's own fallback (such as a source priority). Also look for other datasets that could stand in for this one if it stopped, and say how much of it each could replace (region, period, update rate, quality control).

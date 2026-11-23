@@ -23,9 +23,10 @@ You can also open `app/index.html` straight from disk. The data is loaded with a
 
 The pages read `data/rstar-data.js`, which is generated. Re-run the build after changing any of:
 
-- `rstar_definitions/*.md` (titles, descriptions, "How to find" text)
+- `rstar_definitions/*.md` (titles, descriptions, "How to find" text; the first paragraph of a "... defined"
+  section is the short definition on the landing page, and any later paragraphs show only on the category page)
 - `data-rstar-categories/datasets/<dataset>/*.json` (the categorizations)
-- `docs/rstar_relationship_graph/rstar_graphs.md` (point values and group weights)
+- `docs/scoring/how_to_score_rstar.md` (point values and group weights)
 - `datasets_metadata/json/*_dataset-metadata.json` (dataset names and details)
 
 ```bash

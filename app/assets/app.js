@@ -331,6 +331,7 @@
       el("h1", { text: cat.heading }),
       el("span", { class: "weight", text: weightLabel(cat) }),
       el("p", { class: "lede", text: cat.definition }),
+      ...(cat.definition_more || []).map((t) => el("p", { class: "lede", text: t })),
       el("p", { class: "lede" }, [
         "Showing ",
         el("strong", { text: dataset.name }),
