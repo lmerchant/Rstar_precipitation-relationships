@@ -18,9 +18,9 @@ repository questions go to shared runs, one per repository, so NCEI and GES DISC
 | 3 | [gpcp-daily-gaps_Rstar_query_pt7_people-production.md](gpcp-daily_gap-queries/gpcp-daily-gaps_Rstar_query_pt7_people-production.md) | GPCP: P-1 to P-4, D-1, DIRS-1, DIRS-4, DIRS-5, copies | 40 min, 320,000 | Any time |
 | 4 | `Rstar_query_results/queries/archive_queries/archive_specific_queries/A2_Rstar_query-nasa_gesdisc_pps.md` | NASA GES DISC and PPS: RRS-1 to RRS-3, RRS-5, D-2, D-3 | 40 min, 320,000 | Any time |
 | 5 | `Rstar_query_results/queries/archive_queries/archive_specific_queries/A2_Rstar_query-uci_chrs.md` | CHRS data site: RRS-1 to RRS-5, D-2, D-3 | 30 min, 240,000 | Any time |
-| — | `Rstar_query_results/queries/archive_queries/archive_specific_queries/A2_Rstar_query-noaa_ncei.md` | NCEI: RRS-1 to RRS-3, RRS-5 (also serves GHCN-Daily) | 40 min, 320,000 | Already in your GHCN-Daily queue |
+| — | `Rstar_query_results/queries/archive_queries/archive_specific_queries/A2_Rstar_query-noaa_ncei.md` | NCEI: RRS-1 to RRS-3, RRS-5 (also serves GHCN-Daily) | 40 min, 320,000 | Ran 2026-11-23; copied to `archives/noaa-ncei/` |
 
-That's 5 new sessions for the three datasets, plus the NCEI A2 run you're already doing for GHCN-Daily. All five are
+That's 5 new sessions for the three datasets, plus the NCEI A2 run (done 2026-11-23). All five are
 standard-tier questions: none asks about cuts or news, which the earlier runs already covered.
 
 ## Step 1: rewrite all five in one session
@@ -45,5 +45,5 @@ Copy each run folder into this project's `data-rstar-query-results/`:
 - dataset runs into `about-datasets/<id>/`;
 - repository runs into `archives/<repository>/` (for example `archives/nasa-gesdisc-pps/` and `archives/uci-chrs/`).
 
-Also copy the runs not yet here: GHCN-Daily pt7 and pt8, and IMERG inputs-pt6. Then categorize each dataset (Prompt 1 in
+(GHCN-Daily pt6–pt9, the NCEI A2 run and IMERG inputs-pt6 are already copied.) Then categorize each dataset (Prompt 1 in
 `docs/categorizing-web-searches_README.md`), using its own runs, the shared repository runs and the instrument runs.

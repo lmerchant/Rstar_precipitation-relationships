@@ -31,16 +31,22 @@ calibration, and which of its copies are current? Add to what those runs found r
 - **Contracts and processing (P-3, P-4, DIRS-4, D-1):** which contract pays the SSAI IMERG staff now that SAMDA
   NNG17HP01C ended on May 31, 2025 (ATMOS, awarded to STC from November 3, 2025, is a candidate); which contract runs PPS
   and how PPS is funded; the George Mason University CEOSR contract that writes PPS job-control software; where PDIR-Now
-  is computed; whether the IMERG production code is shared on request.
+  is computed, and whether V08 replaces it with GPROF-IR (an IMERG-team preprint presents GPROF-IR as V08's IR
+  retrieval); whether the IMERG production code is shared on request.
 - **Calibration (DIRS-1):** who maintains the X-CAL offset tables that put each microwave sensor on GMI's scale (the
   GPM X-CAL working group, Wesley Berg at CSU, GSICS), how they are funded, and their current versions; which L1C ATBD
   is current (pt2 says v1.6 from 2016, pt3 cites v1.9); whether the Late Run's gauge calibration, a climatology built
   from the Final Run's GPCC adjustment, is frozen since the V07 Final record ended on September 30, 2025; what would
   calibrate IMERG if GPM's GMI or DPR stopped (the DPR–GMI combined reference has been climatological since March 1,
-  2026).
-- **Inputs and alternatives (DIRS-3, DIRS-5):** status of the JMA forecast (precipitation phase) and NOAA Autosnow
-  inputs; substitutes for NOAA CPC's merged IR and for GMAO's GEOS FP fields if either stops; which datasets could
-  replace the Late Run for near-real-time users.
+  2026); whether near-real-time MetOp-C GPROF has the MetOp-B calibration-file error PPS found on November 20, 2026
+  (standard processing was stopped, near-real-time continued); how GPCC's V2025 change reaches the Late Run's
+  climatological calibration.
+- **Inputs and alternatives (DIRS-2, DIRS-3, DIRS-5):** what PPS's near-real-time stream ingests now that SSMIS
+  (September 30, 2026), NOAA's AMSR2 feed (September 2, 2026) and S-NPP ATMS (November 2, 2026) have ended, and whether
+  the Late Run uses AMSR3; status of the JMA forecast (precipitation phase) input; whether the V07 Late Run uses NOAA's
+  new Autosnow, which includes AMSR3; whether GEOS FP itself ended on May 31, 2026 or only FP-IT did; whether CPC's
+  merged IR switched to Meteosat-12; substitutes for NOAA CPC's merged IR and for GMAO's GEOS FP fields if either
+  stops; which datasets could replace the Late Run for near-real-time users.
 - **Copies (RRS-1, D-3):** who runs dynamical.org's IMERG copy (`s3://dynamical-nasa-imerg`), how it is funded, and
   whether it is current; whether Google Earth Engine's `NASA/GPM_L3/IMERG_V07` is current; how long PPS keeps Late Run
   files.
@@ -72,9 +78,19 @@ records ahead of news. With a time limit of 40 minutes and a token ceiling of 32
     latitudes; the Late Run never reads gauges directly (pt2);
   - contracts from pt4: SAMDA NNG17HP01C (SSAI, ended 2025-05-31), ATMOS (STC, from 2025-11-03), EED-3 80GSFC21CA001
     (Raytheon, to 2027-01-31), HBG 80GSFC20C0044 (SSAI, being recompeted);
-  - the status of every satellite input from 2024 to 2026 (pt6, NASA and NOAA satellite runs).
+  - the status of every satellite input from 2024 to 2026 (pt6, NASA and NOAA satellite runs);
+  - from pt6: WSF-M1 MWI near-real-time files in PPS since August 12, 2026 and AMSR3 1C from about August 25, 2026;
+    GPM's estimate that losing SSMIS raises the Late Run's IR share from 9.9% to 22.9% (about 15.1% with MWI); PPS's
+    V08 GPROF halt (September 18, 2026) and L3 recall (October 1, 2026); GEOS FP upgrades on February 26 and
+    November 18, 2026.
+- **Not for this run:** JAXA's AMSR2 notices and EUMETSAT's Metop-B and Meteosat-9 end dates. Pt6 rated those inputs,
+  and the sandbox refuses their hosts (see pt6's `check-by-hand.md` and `sites-to-trust.md`).
 - **Leads:** the PPS project page (science.gsfc.nasa.gov/earth/projects/212); the GSICS microwave deliverable page
-  (gsics.atmos.umd.edu), unreachable last time; the L1C ATBD v1.9 on arthurhou.pps.eosdis.nasa.gov.
+  (gsics.atmos.umd.edu), unreachable last time; the L1C ATBD v1.9 on arthurhou.pps.eosdis.nasa.gov; the unread
+  "Details" links on the PPS home page (pps.gsfc.nasa.gov) for September 30, October 28 and November 20, 2026; the
+  Earthdata Forum thread on GMAO_FP (forum.earthdata.nasa.gov/viewtopic.php?p=26053), down last time; the V07 ATBD
+  (August 13, 2026) for the GPCC climatology. The Late Run file headers list their inputs but need a PPS sign-up, so
+  say where that would settle a question rather than signing up.
 
 ### What the answer should give
 

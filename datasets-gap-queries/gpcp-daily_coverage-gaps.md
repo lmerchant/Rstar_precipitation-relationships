@@ -18,6 +18,8 @@
 | NASA GES DISC (Earthdata Cloud, AWS us-west-2) | V3.2, V3.3 | NASA A2 written; no A1 (NASA budget is in the IMERG runs) |
 | NSF NCAR GDEX, Copernicus CDS, GSFC backup FTP, obs4MIPs, Earth Engine, gpcp.umd.edu | various; some not confirmed | Copies only: checked in pt7 |
 
+> **Update 2026-11-23: the NCEI A2 run has come back** (`data-rstar-query-results/archives/noaa-ncei/2026-11-23_A2_Rstar_query-noaa_ncei`). It fills the NCEI side of D-2 and RRS-1, RRS-2, RRS-3 and RRS-5 below: no scheduled checksum checks (contradicts RRS-2); the CDR is archived in Asheville with an offsite tape copy only kilometres away, so RRS-1 isn't shown; no DR test is public (RRS-3); no loss reported since 2015 but 8% of Helene's ingest backlog unaccounted (RRS-5). GPCP Daily v1.3's maturity review (DSMR-00163) scores Data Integrity 3.5 with checksums only at ingest and on order; GPCP Daily also has a copy in NCEI's own `climatedatarecords` cloud bucket (low confidence). Rows marked "NCEI A2" still need the other hosts' runs.
+
 ## Summary
 
 | Subcategory | Coverage | What's missing | Filled by |
