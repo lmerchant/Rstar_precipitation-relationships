@@ -16,7 +16,7 @@ No written plan identifies a successor or outlines knowledge transfer steps for 
 
 #### How to find
 
-Search for the number of people in a dataset group and how long it has existed to get an estimate of how many people are available to be a successor. Look for detailed documentation of the how to take the data measurements and process the dataset.
+Search for the number of people in a dataset group and how long it has existed to get an estimate of how many people are available to be a successor. Look for a succession plan, but also look for documentation of knowledge needed to keep taking measurements, process the data, and run the group.
 
 ### P-2
 

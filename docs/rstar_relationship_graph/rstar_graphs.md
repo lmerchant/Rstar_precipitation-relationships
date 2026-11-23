@@ -25,53 +25,20 @@ make these R* weighted network graphs for each dataset.
 
 ---
 
+## R* score definition
 
-## R* definition
+See the definitions in the file docs/scoring/how_to_score_rstar.md
 
-R* is composed of 4 groups (D, P, RRS, DIRS)
+### People risk score values
 
-Group definitions
+People risk subcategories have the format P-# defined in rstar_definitions/p-rstar-people_risk_queries.md
 
-1. D = Data risk
-2. P = People risk
-3. RRS = Repository resilience risk
-4. DIRS = Dependent infrastructure resilience risk
-
-## Scoring formula for group nodes and R*
-
-### R* node value
+Score values
 
 ```
-rstar = d_total*0.40 + p_total*0.30 + (100 - rrs_total)*0.20 + dirs_total*0.10
-```
+Subcategory P-# can only have score values in the following sets and the min score is always 0
 
-### Data risk node values
-
-Data risk items have format D-#
-
-Point values
-
-```
-D-# can only have values in the set and start at 0
-
-d_1 = {0,30}
-d_2 = {0,25}
-d_3 = {0,20}
-d_4 = {0,15}
-d_5 = {0,10}
-
-d_total = d_1 + d_2 + d_3 + d_4 + d_5
-
-```
-
-### People risk node values
-
-People risk items have format P-#
-
-Point values
-
-```
-P-# can only have values in the set and start at 0
+Score sets for the subcategories of the major category People Risk where p_1 represents the score of subcategory P-1, etc. And d_total represents the total score of the People Risk major category.
 
 p_1 = {0,35}
 p_2 = {0,25}
@@ -82,14 +49,16 @@ p_total = p_1 + p_2 + p_3 + p_4
 
 ```
 
-### Repository resilience risk node values
+### Repository resilience score values
 
-Repository risk items have format RRS-#
+Repository resilience subcategories have the format RRS-# defined in rstar_definitions/rrs-rstar-repository_reslience_queries.md
 
-Point values
+Score values
 
 ```
-RRS-# can only have values in the set and start at 0
+RRS-# can only have score values in the following sets and the min score is always 0
+
+Score sets for the subcategories of the major category Repository resilience where rrs_1 represents the score of subcategory RRS-1, etc. And rrs_total represents the total score of the Repository resilience major category.
 
 rrs_1 = {0,25}
 rrs_2 = {0,20}
@@ -101,14 +70,16 @@ rrs_total = rrs_1 + rrs_2 + rrs_3 + rrs_4 + rrs_5
 
 ```
 
-### Dependent infrastructure resilience risk node values
+### Dependent infrastructure resilience score values
 
-Dependent infrastructure resilience risk items have format DIRS-#
+Dependent infrastructure resilience subcategories have the format DIRS-# defined in rstar_definitions/dirs-rstar-dependent_infrastructure_reslience_queries.md
 
-Point values
+Score values
 
 ```
-DIRS-# can only have values in the set and start at 0
+DIRS-# can only have score values in the following sets and the min score is always 0
+
+Score sets for the subcategories of the major category Dependent infrastructure resilience where dirs_1 represents the score of subcategory DIRS-1, etc. And dirs_total represents the total score of the Dependent infrastructure resilience major category.
 
 dirs_1 = {0,25}
 dirs_2 = {0,20}
@@ -119,6 +90,7 @@ dirs_5 = {0,15}
 dirs_total = dirs_1 + dirs_2 + dirs_3 + dirs_4 + dirs_5
 
 ```
+
 
 ## Information nodes
 
