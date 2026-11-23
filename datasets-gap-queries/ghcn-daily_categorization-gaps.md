@@ -1,13 +1,21 @@
 # GHCN-Daily: what the research didn't search, by subcategory
 
 - **Dataset:** GHCN-Daily (GHCNd), NOAA NCEI. DOI 10.7289/V5D21VHZ, current version 3.35.
-- **Categorized:** 2026-11-22 (second pass, which replaces the first pass of the same day).
+- **Categorized:** 2026-11-23 (third pass, adding the four gap runs and the NCEI A2 run; replaces the second pass of 2026-11-22).
 - **Output:** [ghcn-daily_rstar-categories.json](../data-rstar-categories/datasets/ghcn-daily/ghcn-daily_rstar-categories.json). It was built by `scripts/categorize/build_ghcn-daily.py`.
 - **Research used:** every answer file in `data-rstar-query-results/` that bears on GHCN-Daily:
-  - `about-datasets/ghcn-daily/`: about-pt1, about-pt2, about-pt3_combined, funding-pt3, threats-news-pt4 and sources-pt5;
-  - `archives/noaa-ncei/2026-11-17_noaa-ncei-threats`;
+  - `about-datasets/ghcn-daily/`: about-pt1, about-pt2, about-pt3_combined, funding-pt3, threats-news-pt4 and sources-pt5,
+    plus the gap runs people-pt6, repository-pt7, infrastructure-pt8 and repository-resilience-pt9;
+  - `archives/noaa-ncei/2026-11-17_noaa-ncei-threats` and `archives/noaa-ncei/2026-11-23_A2_Rstar_query-noaa_ncei`;
   - `instruments/noaa-rain-gauges/2026-11-18_noaa-rain-gauge-threats`.
 - **Not used:** the NASA and NOAA satellite runs. GHCN-Daily uses only station data, so they don't apply.
+
+> **Update 2026-11-23: all four gap runs and the NCEI A2 run have come back.** They are in
+> `data-rstar-query-results/`: `about-datasets/ghcn-daily/2026-11-23_ghcn-daily-people-pt6`,
+> `2026-11-22_ghcn-daily-repository-pt7`, `2026-11-23_ghcn-daily-infrastructure-pt8`,
+> `2026-11-23_ghcn-daily-repository-resilience-pt9`, and `archives/noaa-ncei/2026-11-23_A2_Rstar_query-noaa_ncei`.
+> The third categorization pass (2026-11-23) uses them. See **After the gap runs** at the end of this note for what each
+> subcategory now has and what is still open. The sections in between are the gaps as they stood on 2026-11-22.
 
 Each subcategory below lists the questions the research never asked, so a decision on it can't be made from what we have. "Partly covered" means there is evidence, but the subcategory's own question is still open. Each list ends with possible searches you could turn into queries.
 
@@ -232,3 +240,65 @@ The repositories are NCEI, the AWS copy (noaa-ghcn-pds) and the Google BigQuery 
 - **RRS-2 is no longer empty:** it has thin evidence.
 - **DIRS-1 now draws on gauge maintenance and USCRN evidence.**
 - **Same JSON format as before:** an Evidence list and a Gaps list, with `data-confidence` and `data-source` attributes. Gaps in the JSON are short; this note holds the full list.
+
+## After the gap runs (2026-11-23)
+
+Checked against the five new runs: people-pt6, repository-pt7, infrastructure-pt8, repository-resilience-pt9 and the
+NCEI A2 run. Every subcategory that was **not searched** now has evidence. What's left is mostly unpublished: NCEI,
+NESDIS or OPM hold it, so it needs an email, a FOIA request or a page read by hand, not another web search.
+
+| Subcategory | Now | Main new evidence | Still open |
+|---|---|---|---|
+| P-1 Succession plan | Covered | No GHCN-Daily, NCEI or NESDIS plan published; NAO 202-1103 lists succession only as a "possible strategy" (pt6) | NOAA's 2012 succession toolkit and Commerce's 2022 guide (unread; generic) |
+| P-2 Retirement-eligible | Covered (low confidence) | ORCID/OpenAlex estimates: Vose likely already eligible, Menne possibly by Nov 2028; Durre left 30 Apr 2025 (pt6) | Real service dates and ages (OPM records, not public) |
+| P-3 Undocumented knowledge | Covered | DSMR-00227: "not currently under Configuration Management"; no public code (pt6) | Code-sharing policy (ask ncdc.ghcnd@noaa.gov) |
+| P-4 Single point of failure | Covered | Menne is the one named federal scientist left; hands-on staff are Riverside Technology contractors; Datzilla gatekeeper may be one contractor (unverified) (pt6) | Who replaced Durre; current status of Gleason, Houston, Korzeniewski, Kantor |
+| D-1 Program defunding | Covered | No CPO COM support found after 2021 (pt7) | GHCN-Daily's own budget share (unpublished) |
+| D-2 Storage single point | Covered | Two tape copies, the offsite one 12.5 miles from Asheville (pt9); AWS lift-and-shift by spring 2027 run by contractors; NCCF single region (OIG-24-034-A) (pt7) | Where GHCN-Daily sits after the move; whether tapes are kept |
+| D-3 Access fragile | Covered | "Data Access Delays" alert 16–30 Nov 2026; NODD on 2019 contracts with no published end; fee rule doesn't touch online GHCN-Daily (pt7) | NODD contract records for AWS and Google; CDO/ADS staff and funding |
+| D-4 Format obsolescence | Covered | All routes open formats; no published Parquet or BigQuery schema (pt7) | Schemas and ADS NetCDF attributes (read by hand) |
+| D-5 Political sensitivity | Covered | None of the 2025–26 NCEI retirements is a GHCN-Daily route (pt7) | The Senate's list of "at least 20" (unpublished) |
+| DIRS-1 Calibration | Covered | ATDD's 8-person USCRN team, parent ARL proposed for closure FY26 and FY27; Sterling SFSC running; WMO RICs being reformed (pt8) | ARL/ATDD's FY2026 status (spend plan not public) |
+| DIRS-2 Observation networks | Covered | NWS electronics technicians down ≥16%; SMN Argentina dismissals and station closures; NRCS snow-survey warnings (pt8) | Which SMN stations close; AWOS-C climate-site list (FAA) |
+| DIRS-3 Upstream supply chain | Covered | SSODv2 full record still not confirmed; GHCNh now upstream; Canada restored Oct 2026; RCCs re-awarded to 2031 (pt8) | SSODv2 integration (spot-check source flags or ask NCEI); GHCNh funding |
+| DIRS-4 External processing | Covered (by absence) | Where processing runs after the AWS move is unpublished (pt7, pt8) | NCEI holds it |
+| DIRS-5 No alternative supplier | Covered | HadISD stopped; ECA&D, C3S and WIS2 current but none is a global QC'd daily archive (pt8) | — |
+| RRS-1 Geographic redundancy | Covered | Asheville's two copies are 12.5 miles apart; Boulder has dispersed copies only of its own holdings; AWS and BigQuery single-region (pt9, NCEI A2) | AWS regions and copy count after the move |
+| RRS-2 Checksum verification | Covered | Checksums at ingest, retrieval and order, not on a schedule; size-only comparisons between copies; NCEI CoreTrustSeal valid to 2028-01-29 (pt9, NCEI A2) | SOP 60-6-015 (not public) |
+| RRS-3 Disaster recovery plan | Covered (by absence) | NESDIS requires annual tests; no test or result is public; NCEI's contingency plan "cannot be shared outside the US Government" (pt9, NCEI A2) | Test results (FOIA) |
+| RRS-4 Stable funding | Covered | FY2026 enacted, no rescission; NODD copies have no guaranteed term (pt9) | NCEI's FY2026 spend plan |
+| RRS-5 Track record | Covered | Helene: holdings safe, 92% of ingest backlog recovered, 8% unaccounted; no shutdown loss found (pt9, NCEI A2) | Final Helene loss count |
+
+### Conflicts to settle when categorizing
+
+- **OIG-24-034-A:** pt7 says recommendations 3, 9 and 10 were open in Sept 2025; pt9 and NCEI A2 found them, and
+  recommendation 11 (single region), "Closed" on Oversight.gov with no date or action. Use the later finding.
+- **NODD term:** the 2023 slides give a ten-year term to about Sept 2029 (inference), while two 2019 Big Data Project
+  IDIQs on USAspending ended 2025-09-19. They may be different instruments (pt9, low).
+- **NCCF regions:** a 2021 prototype briefing says "cross-region replication"; OIG found one region in 2024 (NCEI A2).
+- **Pt9's cross-links** point to `../<run>/answer.md`, which here is named `answer_<query>.md`.
+
+### Left for checking by hand (no new web search planned)
+
+- the AWS per-station files: a checker lead says they haven't been written since 2025-02-09; check object dates in
+  `noaa-ghcn-pds` (pt9);
+- SSODv2's full-record integration: spot-check station `.dly` files for source flag "2" (pt8);
+- the Parquet footer and BigQuery schema tab (pt7);
+- the 2022 WERA1012 slides naming the "Datzilla Gatekeeper" (pt6);
+- each run's `check-by-hand.md` in `Rstar_query_results/web_search_results/` (not copied here).
+
+## Changes from the second pass (2026-11-23)
+
+- **Added the five new runs:** 73 evidence items (people-pt6 17, repository-pt7 16, infrastructure-pt8 20,
+  repository-resilience-pt9 14, NCEI A2 6).
+- **Dropped 10 items** that only said a topic was "not searched" or "not read", now that a run has searched it (for
+  example the P-2, DIRS-1, RRS-2 and RRS-3 placeholders, and the unread fee rule and OIG reports).
+- **DIRS kept to the dataset's own dependencies:** four DIRS-4 items about NCEI as a whole (the archive's move to
+  AWS, NCEI's support contracts, Hurricane Helene, the migration contractors) were removed; each is already under
+  D-2, D-3, P-4 or RRS. That leaves 210 items in all.
+- **Every Gaps list rewritten** to what is still open after the gap runs (the table above).
+- **The script now keeps each item's stance next to it** (a fourth tuple field) instead of in a separate table of
+  letters, so items can be added or removed without shifting the others' stances. The second-pass output was rebuilt
+  byte-identical before any evidence changed.
+- **Older items kept as they were** even where a later run adds to them, for example the rain-gauge run's "Congress
+  rejected" ARL closure for FY2026, next to pt8's finding that the enacted statement doesn't name ARL.
