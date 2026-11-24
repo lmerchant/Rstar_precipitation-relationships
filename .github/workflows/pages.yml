@@ -33,16 +33,16 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - uses: actions/checkout@v5
-      - uses: actions/configure-pages@v5
+      - uses: actions/checkout@v7
+      - uses: actions/configure-pages@v6
       # Copy the site without the developer files (tests, test settings, the data build script).
       - name: Gather the site files
         run: >
           rsync -a
           --exclude e2e/ --exclude pytest.ini --exclude requirements-dev.txt --exclude scripts/
           app/ _site/
-      - uses: actions/upload-pages-artifact@v4
+      - uses: actions/upload-pages-artifact@v5
         with:
           path: _site
       - id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
