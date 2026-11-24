@@ -222,6 +222,18 @@
     return { rstar, groups, subcategories: subs };
   }
 
+  // What a category adds to R*: weight × raw total, or for repository resilience weight × (100 − raw total).
+  // Rounded to one decimal, like R*. NA when the raw total is NA.
+  function categoryContribution(cat, total) {
+    if (isNA(total)) return "NA";
+    return Math.round(cat.weight * (cat.key === "repo_resilience" ? 100 - total : total) * 10) / 10;
+  }
+
+  function contributionRule(cat) {
+    const w = cat.weight.toFixed(2);
+    return cat.key === "repo_resilience" ? `${w} × (100 − raw total)` : `${w} × raw total`;
+  }
+
   // ------------------------------------------------------- saved files
   // One JSON file per save, in the format of the colleague's R* form (docs/json_output/example_rstar_json.json)
   // plus an "assessor" block. NA is saved as null. Plan: notes/rstar-score-json-save-plan.md.
@@ -834,6 +846,7 @@
     if (!dataset.scores) return null;
     const tbody = el("tbody");
     const totalCell = el("td");
+    const contribCell = el("td");
     const changedNote = el("p", { class: "cat-scores-note" });
     const live = el("p", { class: "sr-only", "aria-live": "polite" });
     const resetBtn = el("button", { class: "btn small", type: "button", text: "Reset scores" });
@@ -851,13 +864,18 @@
         )
       );
       totalCell.replaceChildren(scoreValue(g.total, "small"));
+      const contrib = categoryContribution(cat, g.total);
+      contribCell.replaceChildren(scoreValue(contrib, "small"));
       const changed = cat.subcategories.filter((sub) => chosenScore(sub) !== researchScore(sub.id)).length;
       changedNote.textContent =
         changed === 0
           ? "All are the web evidence scores."
           : `${changed} changed from the web evidence score${changed === 1 ? "" : "s"}.`;
       resetBtn.disabled = changed === 0;
-      if (announce) live.textContent = `${cat.title} total: ${isNA(g.total) ? "NA" : g.total} of ${g.max_points}.`;
+      if (announce)
+        live.textContent =
+          `${cat.title} raw total: ${isNA(g.total) ? "NA" : g.total} of ${g.max_points}. ` +
+          `${cat.title} contribution to R*: ${contrib}.`;
     }
 
     resetBtn.addEventListener("click", () => {
@@ -876,13 +894,27 @@
         el("caption", { class: "sr-only", text: `${cat.title} subcategory scores for ${dataset.name}` }),
         el("thead", {}, el("tr", {}, ["Subcategory", "Points", "Score"].map((h) => el("th", { scope: "col", text: h })))),
         tbody,
-        el("tfoot", {}, el("tr", {}, [
-          el("th", { scope: "row", text: "Total" }),
-          el("td", { text: String(cat.subcategories.reduce((a, s) => a + (s.points || 0), 0)) }),
-          totalCell,
-        ])),
+        el("tfoot", {}, [
+          // The category's score before its weight is applied.
+          el("tr", {}, [
+            el("th", { scope: "row", text: "Raw total" }),
+            el("td", { text: String(cat.subcategories.reduce((a, s) => a + (s.points || 0), 0)) }),
+            totalCell,
+          ]),
+          // What it adds to R*; the points column holds the most it can add.
+          el("tr", { class: "contribution" }, [
+            el("th", { scope: "row", text: `${cat.title} contribution` }),
+            el("td", { text: String(Math.round(cat.weight * 100)) }),
+            contribCell,
+          ]),
+        ]),
       ]),
-      el("p", { class: "cat-scores-note", text: "The total is NA if any subcategory is NA." }),
+      el("p", {
+        class: "cat-scores-note",
+        text:
+          `The raw total is NA if any subcategory is NA. The contribution is ${contributionRule(cat)}: ` +
+          `the part of R* that comes from ${cat.title.toLowerCase()}.`,
+      }),
       changedNote,
       resetBtn,
       live,

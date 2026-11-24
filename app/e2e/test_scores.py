@@ -16,7 +16,11 @@ def score_panel(page: Page, title: str):
 
 
 def total(page: Page, title: str):
-    return score_panel(page, title).get_by_role("row", name=re.compile(r"^Total "))
+    return score_panel(page, title).get_by_role("row", name=re.compile(r"^Raw total "))
+
+
+def contribution(page: Page, title: str, category: str):
+    return score_panel(page, title).get_by_role("row", name=re.compile(rf"^{category} contribution "))
 
 
 def test_radios_start_on_the_research_score(page: Page, console_errors):
@@ -40,18 +44,21 @@ def test_radio_labels_are_only_the_values(page: Page):
 def test_choosing_scores_updates_the_category_total(page: Page):
     page.goto("/people-risk.html?dataset=ghcn-daily")
     panel = score_panel(page, "People risk scores")
-    expect(total(page, "People risk scores")).to_have_text(re.compile(r"Total\s*100\s*NA"))
+    expect(total(page, "People risk scores")).to_have_text(re.compile(r"Raw total\s*100\s*NA"))
+    expect(contribution(page, "People risk scores", "People risk")).to_have_text(re.compile(r"People risk contribution\s*30\s*NA"))
 
     for sub_id, value in [("P-1", "35"), ("P-2", "0"), ("P-3", "25"), ("P-4", "15")]:
         choices(page, sub_id).get_by_role("radio", name=value, exact=True).check()
 
-    expect(total(page, "People risk scores")).to_have_text(re.compile(r"Total\s*100\s*75"))
+    expect(total(page, "People risk scores")).to_have_text(re.compile(r"Raw total\s*100\s*75"))
+    # 0.30 × 75 = 22.5 of R*.
+    expect(contribution(page, "People risk scores", "People risk")).to_have_text(re.compile(r"People risk contribution\s*30\s*22.5"))
     expect(panel.get_by_role("row", name=re.compile(r"^P-2 "))).to_have_text(re.compile(r"P-2\s*25\s*0"))
     expect(panel).to_contain_text("4 changed from the web evidence scores.")
 
     choices(page, "P-4").get_by_role("radio", name="NA", exact=True).check()
 
-    expect(total(page, "People risk scores")).to_have_text(re.compile(r"Total\s*100\s*NA"))
+    expect(total(page, "People risk scores")).to_have_text(re.compile(r"Raw total\s*100\s*NA"))
 
 
 def test_choosing_a_score_does_not_open_the_card(page: Page):
@@ -182,3 +189,18 @@ def test_key_comes_after_the_score_section(page: Page):
         re.compile(r"^R\* score for GHCN-D"),
         "How to read the tags and scores",
     ])
+
+
+def test_repository_resilience_contribution_uses_100_minus_the_raw_total(page: Page):
+    page.goto("/repository-resilience.html?dataset=ghcn-daily")
+    panel = score_panel(page, "Repository resilience scores")
+    expect(panel).to_contain_text("The contribution is 0.20 × (100 − raw total)")
+
+    for sub_id, value in [("RRS-1", "25"), ("RRS-2", "20"), ("RRS-3", "20"), ("RRS-4", "0"), ("RRS-5", "15")]:
+        choices(page, sub_id).get_by_role("radio", name=value, exact=True).check()
+
+    # Raw total 80, so 0.20 × (100 − 80) = 4 of R*.
+    expect(total(page, "Repository resilience scores")).to_have_text(re.compile(r"Raw total\s*100\s*80"))
+    expect(contribution(page, "Repository resilience scores", "Repository resilience")).to_have_text(
+        re.compile(r"Repository resilience contribution\s*20\s*4$")
+    )

@@ -5,7 +5,9 @@ the dataset's R* score (total, four category scores and a "Score details" panel)
 the four categories, and one page per category. On a category page, each subcategory card shows its description,
 "What counts as evidence" text, why the research evidence gives the score it does, "Your score" radio buttons
 (starting on the research score) and status, and opens to show the evidence sorted into it. A panel beside the category description lists each
-subcategory's chosen score and the category total. A score graph page draws the dataset's R* scores as a weighted
+subcategory's chosen score, the category's **raw total** (the sum, before its weight) and its **contribution** (what it
+adds to R*: 0.40 × raw total for D, 0.30 × for P, 0.10 × for DIRS, 0.20 × (100 − raw total) for RRS; NA when the raw
+total is NA). A score graph page draws the dataset's R* scores as a weighted
 network graph.
 
 ## Score graph (`graph.html`)
