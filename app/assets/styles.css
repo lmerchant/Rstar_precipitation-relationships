@@ -234,7 +234,12 @@ h2 { font-size: 1.2rem; margin: 0 0 8px; }
 .score-panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 18px; margin-bottom: 24px; box-shadow: var(--shadow); }
 .score-intro { margin: 0 0 12px; color: var(--muted); font-size: 0.93rem; }
 .score-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 160px), 1fr)); gap: 12px; margin-bottom: 12px; }
-.score-tile { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface-2); }
+/* Label top left, score pinned top right, note underneath across the tile, so every score sits in the same place
+   however many lines the label wraps to. */
+.score-tile { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "label value" "note note"; align-items: start; column-gap: 10px; row-gap: 6px; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface-2); }
+.score-tile > .score-label { grid-area: label; }
+.score-tile > .score-value { grid-area: value; justify-self: end; }
+.score-tile > .score-note { grid-area: note; }
 .score-tile.total { border-color: var(--text); }
 .score-label { font-weight: 650; font-size: 0.92rem; }
 .score-note { font-size: 0.8rem; color: var(--muted); }
