@@ -179,9 +179,13 @@
     writeStore(all);
   }
 
-  function clearChoices() {
+  // Clear the choices for these subcategories (one category, or all of them) so they use the web evidence scores.
+  function clearChoices(subIds) {
     const all = readStore();
-    delete all[dataset.id];
+    const mine = { ...(all[dataset.id] || {}) };
+    subIds.forEach((id) => delete mine[id]);
+    if (Object.keys(mine).length) all[dataset.id] = mine;
+    else delete all[dataset.id];
     writeStore(all);
   }
 
@@ -352,7 +356,7 @@
     });
     header.replaceChildren(
       el("div", { class: "container" }, [
-        el("a", { class: "brand", href: withDataset("index.html") }, [el("span", { text: "R*" }), " categorizations"]),
+        el("a", { class: "brand", href: withDataset("index.html") }, [el("span", { text: "R*" }), " Scores"]),
         nav,
         el("div", { class: "dataset-picker" }, [el("label", { for: "dataset-select", text: "Dataset" }), select]),
       ])
@@ -448,17 +452,15 @@
     const tables = DATA.categories.map((cat) =>
       el("table", { class: "score-table" }, [
         el("caption", {}, [cat.title, " · total ", scoreValue(s.groups[cat.key].total, "small")]),
-        el("thead", {}, el("tr", {}, ["Subcategory", "Statement", "Points", "Web evidence", "Score"].map((h) => el("th", { scope: "col", text: h })))),
+        el("thead", {}, el("tr", {}, ["Subcategory", "Statement", "Points", "Score"].map((h) => el("th", { scope: "col", text: h })))),
         el(
           "tbody",
           {},
           cat.subcategories.map((sub) => {
-            const e = subScore(sub.id) || {};
             return el("tr", {}, [
               el("th", { scope: "row" }, el("a", { href: withDataset(`${cat.page}#${sub.id}`), text: sub.id })),
               el("td", { text: sub.title }),
               el("td", { text: sub.points != null ? String(sub.points) : "—" }),
-              el("td", { title: basisText(e.basis, sub.points) }, scoreValue(e.score, "small")),
               el("td", {}, scoreValue(s.subcategories[sub.id], "small")),
             ]);
           })
@@ -499,10 +501,27 @@
             : `You changed ${changed} of ${Object.keys(s.subcategories).length} subcategory scores from the web evidence scores.`,
       }),
       el("div", { class: "score-row" }, tiles),
-      btn,
+      el("div", { class: "score-actions" }, [btn, resetAllButton()]),
       details,
       savePanel(),
     ]);
+  }
+
+  // Resets every category's scores for this dataset to the web evidence scores (notes are kept).
+  function resetAllButton() {
+    const changed = changedCount();
+    const reset = el("button", { class: "btn", type: "button", text: "Reset scores", disabled: changed === 0 });
+    reset.addEventListener("click", () => {
+      const n = changedCount();
+      const ask =
+        `Reset ${n} changed score${n === 1 ? "" : "s"} in all categories for ${dataset.name} ` +
+        "to the web evidence scores? Your notes are kept.";
+      if (!window.confirm(ask)) return;
+      clearChoices(DATA.categories.flatMap((c) => c.subcategories.map((s) => s.id)));
+      render();
+      document.getElementById("score-details-btn").focus();
+    });
+    return reset;
   }
 
   function formatTime(iso) {
@@ -640,7 +659,7 @@
     });
 
     main.replaceChildren(
-      el("h1", { text: "R* categorizations" }),
+      el("h1", { text: "R* Scores" }),
       el("p", {
         class: "lede",
         text:
@@ -658,7 +677,7 @@
         el("span", {}, [el("span", { class: "dot none" }), "not categorized"]),
       ])
     );
-    document.title = "R* categorizations";
+    document.title = "R* Scores";
   }
 
   // ----------------------------------------------------------- category
@@ -835,10 +854,8 @@
     }
 
     resetBtn.addEventListener("click", () => {
-      // Clears this dataset's choices in every category, so ask first when others would be lost too.
-      const elsewhere = changedCount() - cat.subcategories.filter((sub) => chosenScore(sub) !== researchScore(sub.id)).length;
-      if (elsewhere > 0 && !window.confirm(`This also resets ${elsewhere} choice${elsewhere === 1 ? "" : "s"} in other categories for ${dataset.name}. Continue?`)) return;
-      clearChoices();
+      // Only this category: the other categories keep their choices.
+      clearChoices(cat.subcategories.map((sub) => sub.id));
       syncChoices();
       live.textContent = `Reset to the web evidence scores. ${live.textContent}`;
     });
@@ -982,7 +999,7 @@
       ]),
       list
     );
-    document.title = `${cat.title} · R* categorizations`;
+    document.title = `${cat.title} · R* Scores`;
     openFromHash();
   }
 

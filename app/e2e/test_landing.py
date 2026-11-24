@@ -9,7 +9,8 @@ CATEGORIES = ["People risk", "Data risk", "Dependent infrastructure resilience",
 def test_landing_links_to_all_four_categories(page: Page, console_errors):
     page.goto("/index.html")
 
-    expect(page.get_by_role("heading", level=1, name="R* categorizations")).to_be_visible()
+    expect(page.get_by_role("heading", level=1, name="R* Scores")).to_be_visible()
+    expect(page).to_have_title("R* Scores")
     for name in CATEGORIES:
         expect(page.get_by_role("link", name=f"Open {name} →")).to_be_visible()
     assert console_errors == []
@@ -76,7 +77,7 @@ def test_landing_shows_rstar_and_category_scores(page: Page):
     details = page.get_by_role("region", name="Score details")
     expect(details_button).to_have_attribute("aria-expanded", "true")
     expect(details.get_by_role("link", name=re.compile(r"^(P|D|DIRS|RRS)-\d$"))).to_have_count(19)
-    expect(details.get_by_role("row", name=re.compile(r"^RRS-2 Regular backup integrity verification 20 0 0$"))).to_be_visible()
+    expect(details.get_by_role("row", name=re.compile(r"^RRS-2 Regular backup integrity verification 20 0$"))).to_be_visible()
 
     details.get_by_role("link", name="RRS-2").click()
     expect(page).to_have_url(re.compile(r"/repository-resilience\.html\?dataset=ghcn-daily#RRS-2$"))

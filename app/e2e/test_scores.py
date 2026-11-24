@@ -86,7 +86,7 @@ def test_choices_show_on_the_landing_page_and_after_going_back(page: Page):
     expect(scores).to_contain_text("You changed 4 of 19 subcategory scores")
     scores.get_by_role("button", name="Score details").click()
     expect(page.get_by_role("region", name="Score details").get_by_role("row", name=re.compile(r"^P-4 "))
-           ).to_have_text(re.compile(r"15\s*NA\s*0$"))
+           ).to_have_text(re.compile(r"15\s*0$"))
 
     page.get_by_role("navigation", name="Categories").get_by_role("link", name="People risk").click()
     expect(choices(page, "P-4").get_by_role("radio", name="0", exact=True)).to_be_checked()
@@ -123,19 +123,47 @@ def test_reset_returns_to_the_research_scores(page: Page):
     assert json.loads(page.evaluate(f"localStorage.getItem('{STORE_KEY}')")) == {}
 
 
-def test_reset_asks_before_clearing_other_categories(page: Page):
+def test_category_reset_keeps_other_categories(page: Page):
     page.goto("/people-risk.html?dataset=ghcn-daily")
     choices(page, "P-1").get_by_role("radio", name="0", exact=True).check()
     page.goto("/data-risk.html?dataset=ghcn-daily")
     choices(page, "D-1").get_by_role("radio", name="0", exact=True).check()
+    dialogs = []
+    page.on("dialog", lambda d: (dialogs.append(d.message), d.dismiss()))
+
+    score_panel(page, "Data risk scores").get_by_role("button", name="Reset scores").click()
+
+    expect(choices(page, "D-1").get_by_role("radio", name="NA", exact=True)).to_be_checked()
+    assert dialogs == []
+    page.goto("/people-risk.html?dataset=ghcn-daily")
+    expect(choices(page, "P-1").get_by_role("radio", name="0", exact=True)).to_be_checked()
+
+
+def test_landing_reset_clears_every_category_after_asking(page: Page):
+    page.goto("/index.html?dataset=ghcn-daily")
+    scores = page.get_by_role("region", name=re.compile(r"^R\* score for GHCN-D"))
+    reset = scores.get_by_role("button", name="Reset scores")
+    expect(reset).to_be_disabled()
+    page.goto("/people-risk.html?dataset=ghcn-daily")
+    choices(page, "P-1").get_by_role("radio", name="0", exact=True).check()
+    page.get_by_label("Your notes for P-1").fill("Kept after a reset")
+    page.goto("/data-risk.html?dataset=ghcn-daily")
+    choices(page, "D-1").get_by_role("radio", name="0", exact=True).check()
+    page.goto("/index.html?dataset=ghcn-daily")
+    expect(scores).to_contain_text("You changed 2 of 19")
 
     page.once("dialog", lambda d: d.dismiss())
-    score_panel(page, "Data risk scores").get_by_role("button", name="Reset scores").click()
-    expect(choices(page, "D-1").get_by_role("radio", name="0", exact=True)).to_be_checked()
+    reset.click()
+    expect(scores).to_contain_text("You changed 2 of 19")
 
     page.once("dialog", lambda d: d.accept())
-    score_panel(page, "Data risk scores").get_by_role("button", name="Reset scores").click()
-    expect(choices(page, "D-1").get_by_role("radio", name="NA", exact=True)).to_be_checked()
+    reset.click()
+
+    expect(scores).to_contain_text("All scores are the web evidence scores.")
+    expect(reset).to_be_disabled()
+    assert json.loads(page.evaluate(f"localStorage.getItem('{STORE_KEY}')")) == {}
+    page.goto("/people-risk.html?dataset=ghcn-daily")
+    expect(page.get_by_label("Your notes for P-1")).to_have_value("Kept after a reset")
 
 
 def test_dataset_without_categorization_has_no_choices(page: Page):

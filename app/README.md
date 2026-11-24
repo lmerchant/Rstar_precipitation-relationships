@@ -1,6 +1,6 @@
 # R* categorization viewer
 
-A static site for reading the R* categorizations of each dataset and choosing its scores. It has a landing page with
+A static site titled "R* Scores" for reading the R* categorizations of each dataset and choosing its scores. It has a landing page with
 the dataset's R* score (total, four category scores and a "Score details" panel), a key to the tags and scoring, and
 the four categories, and one page per category. On a category page, each subcategory card shows its description,
 "What counts as evidence" text, why the research evidence gives the score it does, "Your score" radio buttons
@@ -10,9 +10,10 @@ subcategory's chosen score and the category total.
 ## Chosen scores
 
 Each card's "Your score" radios offer full points, 0 or NA, and start on the research score. A choice updates the
-category panel at once, and the landing page's category totals, R* and "Score details" (which shows both the research
-and the chosen score). Above the radios, each card states the score the web evidence implies and why, for example
-"Both “for” and “against” web evidence (high or moderate): score = NA". "Reset scores" clears the dataset's choices (it asks first if other categories have choices too).
+category panel at once, and the landing page's category totals, R* and "Score details" (which shows only the chosen
+scores; the web evidence score and its reason are on the category page cards). Above the radios, each card states the score the web evidence implies and why, for example
+"Both “for” and “against” web evidence (high or moderate): score = NA". "Reset scores" in a category's panel clears only that category's choices. The landing page's "Reset scores",
+next to "Score details", clears every category's choices for the dataset after asking. Neither clears notes.
 
 On the site (GitHub Pages or any address), each person's browser keeps its own choices: a first visit starts from the
 web evidence scores, and a returning person sees the choices they left until they click "Reset scores" (decided
