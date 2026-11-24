@@ -76,7 +76,7 @@ def test_landing_shows_rstar_and_category_scores(page: Page):
     details = page.get_by_role("region", name="Score details")
     expect(details_button).to_have_attribute("aria-expanded", "true")
     expect(details.get_by_role("link", name=re.compile(r"^(P|D|DIRS|RRS)-\d$"))).to_have_count(19)
-    expect(details.get_by_role("row", name=re.compile(r"^RRS-2 Regular backup integrity verification 20 0$"))).to_be_visible()
+    expect(details.get_by_role("row", name=re.compile(r"^RRS-2 Regular backup integrity verification 20 0 0$"))).to_be_visible()
 
     details.get_by_role("link", name="RRS-2").click()
     expect(page).to_have_url(re.compile(r"/repository-resilience\.html\?dataset=ghcn-daily#RRS-2$"))

@@ -1,9 +1,38 @@
 # R* categorization viewer
 
-A static site for reading the R* categorizations of each dataset. It has a landing page with a key to the tags and
-scoring, the dataset's R* score (total, four category scores and a "Score details" panel) and the four categories, and
-one page per category. On a category page, each subcategory card shows its description, "What counts as evidence" text, score
-(a number or NA, with the reason) and status, and opens to show the evidence sorted into it.
+A static site for reading the R* categorizations of each dataset and choosing its scores. It has a landing page with
+the dataset's R* score (total, four category scores and a "Score details" panel), a key to the tags and scoring, and
+the four categories, and one page per category. On a category page, each subcategory card shows its description,
+"What counts as evidence" text, why the research evidence gives the score it does, "Your score" radio buttons
+(starting on the research score) and status, and opens to show the evidence sorted into it. A panel beside the category description lists each
+subcategory's chosen score and the category total.
+
+## Chosen scores
+
+Each card's "Your score" radios offer full points, 0 or NA, and start on the research score. A choice updates the
+category panel at once, and the landing page's category totals, R* and "Score details" (which shows both the research
+and the chosen score). "Reset to research scores" clears the dataset's choices (it asks first if other categories
+have choices too).
+
+Each card also has a **Your notes** box for inside knowledge or reasons for the score.
+
+Choices are kept in the browser's `localStorage` until saved to a file: `rstar-chosen-scores-v1`
+(`{"<dataset id>": {"P-1": 35, "P-2": 0, "P-3": "NA"}}`; only chosen subcategories), `rstar-notes-v1` (notes, same
+shape), `rstar-assessor-v1` (name, email, role) and `rstar-last-save-v1` (the last file saved per dataset). They stay
+in that browser and on that address (a page opened from disk keeps its own set).
+
+## Saving scores to a file
+
+The landing page's **Save your scores** panel takes the scorer's name (required), email and role (expert, workshop
+participant or workshop group), and **Save scores to a file** downloads one JSON file, for example
+`ghcn-daily_rstar_jane-smith_2026-11-23T232937Z.json`. Each save is a new file. The panel shows a note when NA values
+are included and says when there are changes since the last save.
+
+The file uses the format of a colleague's R* form (`docs/json_output/example_rstar_json.json`) plus an `assessor`
+block. NA is saved as `null`; notes go in each category's `justification` (`P-1: ...`); `scoringMethod` is `""`.
+`build_data.py` copies the example's `formula` and `framework` blocks into the data, and passes each dataset's DOI (or
+a data endpoint URL) as the identifier. The schema is `schema/rstar-assessment.schema.json`; the changes from the
+colleague's form are listed in `notes/rstar-json-format-changes.md`.
 
 Scores come from `data-score` on each subcategory's div in the category JSON (written by
 `scripts/categorize/rstar_common.py`); `scripts/build_data.py` adds the category totals and R*. A total is NA if any
@@ -33,6 +62,7 @@ The pages read `data/rstar-data.js`, which is generated. Re-run the build after 
   section is the short definition on the landing page, and any later paragraphs show only on the category page)
 - `data-rstar-categories/datasets/<dataset>/*.json` (the categorizations)
 - `docs/scoring/how_to_score_rstar.md` (point values and group weights)
+- `docs/json_output/example_rstar_json.json` (the saved file's `formula` and `framework` blocks)
 - `datasets_metadata/json/*_dataset-metadata.json` (dataset names and details)
 
 ```bash

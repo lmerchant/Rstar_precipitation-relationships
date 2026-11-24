@@ -7,7 +7,7 @@ window.RSTAR_DATA = {
    "title": "People risk",
    "heading": "People Risk",
    "page": "people-risk.html",
-   "definition": "Vulnerability created when critical institutional knowledge resides in a small number of individuals. When a lead data curator retires without a documented succession plan, or a wave of RIFs eliminates the team that knows how to run a specialized processing chain, the data may still technically exist while becoming operationally inaccessible. That kind of loss is invisible to systems that only track files and metadata.",
+   "definition": "Vulnerability created when critical institutional knowledge resides in a small number of individuals. When a lead data curator retires without a documented succession plan, or a wave of RIFs eliminates the team that knows how to run a specialized processing chain, the data may still technically exist while becoming operationally inaccessible. That kind of loss is invisible to systems that only track files and metadata. P makes it visible.",
    "definition_more": [
     "P covers the people who produce this dataset: its own team, including contractors, at the producer. Staff losses at the wider agency, or at a source network, are context here unless a source names this team. Losses at a source network can still count in DIRS-2."
    ],
@@ -35,7 +35,7 @@ window.RSTAR_DATA = {
      "description": "Processing, calibration, or QC expertise held by individual(s) but not captured in documentation or code",
      "how_to_find": "Want to know if a person stops working with the dataset, will another person be able to continue making the dataset. Search to find publically available software, dataset processing documentation, or code to process the dataset and peform QC. Want information on whether there is no documentation on how to process the dataset or there is.",
      "what_counts": "Whether the processing and quality-control steps are written down, in public code, software, processing documents or methods papers. If they are, someone new could keep the dataset going after a person leaves. If not, the knowledge sits with individuals.",
-     "points": 20
+     "points": 25
     },
     {
      "id": "P-4",
@@ -54,7 +54,7 @@ window.RSTAR_DATA = {
    "title": "Data risk",
    "heading": "D: Data Risk",
    "page": "data-risk.html",
-   "definition": "Probability of loss through technical failure, policy disruption, or infrastructure degradation. Includes storage system vulnerabilities, format obsolescence, access infrastructure dependencies, and the direct effects of program terminations or defunding.",
+   "definition": "Probability of loss through technical failure, policy disruption, or infrastructure degradation. Includes storage system vulnerabilities, format obsolescence, access infrastructure dependencies, and the direct effects of program terminations or defunding. Weighted most heavily because it is the most direct signal of imminent loss.",
    "definition_more": [
     "D covers the dataset as a product and the places that serve it: the programs that produce and host it, where it is stored and how users reach it (including the repository going offline), its formats, and political pressure on it. Because the dataset is served by its repository, repository facts count in D-2 and D-3 as well as in RRS."
    ],
@@ -129,7 +129,7 @@ window.RSTAR_DATA = {
      "description": "Upstream sensors, ground stations, buoys, or satellite instruments that feed this dataset are aging out, losing funding, or operating past design life",
      "how_to_find": "From the dataset's own documentation (source flags, input lists), list the networks, stations and satellite instruments that feed it, and how much each supplies. For each, look for end-of-life dates, funding cuts, closures or staff losses that would stop or thin its observations.",
      "what_counts": "The networks, stations and satellite instruments that feed the dataset and how much each supplies, plus any end-of-life dates, funding cuts, closures or staff losses that would stop or thin out their observations.",
-     "points": 20
+     "points": 25
     },
     {
      "id": "DIRS-3",
@@ -145,7 +145,7 @@ window.RSTAR_DATA = {
      "description": "Specialized computing, software, or lab facilities not controlled by the data steward are required to produce or update this dataset",
      "how_to_find": "Find who processes and quality-controls this dataset, and on what systems. Is it done by the producer on its own systems, or does it rely on outside groups, contracted or commercial computing, or third-party software? The repository's general IT and cloud moves count only if a source says this dataset's processing moves with them.",
      "what_counts": "Who processes and quality-controls the dataset, and on what systems: the producer's own, or outside groups, contracted or commercial computing, or third-party software. The repository's general IT or cloud moves count only when a source says this dataset's processing moves with them.",
-     "points": 20
+     "points": 15
     },
     {
      "id": "DIRS-5",
@@ -164,7 +164,7 @@ window.RSTAR_DATA = {
    "title": "Repository resilience",
    "heading": "RRS: Repository resilience",
    "page": "repository-resilience.html",
-   "definition": "Robustness of the hosting institution’s data infrastructure: governance stability, redundancy, backup arrangements, distributed replication, and track record through prior funding disruptions.",
+   "definition": "Robustness of the hosting institution’s data infrastructure: governance stability, redundancy, backup arrangements, distributed replication, and track record through prior funding disruptions. Because higher resilience means lower risk, it enters the formula inverted. A score of 80 on RRS becomes a contribution of 4 to R*, correctly rewarding well-governed repositories while flagging fragile ones.",
    "definition_more": [
     "RRS covers each repository that holds a copy of the dataset, judged as an institution: its redundancy, integrity checks, disaster recovery, funding and track record. \"For\" means the repository is resilient. A repository serves the dataset in its original format with its metadata: the archive of record (the parent), its copies and mirrors (children) and the producer's own site count; volunteer snapshots and third-party reformatted copies don't. RRS gives one pooled verdict across all of them."
    ],
@@ -227,7 +227,8 @@ window.RSTAR_DATA = {
     "period_of_record": "January 1880 - Present",
     "spatial_coverage": "Global land",
     "temporal_frequency": "Daily",
-    "precipitation_basis": "Gauge-based"
+    "precipitation_basis": "Gauge-based",
+    "identifier": "10.7289/V5D21VHZ"
    },
    "file": "data-rstar-categories/datasets/ghcn-daily/ghcn-daily_rstar-categories.json",
    "categorizations": {
@@ -285,7 +286,7 @@ window.RSTAR_DATA = {
       "scored": 0,
       "of": 4,
       "known_points": 0,
-      "max_points": 95
+      "max_points": 100
      },
      "data_risk": {
       "total": "NA",
@@ -420,7 +421,8 @@ window.RSTAR_DATA = {
     "period_of_record": "January 1998 - Present",
     "spatial_coverage": "Global land + ocean, 90°S-90°N",
     "temporal_frequency": "Daily",
-    "precipitation_basis": "Satellite + gauges; constrained to GPCP monthly"
+    "precipitation_basis": "Satellite + gauges; constrained to GPCP monthly",
+    "identifier": "10.5067/MEASURES/GPCP/DATA307"
    },
    "file": null,
    "categorizations": null,
@@ -438,11 +440,30 @@ window.RSTAR_DATA = {
     "period_of_record": "1 Jan 1983 - Present",
     "spatial_coverage": "60°S-60°N, all longitudes",
     "temporal_frequency": "Daily (monthly/yearly aggregations also distributed by CHRS)",
-    "precipitation_basis": "Geostationary IR + GPCP gauge adjustment"
+    "precipitation_basis": "Geostationary IR + GPCP gauge adjustment",
+    "identifier": "10.7289/V51V5BWQ"
    },
    "file": null,
    "categorizations": null,
    "scores": null
   }
- ]
+ ],
+ "form": {
+  "formula": "R* = 0.40·D + 0.30·P + 0.20·(100-RRS) + 0.10·DIRS",
+  "framework": {
+   "name": "R* Composite Priority Index",
+   "version": "2.0",
+   "authors": [
+    "S.C. Diggs",
+    "T.R. Karl",
+    "R. Keeling"
+   ],
+   "rcsReference": "https://doi.org/10.5281/zenodo.15208172",
+   "triageThresholds": {
+    "mirrorNow": ">=70",
+    "stabilizeAndMirror": "40-69",
+    "monitor": "<40"
+   }
+  }
+ }
 };

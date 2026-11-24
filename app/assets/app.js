@@ -105,6 +105,218 @@
     return (dataset.categorizations && dataset.categorizations.dataset) || null;
   }
 
+  // ------------------------------------------------------ chosen scores
+  // After reading the evidence, a person picks each subcategory's score: full points, 0 or NA.
+  // Choices live in this browser's localStorage until they are saved to a file, in the shape
+  // { "<dataset id>": { "P-1": 35, "P-2": 0, "P-3": "NA", ... } }. A subcategory with no choice
+  // uses its research score.
+  const STORE_KEY = "rstar-chosen-scores-v1";
+  // Notes per subcategory: { "<dataset id>": { "P-1": "text", ... } }.
+  const NOTES_KEY = "rstar-notes-v1";
+  // Who is scoring: { name, email, role }. Remembered so a scorer types it once.
+  const ASSESSOR_KEY = "rstar-assessor-v1";
+  // The last file saved per dataset: { "<dataset id>": { timestamp, filename, state } }.
+  const SAVES_KEY = "rstar-last-save-v1";
+  const STORAGE_KEYS = [STORE_KEY, NOTES_KEY, ASSESSOR_KEY, SAVES_KEY];
+  const memory = {}; // used when localStorage is unavailable (for example, some private windows)
+
+  function readKey(key) {
+    try {
+      const saved = JSON.parse(localStorage.getItem(key));
+      return saved && typeof saved === "object" ? saved : {};
+    } catch {
+      return memory[key] || {};
+    }
+  }
+
+  function writeKey(key, value) {
+    memory[key] = value;
+    try {
+      localStorage.setItem(key, JSON.stringify(value));
+    } catch {
+      /* keep the in-memory copy */
+    }
+  }
+
+  const readStore = () => readKey(STORE_KEY);
+  const writeStore = (all) => writeKey(STORE_KEY, all);
+
+  function datasetNotes() {
+    return readKey(NOTES_KEY)[dataset.id] || {};
+  }
+
+  function setNote(subId, text) {
+    const all = readKey(NOTES_KEY);
+    const mine = { ...(all[dataset.id] || {}) };
+    if (text.trim()) mine[subId] = text;
+    else delete mine[subId];
+    all[dataset.id] = mine;
+    writeKey(NOTES_KEY, all);
+  }
+
+  function researchScore(subId) {
+    const e = subScore(subId);
+    return e ? e.score : "NA";
+  }
+
+  function scoreOptions(sub) {
+    return [sub.points, 0, "NA"].filter((v, i, a) => v !== null && v !== undefined && a.indexOf(v) === i);
+  }
+
+  function chosenScore(sub) {
+    const choice = (readStore()[dataset.id] || {})[sub.id];
+    return choice !== undefined && scoreOptions(sub).includes(choice) ? choice : researchScore(sub.id);
+  }
+
+  function setChoice(sub, value) {
+    const all = readStore();
+    all[dataset.id] = { ...(all[dataset.id] || {}), [sub.id]: value };
+    writeStore(all);
+  }
+
+  function clearChoices() {
+    const all = readStore();
+    delete all[dataset.id];
+    writeStore(all);
+  }
+
+  function changedCount() {
+    return DATA.categories
+      .flatMap((c) => c.subcategories)
+      .filter((s) => chosenScore(s) !== researchScore(s.id)).length;
+  }
+
+  // Group totals and R* from the chosen scores, the same way build_data.py works them out from the
+  // research scores: a total is NA if any of its subcategories is NA, and R* is NA if any total is.
+  function currentScores() {
+    if (!dataset.scores) return null;
+    const subs = {};
+    const groups = {};
+    for (const cat of DATA.categories) {
+      const values = cat.subcategories.map((s) => (subs[s.id] = chosenScore(s)));
+      const known = values.filter((v) => !isNA(v));
+      groups[cat.key] = {
+        total: known.length === values.length ? known.reduce((a, b) => a + b, 0) : "NA",
+        scored: known.length,
+        of: values.length,
+        max_points: cat.subcategories.reduce((a, s) => a + (s.points || 0), 0),
+      };
+    }
+    let rstar = "NA";
+    if (DATA.categories.every((c) => !isNA(groups[c.key].total))) {
+      const sum = DATA.categories.reduce((acc, c) => {
+        const t = groups[c.key].total;
+        return acc + c.weight * (c.key === "repo_resilience" ? 100 - t : t);
+      }, 0);
+      rstar = Math.round(sum * 10) / 10;
+    }
+    return { rstar, groups, subcategories: subs };
+  }
+
+  // ------------------------------------------------------- saved files
+  // One JSON file per save, in the format of the colleague's R* form (docs/json_output/example_rstar_json.json)
+  // plus an "assessor" block. NA is saved as null. Plan: notes/rstar-score-json-save-plan.md.
+  const COMPONENT_ORDER = ["D", "P", "RRS", "DIRS"];
+  const ROLES = [
+    ["expert", "Expert"],
+    ["workshop_participant", "Workshop participant"],
+    ["workshop_group", "Workshop group"],
+  ];
+
+  function factorKey(title) {
+    return title.toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_+|_+$/g, "");
+  }
+
+  function triageTier(rstar) {
+    if (isNA(rstar)) return null;
+    if (rstar >= 70) return "Mirror now";
+    if (rstar >= 40) return "Stabilize and mirror";
+    return "Monitor";
+  }
+
+  const round2 = (x) => Math.round(x * 100) / 100;
+
+  // The chosen scores and notes, to tell whether anything changed since the last save.
+  function saveState() {
+    const s = currentScores();
+    return JSON.stringify({ scores: s ? s.subcategories : null, notes: datasetNotes() });
+  }
+
+  function buildAssessment(assessor, now) {
+    const s = currentScores();
+    const m = dataset.meta || {};
+    const notes = datasetNotes();
+    const components = {};
+    for (const prefix of COMPONENT_ORDER) {
+      const cat = DATA.categories.find((c) => c.prefix === prefix);
+      const total = s.groups[cat.key].total;
+      const raw = isNA(total) ? null : total;
+      const factors = {};
+      for (const sub of cat.subcategories) {
+        const v = s.subcategories[sub.id];
+        factors[factorKey(sub.title)] = {
+          condition: sub.title,
+          present: isNA(v) ? null : v > 0,
+          points: isNA(v) ? null : v,
+          maxPoints: sub.points,
+        };
+      }
+      components[prefix] = {
+        label: cat.title,
+        definition: cat.definition,
+        rawScore: raw,
+        weight: cat.weight,
+        weightedContribution:
+          raw === null ? null : round2(cat.weight * (cat.key === "repo_resilience" ? 100 - raw : raw)),
+        scoringMethod: "",
+        justification: cat.subcategories
+          .filter((sub) => notes[sub.id] && notes[sub.id].trim())
+          .map((sub) => `${sub.id}: ${notes[sub.id].trim()}`)
+          .join("\n"),
+        factors,
+      };
+    }
+    return {
+      assessmentTimestamp: now.toISOString(),
+      dataset: { name: dataset.name, identifier: m.identifier || "" },
+      primaryDataCurator: { name: m.curator || "", email: "" },
+      assessor: { name: assessor.name.trim(), email: (assessor.email || "").trim(), role: assessor.role || "" },
+      rStarCompositeScore: isNA(s.rstar) ? null : s.rstar,
+      triageTier: triageTier(s.rstar),
+      formula: DATA.form ? DATA.form.formula : "",
+      components,
+      framework: DATA.form ? DATA.form.framework : {},
+    };
+  }
+
+  // ghcn-daily_rstar_jane-smith_2026-11-23T232937Z.json (no colons: some systems refuse them in file names).
+  function saveFileName(assessor, now) {
+    const who =
+      assessor.name
+        .toLowerCase()
+        .normalize("NFKD")
+        .replace(/[̀-ͯ]/g, "")
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "") || "scorer";
+    const stamp = now.toISOString().replace(/\.\d+Z$/, "Z").replace(/:/g, "");
+    return `${dataset.id}_rstar_${who}_${stamp}.json`;
+  }
+
+  function downloadJson(obj, filename) {
+    const blob = new Blob([JSON.stringify(obj, null, 2) + "\n"], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = el("a", { href: url, download: filename, hidden: true });
+    document.body.append(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+
+  function naCount() {
+    const s = currentScores();
+    return s ? Object.values(s.subcategories).filter(isNA).length : 0;
+  }
+
   // ------------------------------------------------------------- header
   function renderHeader() {
     const current = body.dataset.category;
@@ -206,8 +418,9 @@
 
   // R* and the four category totals, with a panel listing every subcategory score.
   function scoreSection() {
-    const s = dataset.scores;
+    const s = currentScores();
     if (!s) return null;
+    const changed = changedCount();
     const tiles = [
       el("div", { class: "score-tile total" }, [
         el("span", { class: "score-label", text: "R*" }),
@@ -230,17 +443,18 @@
     const tables = DATA.categories.map((cat) =>
       el("table", { class: "score-table" }, [
         el("caption", {}, [cat.title, " · total ", scoreValue(s.groups[cat.key].total, "small")]),
-        el("thead", {}, el("tr", {}, ["Subcategory", "Statement", "Points", "Score"].map((h) => el("th", { scope: "col", text: h })))),
+        el("thead", {}, el("tr", {}, ["Subcategory", "Statement", "Points", "Research", "Score"].map((h) => el("th", { scope: "col", text: h })))),
         el(
           "tbody",
           {},
           cat.subcategories.map((sub) => {
-            const e = s.subcategories[sub.id] || {};
+            const e = subScore(sub.id) || {};
             return el("tr", {}, [
               el("th", { scope: "row" }, el("a", { href: withDataset(`${cat.page}#${sub.id}`), text: sub.id })),
               el("td", { text: sub.title }),
               el("td", { text: sub.points != null ? String(sub.points) : "—" }),
               el("td", { title: BASIS_TEXT[e.basis] || "" }, scoreValue(e.score, "small")),
+              el("td", {}, scoreValue(s.subcategories[sub.id], "small")),
             ]);
           })
         ),
@@ -267,11 +481,127 @@
       el("h2", { id: "score-title", text: `R* score for ${dataset.name}` }),
       el("p", {
         class: "score-intro",
-        text: "Scores worked out from the web research evidence. NA marks a score a person still has to decide.",
+        text:
+          "Each subcategory starts with the score worked out from the web research. After reading its evidence on " +
+          "the category page, you can set it to full points, 0 or NA; your choices are saved in this browser. NA " +
+          "marks a score that still needs a decision.",
+      }),
+      el("p", {
+        class: "score-intro changed-count",
+        text:
+          changed === 0
+            ? "All scores are the research scores."
+            : `You changed ${changed} of ${Object.keys(s.subcategories).length} subcategory scores from the research scores.`,
       }),
       el("div", { class: "score-row" }, tiles),
       btn,
       details,
+      savePanel(),
+    ]);
+  }
+
+  function formatTime(iso) {
+    return new Date(iso).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" });
+  }
+
+  // Name, email and role, then a button that downloads the scores as a JSON file.
+  function savePanel() {
+    const who = readKey(ASSESSOR_KEY);
+    const field = (id, label, input, hint) =>
+      el("div", { class: "field" }, [el("label", { for: id, text: label }), hint || null, input]);
+
+    const nameError = el("p", { class: "field-error", id: "assessor-name-error", hidden: true, text: "Enter your name to save." });
+    const nameIn = el("input", {
+      id: "assessor-name",
+      type: "text",
+      autocomplete: "name",
+      required: true,
+      "aria-describedby": "assessor-name-error",
+    });
+    const emailIn = el("input", { id: "assessor-email", type: "email", autocomplete: "email" });
+    const roleIn = el(
+      "select",
+      { id: "assessor-role" },
+      [el("option", { value: "", text: "Choose a role" }), ...ROLES.map(([v, t]) => el("option", { value: v, text: t }))]
+    );
+    nameIn.value = who.name || "";
+    emailIn.value = who.email || "";
+    roleIn.value = who.role || "";
+
+    const remember = () =>
+      writeKey(ASSESSOR_KEY, { name: nameIn.value, email: emailIn.value, role: roleIn.value });
+    [nameIn, emailIn].forEach((i) => i.addEventListener("input", remember));
+    roleIn.addEventListener("change", remember);
+    nameIn.addEventListener("input", () => {
+      if (nameIn.value.trim()) {
+        nameError.hidden = true;
+        nameIn.removeAttribute("aria-invalid");
+      }
+    });
+
+    const na = naCount();
+    const total = Object.keys(currentScores().subcategories).length;
+    const naNote = na
+      ? el("p", {
+          class: "na-note",
+          text:
+            `NA values are included: ${na} of ${total} subcategories are NA. They are saved as null, and so is ` +
+            "each category total that has an NA, and R* if any total is NA.",
+        })
+      : null;
+
+    const lastLine = el("p", { class: "save-last" });
+    const status = el("p", { class: "save-status", role: "status" });
+
+    function showLast() {
+      const last = readKey(SAVES_KEY)[dataset.id];
+      if (!last) {
+        lastLine.textContent = "Not saved yet from this browser.";
+        return;
+      }
+      lastLine.textContent =
+        `Last saved ${formatTime(last.timestamp)} as ${last.filename}.` +
+        (last.state !== saveState() ? " You have changes since then." : "");
+    }
+
+    const saveBtn = el("button", { class: "btn primary", type: "button", text: "Save scores to a file" });
+    saveBtn.addEventListener("click", () => {
+      if (!nameIn.value.trim()) {
+        nameError.hidden = false;
+        nameIn.setAttribute("aria-invalid", "true");
+        nameIn.focus();
+        return;
+      }
+      const now = new Date();
+      const assessor = { name: nameIn.value, email: emailIn.value, role: roleIn.value };
+      const filename = saveFileName(assessor, now);
+      downloadJson(buildAssessment(assessor, now), filename);
+      const saves = readKey(SAVES_KEY);
+      saves[dataset.id] = { timestamp: now.toISOString(), filename, state: saveState() };
+      writeKey(SAVES_KEY, saves);
+      showLast();
+      status.textContent =
+        `Saved ${filename} to your downloads.` + (na ? ` NA values are included (${na} of ${total}).` : "");
+    });
+    showLast();
+
+    return el("section", { class: "save-panel", "aria-labelledby": "save-title" }, [
+      el("h3", { id: "save-title", text: "Save your scores" }),
+      el("p", {
+        class: "score-intro",
+        text:
+          "Saves this dataset's scores and your notes as a JSON file on your computer, with the date and time. " +
+          "Each save makes a new file, so earlier ones are kept. Send the file to the person collecting the scores.",
+      }),
+      el("div", { class: "save-fields" }, [
+        field("assessor-name", "Your name (required)", nameIn),
+        field("assessor-email", "Email (optional)", emailIn),
+        field("assessor-role", "Role", roleIn),
+      ]),
+      nameError,
+      naNote,
+      el("div", { class: "save-actions" }, [saveBtn, lastLine]),
+      status,
     ]);
   }
 
@@ -312,9 +642,9 @@
           "Web research on each dataset, sorted into the R* subcategories. Pick a category to read " +
           "the evidence behind each subcategory, or click a subcategory chip to jump straight to it.",
       }),
-      keySection(),
       datasetStrip(),
       scoreSection(),
+      keySection(),
       el("div", { class: "cat-grid" }, cards),
       el("p", { class: "legend" }, [
         el("span", {}, [el("span", { class: "dot filled" }), "4+ evidence items"]),
@@ -399,16 +729,133 @@
     card.classList.toggle("is-open", open);
   }
 
-  function scoreLine(s) {
+  // Why the research evidence gives the score the radios start on.
+  function scoreWhy(s) {
     const e = subScore(s.id);
-    if (!e) return null;
-    const max = s.points != null ? ` of ${s.points}` : "";
-    return el("p", { class: "score-line" }, [
-      el("span", { class: `score-badge ${isNA(e.score) ? "na" : "num"}` }, [
-        "Score ",
-        el("strong", { text: isNA(e.score) ? "NA" : `${e.score}${max}` }),
+    if (!e || !BASIS_TEXT[e.basis]) return null;
+    return el("p", { class: "score-why", id: `score-why-${s.id}`, text: BASIS_TEXT[e.basis] });
+  }
+
+  // "Your score": radio buttons for full points, 0 and NA. Starts on the research score.
+  function scoreChoice(sub) {
+    if (!dataset.scores) return null;
+    const current = chosenScore(sub);
+    const options = scoreOptions(sub).map((v) => {
+      const input = el("input", {
+        type: "radio",
+        name: `score-${sub.id}`,
+        value: String(v),
+        checked: v === current,
+      });
+      input.addEventListener("change", () => {
+        if (!input.checked) return;
+        setChoice(sub, v);
+        refreshCategoryPanel();
+      });
+      return el("label", { class: "choice" }, [input, el("span", { text: isNA(v) ? "NA" : String(v) })]);
+    });
+    const why = subScore(sub.id) && BASIS_TEXT[subScore(sub.id).basis] ? `score-why-${sub.id}` : null;
+    return el("fieldset", { class: "score-choice no-toggle", "aria-describedby": why }, [
+      el("legend", {}, ["Your score", el("span", { class: "sr-only", text: ` for ${sub.id}` })]),
+      el("div", { class: "choices" }, options),
+    ]);
+  }
+
+  // "Your notes": inside knowledge or reasons for the score. Saved into the category's "justification".
+  function notesBox(sub) {
+    if (!dataset.scores) return null;
+    const id = `notes-${sub.id}`;
+    const area = el("textarea", { id, class: "notes-input", rows: "2", "aria-describedby": `${id}-hint` });
+    area.value = datasetNotes()[sub.id] || "";
+    area.addEventListener("input", () => setNote(sub.id, area.value));
+    return el("div", { class: "notes no-toggle" }, [
+      el("label", { for: id }, ["Your notes", el("span", { class: "sr-only", text: ` for ${sub.id}` })]),
+      el("p", {
+        class: "notes-hint",
+        id: `${id}-hint`,
+        text: "Optional. Inside knowledge or reasons for your score. Saved in the file with your scores.",
+      }),
+      area,
+    ]);
+  }
+
+  // Bring the radios and notes in line with what is stored (after a reset, or a change in another tab).
+  function syncChoices() {
+    const cat = DATA.categories.find((c) => c.key === body.dataset.category);
+    if (!cat) return;
+    const notes = datasetNotes();
+    for (const sub of cat.subcategories) {
+      const current = String(chosenScore(sub));
+      document.querySelectorAll(`input[name="score-${sub.id}"]`).forEach((input) => {
+        input.checked = input.value === current;
+      });
+      const area = document.getElementById(`notes-${sub.id}`);
+      if (area && area !== document.activeElement) area.value = notes[sub.id] || "";
+    }
+    refreshCategoryPanel();
+  }
+
+  // The category's scores beside its description: every subcategory and the total, kept up to date.
+  let refreshCategoryPanel = () => {};
+
+  function categoryScorePanel(cat) {
+    if (!dataset.scores) return null;
+    const tbody = el("tbody");
+    const totalCell = el("td");
+    const changedNote = el("p", { class: "cat-scores-note" });
+    const live = el("p", { class: "sr-only", "aria-live": "polite" });
+    const resetBtn = el("button", { class: "btn small", type: "button", text: "Reset to research scores" });
+
+    function update(announce) {
+      const s = currentScores();
+      const g = s.groups[cat.key];
+      tbody.replaceChildren(
+        ...cat.subcategories.map((sub) =>
+          el("tr", {}, [
+            el("th", { scope: "row" }, el("a", { href: `#${sub.id}`, text: sub.id })),
+            el("td", { text: sub.points != null ? String(sub.points) : "—" }),
+            el("td", {}, scoreValue(s.subcategories[sub.id], "small")),
+          ])
+        )
+      );
+      totalCell.replaceChildren(scoreValue(g.total, "small"));
+      const changed = cat.subcategories.filter((sub) => chosenScore(sub) !== researchScore(sub.id)).length;
+      changedNote.textContent =
+        changed === 0
+          ? "All are the research scores."
+          : `${changed} changed from the research score${changed === 1 ? "" : "s"}.`;
+      resetBtn.disabled = changed === 0;
+      if (announce) live.textContent = `${cat.title} total: ${isNA(g.total) ? "NA" : g.total} of ${g.max_points}.`;
+    }
+
+    resetBtn.addEventListener("click", () => {
+      // Clears this dataset's choices in every category, so ask first when others would be lost too.
+      const elsewhere = changedCount() - cat.subcategories.filter((sub) => chosenScore(sub) !== researchScore(sub.id)).length;
+      if (elsewhere > 0 && !window.confirm(`This also resets ${elsewhere} choice${elsewhere === 1 ? "" : "s"} in other categories for ${dataset.name}. Continue?`)) return;
+      clearChoices();
+      syncChoices();
+      live.textContent = `Reset to the research scores. ${live.textContent}`;
+    });
+
+    refreshCategoryPanel = () => update(true);
+    update(false);
+
+    return el("aside", { class: "cat-scores", "aria-labelledby": "cat-scores-title" }, [
+      el("h2", { id: "cat-scores-title", text: `${cat.title} scores` }),
+      el("table", { class: "score-table compact" }, [
+        el("caption", { class: "sr-only", text: `${cat.title} subcategory scores for ${dataset.name}` }),
+        el("thead", {}, el("tr", {}, ["Subcategory", "Points", "Score"].map((h) => el("th", { scope: "col", text: h })))),
+        tbody,
+        el("tfoot", {}, el("tr", {}, [
+          el("th", { scope: "row", text: "Total" }),
+          el("td", { text: String(cat.subcategories.reduce((a, s) => a + (s.points || 0), 0)) }),
+          totalCell,
+        ])),
       ]),
-      el("span", { class: "score-why", text: BASIS_TEXT[e.basis] || "" }),
+      el("p", { class: "cat-scores-note", text: "The total is NA if any subcategory is NA." }),
+      changedNote,
+      resetBtn,
+      live,
     ]);
   }
 
@@ -452,7 +899,9 @@
           el("div", {}, [el("h3", { text: "Description" }), el("p", { text: s.description || "—" })]),
           el("div", {}, [el("h3", { text: "What counts as evidence" }), el("p", { text: s.what_counts || "—" })]),
         ]),
-        scoreLine(s),
+        scoreWhy(s),
+        scoreChoice(s),
+        notesBox(s),
         el("p", { class: "coverage" }, [
           el("span", { class: `dot ${cov.status}`, "aria-hidden": "true" }),
           coverageText(cov),
@@ -477,9 +926,9 @@
     const card = el("li", { class: "sub-card", id: s.id }, [head, panel]);
 
     // The button is the accessible control; clicking anywhere on the header also toggles,
-    // except when selecting text.
+    // except on a link, the score choices or notes, or when selecting text.
     head.addEventListener("click", (e) => {
-      if (e.target.closest("a")) return;
+      if (e.target.closest("a, .no-toggle")) return;
       if (e.target !== toggle && !toggle.contains(e.target) && String(window.getSelection())) return;
       const open = toggle.getAttribute("aria-expanded") !== "true";
       setOpen(card, open);
@@ -496,6 +945,8 @@
     }
     const list = el("ol", { class: "sub-list" }, cat.subcategories.map((s) => subCard(cat, s)));
     const setAll = (open) => list.querySelectorAll(".sub-card").forEach((c) => setOpen(c, open));
+    refreshCategoryPanel = () => {};
+    const scores = categoryScorePanel(cat);
 
     main.replaceChildren(
       el("nav", { class: "breadcrumb", "aria-label": "Breadcrumb" }, [
@@ -504,13 +955,20 @@
         cat.title,
       ]),
       el("h1", { text: cat.heading }),
-      el("span", { class: "weight", text: weightLabel(cat) }),
-      el("p", { class: "lede", text: cat.definition }),
-      ...(cat.definition_more || []).map((t) => el("p", { class: "lede", text: t })),
-      el("p", { class: "lede" }, [
-        "Showing ",
-        el("strong", { text: dataset.name }),
-        ". Click a card to see the evidence sorted into it.",
+      el("div", { class: scores ? "cat-intro" : "cat-intro no-scores" }, [
+        el("div", {}, [
+          el("span", { class: "weight", text: weightLabel(cat) }),
+          el("p", { class: "lede", text: cat.definition }),
+          ...(cat.definition_more || []).map((t) => el("p", { class: "lede", text: t })),
+          el("p", { class: "lede" }, [
+            "Showing ",
+            el("strong", { text: dataset.name }),
+            scores
+              ? ". Click a card to see the evidence sorted into it, then choose its score under “Your score”."
+              : ". Click a card to see the evidence sorted into it.",
+          ]),
+        ]),
+        scores,
       ]),
       el("div", { class: "toolbar" }, [
         el("button", { class: "btn", type: "button", onclick: () => setAll(true), text: "Expand all" }),
@@ -540,5 +998,17 @@
   }
 
   window.addEventListener("hashchange", openFromHash);
+  // Show the latest choices when the page comes back from the browser's back/forward cache
+  // or another tab changes them.
+  window.addEventListener("pageshow", (e) => {
+    if (!e.persisted) return;
+    if (body.dataset.page === "category") syncChoices();
+    else render();
+  });
+  window.addEventListener("storage", (e) => {
+    if (e.key !== null && !STORAGE_KEYS.includes(e.key)) return;
+    if (body.dataset.page === "category") syncChoices();
+    else render();
+  });
   render();
 })();
