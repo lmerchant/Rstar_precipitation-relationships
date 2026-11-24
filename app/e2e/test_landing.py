@@ -49,7 +49,7 @@ def test_switching_dataset_updates_links_and_details(page: Page):
 
     expect(page).to_have_url(re.compile(r"\?dataset=gpcp-daily$"))
     expect(page.get_by_text("This dataset has no categorization file yet.")).to_be_visible()
-    nav = page.get_by_role("navigation", name="Categories")
+    nav = page.get_by_role("navigation", name="Pages")
     expect(nav.get_by_role("link", name="Data risk")).to_have_attribute("href", "data-risk.html?dataset=gpcp-daily")
 
 

@@ -329,13 +329,16 @@
   // ------------------------------------------------------------- header
   function renderHeader() {
     const current = body.dataset.category;
-    const nav = el(
-      "nav",
-      { class: "cat-nav", "aria-label": "Categories" },
-      DATA.categories.map((c) =>
+    const nav = el("nav", { class: "cat-nav", "aria-label": "Pages" }, [
+      ...DATA.categories.map((c) =>
         el("a", { href: withDataset(c.page), "aria-current": c.key === current ? "page" : null, text: c.title })
-      )
-    );
+      ),
+      el("a", {
+        href: withDataset("graph.html"),
+        "aria-current": body.dataset.page === "graph" ? "page" : null,
+        text: "Score graph",
+      }),
+    ]);
     const select = el(
       "select",
       { id: "dataset-select" },
@@ -501,7 +504,11 @@
             : `You changed ${changed} of ${Object.keys(s.subcategories).length} subcategory scores from the web evidence scores.`,
       }),
       el("div", { class: "score-row" }, tiles),
-      el("div", { class: "score-actions" }, [btn, resetAllButton()]),
+      el("div", { class: "score-actions" }, [
+        btn,
+        resetAllButton(),
+        el("a", { class: "graph-link", href: withDataset("graph.html"), text: "See the score graph →" }),
+      ]),
       details,
       savePanel(),
     ]);
@@ -1014,9 +1021,36 @@
     }
   }
 
+  // The score graph page (assets/graph.js) gets the helpers it needs from here.
+  function renderGraph() {
+    if (!window.RSTAR_GRAPH) {
+      main.replaceChildren(el("p", { class: "notice", text: "The graph script (assets/graph.js) did not load." }));
+      return;
+    }
+    window.RSTAR_GRAPH.render({
+      DATA,
+      dataset,
+      main,
+      el,
+      isNA,
+      withDataset,
+      currentScores,
+      subScore,
+      basisText,
+      coverage,
+      coverageText,
+      subHtml,
+      weightLabel,
+      triageTier,
+      scoreValue,
+      CHEVRON,
+    });
+  }
+
   function render() {
     renderHeader();
     if (body.dataset.page === "category") renderCategory();
+    else if (body.dataset.page === "graph") renderGraph();
     else renderLanding();
   }
 

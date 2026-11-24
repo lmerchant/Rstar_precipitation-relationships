@@ -88,7 +88,7 @@ def test_choices_show_on_the_landing_page_and_after_going_back(page: Page):
     expect(page.get_by_role("region", name="Score details").get_by_role("row", name=re.compile(r"^P-4 "))
            ).to_have_text(re.compile(r"15\s*0$"))
 
-    page.get_by_role("navigation", name="Categories").get_by_role("link", name="People risk").click()
+    page.get_by_role("navigation", name="Pages").get_by_role("link", name="People risk").click()
     expect(choices(page, "P-4").get_by_role("radio", name="0", exact=True)).to_be_checked()
 
 

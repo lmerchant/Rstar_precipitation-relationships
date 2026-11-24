@@ -5,7 +5,29 @@ the dataset's R* score (total, four category scores and a "Score details" panel)
 the four categories, and one page per category. On a category page, each subcategory card shows its description,
 "What counts as evidence" text, why the research evidence gives the score it does, "Your score" radio buttons
 (starting on the research score) and status, and opens to show the evidence sorted into it. A panel beside the category description lists each
-subcategory's chosen score and the category total.
+subcategory's chosen score and the category total. A score graph page draws the dataset's R* scores as a weighted
+network graph.
+
+## Score graph (`graph.html`)
+
+A weighted network graph of one dataset's chosen scores (the same scores as the landing page, so it changes as scores
+are chosen). Reached from "Score graph" in the header or "See the score graph →" in the landing page's score panel.
+The drawing code is `assets/graph.js`; `app.js` passes it its helpers.
+
+- **Nodes:** R* in the middle (black while it is NA, red once every subcategory has a score); the four category nodes (P, D, DIRS, RRS), each in its own colour (blue, orange, aqua,
+  violet; blue and violet sit opposite each other because they are the hardest pair to tell apart); and each
+  category's subcategory nodes, smaller and in the same colour. Each node shows its ID and score.
+- **Lines:** width carries the score. A subcategory line is score ÷ 5 (35 is 7 px). A category line is its weighted
+  share of R* ÷ 4 (chosen 2026-11-24), so the most each can draw is D 40 → 10 px, P 30 → 7.5 px, RRS 20 → 5 px and
+  DIRS 10 → 2.5 px; RRS's share is 0.20 × (100 − total). Each category node shows its total and what it adds to R*.
+  A 0 is a 1 px line. **NA is a black node with a dashed line** (its ring keeps the category colour).
+- **Repository resilience:** a switch above the graph draws the RRS subcategory lines as the risk they add (points −
+  score, the default, matching how RRS enters R* as 100 − total, so a resilient repository is a thin line) or as the
+  score. The RRS line to R* is always its share of R*.
+- **Details:** hovering or focusing a node shows its title, score, the web evidence reason and evidence count;
+  selecting a subcategory node opens its card, and a category node its page. "The graph as a table" lists every node,
+  its score and the line drawn, for screen readers and for checking the numbers.
+- Below 660 px wide the graph keeps a readable size and scrolls sideways.
 
 ## Chosen scores
 
@@ -112,12 +134,14 @@ Firefox loads Homebrew's `libnss3` instead of its own and fails with "Symbol not
 | Path | What it is |
 |---|---|
 | `index.html` | Landing page: dataset details and the four category cards |
+| `graph.html` | Score graph page (`assets/graph.js` draws it) |
 | `people-risk.html`, `data-risk.html`, `dependent-infrastructure.html`, `repository-resilience.html` | Category pages (thin shells; `assets/app.js` fills them) |
 | `assets/app.js` | Renders all pages from `window.RSTAR_DATA` |
+| `assets/graph.js` | Draws the weighted network graph on `graph.html` (SVG, no libraries) |
 | `assets/styles.css` | Styles, with light and dark themes that follow the system setting |
 | `data/rstar-data.js` | Generated data. Don't edit it by hand |
 | `scripts/build_data.py` | Builds `data/rstar-data.js` (Python standard library only) |
-| `e2e/` | Playwright tests: `conftest.py` (test server), `test_landing.py`, `test_category.py` |
+| `e2e/` | Playwright tests: `conftest.py` (test server), `test_landing.py`, `test_category.py`, `test_scores.py`, `test_save.py`, `test_graph.py` |
 | `pytest.ini`, `requirements-dev.txt` | Test settings (Firefox and WebKit) and pinned test tools |
 
 ## Using it
