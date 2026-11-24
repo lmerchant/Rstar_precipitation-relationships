@@ -37,6 +37,68 @@
   let rrsMode = "risk";
   let tableOpen = false; // kept when the page re-renders
 
+  // Evidence nodes: one small node per evidence item, in a fan on the outer side of its subcategory node
+  // (plan: notes/score-graph-evidence-nodes-plan.md). Off by default; "?evidence=on" in the URL turns it on.
+  let showEvidence = new URLSearchParams(location.search).get("evidence") === "on";
+  const EV_RINGS = [48, 61, 74, 87, 100]; // distance of each ring of dots from the subcategory node's centre
+  const EV_GAP = 13; // space between neighbouring dots along a ring
+  const EV_HALF_ARC = 40; // each ring covers ±40° around the direction away from the category node
+  const EV_R = 5.5;
+  const STANCE_ORDER = ["for", "against", "context"];
+
+  // The evidence items in a subcategory's HTML, sorted for, against, context as on the cards.
+  function evidenceItems(html) {
+    if (!html) return [];
+    const tpl = document.createElement("template");
+    tpl.innerHTML = html; // our own generated HTML from data-rstar-categories/, not user input
+    const items = [...tpl.content.querySelectorAll("ul.evidence > li")].map((li, i) => {
+      const stance = STANCE_ORDER.includes(li.dataset.stance) ? li.dataset.stance : "context";
+      const confidence = li.dataset.confidence || "low";
+      const copy = li.cloneNode(true);
+      copy.querySelectorAll("span.confidence").forEach((x) => x.remove());
+      return {
+        i,
+        stance,
+        confidence,
+        repository: li.dataset.repository || "",
+        text: copy.textContent.replace(/\s+/g, " ").trim(),
+        // Only high- and moderate-confidence "for" and "against" items set a score (how_to_score_rstar.md).
+        sets: stance !== "context" && (confidence === "high" || confidence === "moderate"),
+      };
+    });
+    return items.sort((a, b) => STANCE_ORDER.indexOf(a.stance) - STANCE_ORDER.indexOf(b.stance) || a.i - b.i);
+  }
+
+  function countEvidence(items) {
+    const c = { n: items.length, for: 0, against: 0, context: 0, sets: 0 };
+    items.forEach((e) => {
+      c[e.stance] += 1;
+      if (e.sets) c.sets += 1;
+    });
+    return c;
+  }
+
+  // "13: 2 for, 4 against, 7 context; 6 set the score"
+  function evidenceWords(c) {
+    if (!c.n) return "No evidence";
+    return `${c.n}: ${c.for} for, ${c.against} against, ${c.context} context; ${c.sets} set${c.sets === 1 ? "s" : ""} the score`;
+  }
+
+  // Dot positions: fill the inner ring first; each ring's dots are centred on the outward direction.
+  function fanPositions(center, outward, count) {
+    const out = [];
+    let left = count;
+    for (const r of EV_RINGS) {
+      if (left <= 0) break;
+      const step = (EV_GAP / r) * (180 / Math.PI); // degrees between dots on this ring
+      const fits = Math.floor((2 * EV_HALF_ARC) / step) + 1;
+      const k = Math.min(fits, left);
+      for (let j = 0; j < k; j++) out.push(polar(center.x, center.y, r, outward + (j - (k - 1) / 2) * step));
+      left -= k;
+    }
+    return out;
+  }
+
   function s(tag, attrs, children) {
     const node = document.createElementNS(SVGNS, tag);
     for (const [k, v] of Object.entries(attrs || {})) {
@@ -55,7 +117,7 @@
 
   const fmt = (v) => (typeof v === "number" ? String(Math.round(v * 10) / 10) : v);
 
-  function render(ctx) {
+  function render(ctx, opts) {
     const { DATA, dataset, el, isNA, main } = ctx;
 
     const intro = [
@@ -100,7 +162,11 @@
 
     // ------------------------------------------------------------ the graph
     const edges = s("g", { class: "g-edges", "aria-hidden": "true" });
+    // Evidence lines and dots sit between the score lines and the nodes. Screen readers skip them: the same
+    // items are on the category pages, and the table gives the counts.
+    const evidence = s("g", { class: "g-evidence", "aria-hidden": "true" });
     const nodes = s("g", { class: "g-nodes" });
+    const evTotals = { n: 0, sets: 0 };
     const bounds = { minX: -CENTER.r, maxX: CENTER.r, minY: -CENTER.r, maxY: CENTER.r };
     const grow = (p, r) => {
       bounds.minX = Math.min(bounds.minX, p.x - r);
@@ -111,14 +177,58 @@
 
     const tip = el("div", { class: "g-tip", "aria-hidden": "true", hidden: true });
 
-    function nodeLink(href, label, tipLines, children) {
+    // While a subcategory node is hovered or focused, its evidence nodes stay bright and the rest dim.
+    function highlight(subId) {
+      if (!showEvidence) return;
+      evidence.classList.toggle("has-active", Boolean(subId));
+      evidence.querySelectorAll(".g-ev-group").forEach((g) => g.classList.toggle("is-active", g.dataset.sub === subId));
+    }
+
+    function nodeLink(href, label, tipLines, children, subId) {
       const a = s("a", { href, class: "g-node", "aria-label": label }, children);
-      const show = () => showTip(a, tipLines);
+      const show = () => {
+        showTip(a, tipLines);
+        if (subId) highlight(subId);
+      };
+      const hide = () => {
+        hideTip();
+        if (subId) highlight(null);
+      };
       a.addEventListener("mouseenter", show);
       a.addEventListener("focus", show);
-      a.addEventListener("mouseleave", hideTip);
-      a.addEventListener("blur", hideTip);
+      a.addEventListener("mouseleave", hide);
+      a.addEventListener("blur", hide);
       return a;
+    }
+
+    const STANCE_WORDS = { for: "For", against: "Against", context: "Context" };
+
+    // One evidence node: a circle (for), a diamond (against) or a small grey ring (context). Filled when it
+    // sets the score; outline only when it doesn't (low confidence).
+    function evidenceDot(p, e, sub, href) {
+      const cls = `g-ev ${e.stance}${e.sets || e.stance === "context" ? "" : " hollow"}`;
+      const d = EV_R + 1;
+      const mark =
+        e.stance === "against"
+          ? s("polygon", { points: `${p.x},${p.y - d} ${p.x + d},${p.y} ${p.x},${p.y + d} ${p.x - d},${p.y}`, class: cls })
+          : s("circle", { cx: p.x, cy: p.y, r: e.stance === "context" ? EV_R - 1.5 : EV_R, class: cls });
+      const dot = s("g", { class: "g-ev-dot", "data-testid": "evidence-node", "data-sub": sub.id }, [
+        s("circle", { cx: p.x, cy: p.y, r: EV_GAP / 2, class: "g-ev-hit" }),
+        mark,
+      ]);
+      const short = e.text.length > 200 ? `${e.text.slice(0, 200).trimEnd()}…` : e.text;
+      const lines = [
+        [`${sub.id} evidence`, "strong"],
+        [`${STANCE_WORDS[e.stance]} · ${e.confidence} confidence · ${e.sets ? "sets the score" : "doesn't set the score"}`],
+        e.repository ? [`Repository: ${e.repository}`] : null,
+        [short],
+      ];
+      dot.addEventListener("mouseenter", () => showTip(dot, lines));
+      dot.addEventListener("mouseleave", hideTip);
+      dot.addEventListener("click", () => {
+        location.href = href;
+      });
+      return dot;
     }
 
     function circleText(p, lines, na) {
@@ -137,8 +247,11 @@
       const g = scores.groups[cat.key];
       const cp = polar(CENTER.x, CENTER.y, CAT_DIST, lay.angle);
       const catEdges = s("g", { style: `--c: var(${lay.color})` });
+      const catEvidence = s("g", { style: `--c: var(${lay.color})` });
       const catNodes = s("g", { style: `--c: var(${lay.color})` });
+      const catCounts = { n: 0, for: 0, against: 0, context: 0, sets: 0 };
       edges.append(catEdges);
+      evidence.append(catEvidence);
       nodes.append(catNodes);
 
       // Category → R*
@@ -165,26 +278,48 @@
         );
         const research = ctx.subScore(sub.id);
         const why = research ? ctx.basisText(research.basis, sub.points) : "";
-        const cov = ctx.coverage(ctx.subHtml(cat.key, sub.id));
+        const html = ctx.subHtml(cat.key, sub.id);
+        const cov = ctx.coverage(html);
         const scoreWords = `score ${fmt(v)} of ${sub.points}`;
+        const href = ctx.withDataset(`${cat.page}#${sub.id}`);
+        const items = evidenceItems(html);
+        const counts = countEvidence(items);
+        Object.keys(catCounts).forEach((k) => (catCounts[k] += counts[k]));
+        evTotals.n += counts.n;
+        evTotals.sets += counts.sets;
+
+        if (showEvidence && items.length) {
+          const group = s("g", { class: "g-ev-group", "data-sub": sub.id });
+          const lines = s("g", { class: "g-ev-lines" });
+          const dots = s("g");
+          fanPositions(p, angle, items.length).forEach((q, j) => {
+            grow(q, EV_R + 2);
+            lines.append(s("line", { x1: q.x, y1: q.y, x2: p.x, y2: p.y, class: "g-ev-line" }));
+            dots.append(evidenceDot(q, items[j], sub, href));
+          });
+          group.append(lines, dots);
+          catEvidence.append(group);
+        }
+
         catNodes.append(
           nodeLink(
-            ctx.withDataset(`${cat.page}#${sub.id}`),
+            href,
             `${sub.id} ${sub.title}: ${scoreWords}. Opens its card on the ${cat.title} page.`,
             [
               [`${sub.id} ${sub.title}`, "strong"],
               [`Your score: ${fmt(v)} of ${sub.points}`],
               isRisk(cat) && !na ? [`Risk drawn: ${fmt(lv)} (${sub.points} − ${fmt(v)})`] : null,
               why ? [`Web evidence: ${why}`] : null,
-              [ctx.coverageText(cov)],
+              counts.n ? [`Evidence items: ${evidenceWords(counts)}`] : [ctx.coverageText(cov)],
             ],
             [
               s("circle", { cx: p.x, cy: p.y, r: SUB_R, class: `g-circle sub${na ? " na" : ""}` }),
               ...circleText(p, [[sub.id, "g-id"], [fmt(v), "g-val"]], na),
-            ]
+            ],
+            sub.id
           )
         );
-        tableRows.push([sub.id, sub.title, cat.title, fmt(v), String(sub.points), lineText(cat, v, sub.points, SUB_STEP)]);
+        tableRows.push([sub.id, sub.title, cat.title, fmt(v), String(sub.points), lineText(cat, v, sub.points, SUB_STEP), false, evidenceWords(counts)]);
       });
 
       // The category node, drawn after its subcategory lines so they end at its edge.
@@ -207,7 +342,7 @@
           ]
         )
       );
-      tableRows.push([cat.prefix, cat.title, "R*", fmt(g.total), String(g.max_points), catLineText(catLine), true]);
+      tableRows.push([cat.prefix, cat.title, "R*", fmt(g.total), String(g.max_points), catLineText(catLine), true, evidenceWords(catCounts)]);
     }
 
     // R* in the middle (not a link: the summary above the graph says the same).
@@ -225,8 +360,14 @@
       .join(" ");
     const graph = s(
       "svg",
-      { viewBox: vb, class: "g-svg", role: "group", "aria-labelledby": "graph-caption", "aria-describedby": "graph-summary" },
-      [edges, nodes]
+      {
+        viewBox: vb,
+        class: `g-svg${showEvidence ? " with-evidence" : ""}`,
+        role: "group",
+        "aria-labelledby": "graph-caption",
+        "aria-describedby": "graph-summary",
+      },
+      [edges, evidence, nodes]
     );
 
     function showTip(a, lines) {
@@ -280,6 +421,26 @@
       }),
     ]);
 
+    // "Show evidence nodes": a switch (announced as on or off). Turning it on or off redraws the graph.
+    const evStatus = el("p", { class: "graph-ev-status", role: "status" });
+    const evMessage = showEvidence
+      ? `Showing ${evTotals.n} evidence item${evTotals.n === 1 ? "" : "s"}; ${evTotals.sets} set${evTotals.sets === 1 ? "s" : ""} a score.`
+      : "";
+    const evSwitch = el("button", { type: "button", role: "switch", id: "evidence-switch", class: "switch", "aria-checked": String(showEvidence) }, [
+      el("span", { class: "switch-track", "aria-hidden": "true" }, el("span", { class: "switch-thumb" })),
+      el("span", { text: "Show evidence nodes" }),
+    ]);
+    evSwitch.addEventListener("click", () => {
+      showEvidence = !showEvidence;
+      const url = new URL(location.href);
+      if (showEvidence) url.searchParams.set("evidence", "on");
+      else url.searchParams.delete("evidence");
+      history.replaceState(null, "", url);
+      render(ctx, { announce: true });
+      const again = document.getElementById("evidence-switch");
+      if (again) again.focus();
+    });
+
     const swatch = (cls) =>
       el("span", { class: "g-key-mark", "aria-hidden": "true" }, [
         (() => {
@@ -299,16 +460,24 @@
       el("li", {}, [swatch('<line x1="2" y1="7" x2="34" y2="7" class="k-line" stroke-width="1"/>'), "Thin line: score 0"]),
       el("li", {}, [swatch('<line x1="2" y1="7" x2="34" y2="7" class="k-line na" stroke-width="1.5"/>'), "Dashed line and black node: NA, a score still to decide"]),
       el("li", {}, [el("span", { class: "g-key-dot rstar", "aria-hidden": "true" }), "Red R*: every subcategory has a score"]),
+      ...(showEvidence
+        ? [
+            el("li", {}, [swatch('<circle cx="18" cy="7" r="5" class="k-ev"/>'), "Evidence “for” that sets the score"]),
+            el("li", {}, [swatch('<polygon points="18,1 24,7 18,13 12,7" class="k-ev"/>'), "Evidence “against” that sets the score"]),
+            el("li", {}, [swatch('<circle cx="11" cy="7" r="4.25" class="k-ev hollow"/><polygon points="25,1.5 30.5,7 25,12.5 19.5,7" class="k-ev hollow"/>'), "Outline only: low confidence, doesn't set the score"]),
+            el("li", {}, [swatch('<circle cx="18" cy="7" r="3.5" class="k-ev context"/>'), "Small grey ring: context, doesn't set the score"]),
+          ]
+        : []),
     ]);
 
     const tableId = "graph-table";
     const table = el("table", { class: "score-table graph-table" }, [
       el("caption", { class: "sr-only", text: `R* score graph for ${dataset.name} as a table` }),
-      el("thead", {}, el("tr", {}, ["Node", "Name", "Joins", "Score", "Points", "Line drawn"].map((h) => el("th", { scope: "col", text: h })))),
+      el("thead", {}, el("tr", {}, ["Node", "Name", "Joins", "Score", "Points", "Line drawn", "Evidence"].map((h) => el("th", { scope: "col", text: h })))),
       el(
         "tbody",
         {},
-        tableRows.map(([id, name, joins, score, pts, line, isCat]) =>
+        tableRows.map(([id, name, joins, score, pts, line, isCat, ev]) =>
           el("tr", { class: isCat ? "is-cat" : null }, [
             el("th", { scope: "row", text: id }),
             el("td", { text: name }),
@@ -316,6 +485,7 @@
             el("td", {}, ctx.scoreValue(score === "NA" ? "NA" : Number(score), "small")),
             el("td", { text: pts }),
             el("td", { text: line }),
+            el("td", { text: ev }),
           ])
         )
       ),
@@ -346,15 +516,27 @@
       summary,
       el("figure", { class: "graph-panel" }, [
         el("figcaption", { id: "graph-caption", class: "sr-only", text: `R* score graph for ${dataset.name}` }),
-        modeField,
+        el("div", { class: "graph-controls" }, [modeField, el("div", { class: "graph-ev-control" }, [evSwitch, evStatus])]),
         el("p", { class: "graph-scroll-hint", text: "Scroll sideways to see the whole graph." }),
         el("div", { class: "graph-wrap" }, [graph, tip]),
         legend,
+        showEvidence
+          ? el("p", {
+              class: "graph-note",
+              text:
+                "Evidence nodes show the web research sorted into each subcategory. Your chosen score can differ " +
+                "from what the evidence implies; select a node to read the evidence on its card.",
+            })
+          : null,
       ]),
       el("div", { class: "score-actions" }, [tableBtn]),
       tableBox
     );
     document.title = "Score graph · R* Scores";
+    // A status message is read out when its text changes after it is on the page, so set it a frame later
+    // when the switch was just used; otherwise show it without announcing it again.
+    if (opts && opts.announce) requestAnimationFrame(() => (evStatus.textContent = evMessage));
+    else evStatus.textContent = evMessage;
   }
 
   window.RSTAR_GRAPH = { render };

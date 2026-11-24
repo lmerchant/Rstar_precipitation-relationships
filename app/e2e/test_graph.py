@@ -74,7 +74,7 @@ def test_graph_uses_the_chosen_scores(page: Page):
     expect(page.get_by_text("R* is 65 (triage: Stabilize and mirror). Every subcategory has a score.")).to_be_visible()
     expect(graph(page).get_by_role("link", name=re.compile(r"^P-1 No documented succession plan: score 35 of 35\."))).to_be_visible()
     open_table(page)
-    expect(table_row(page, "P-1")).to_have_text(re.compile(r"35\s*35\s*7 px$"))
+    expect(table_row(page, "P-1")).to_have_text(re.compile(r"35\s*35\s*7 px"))
 
 
 def test_category_lines_show_their_weighted_share_of_rstar(page: Page):
@@ -82,13 +82,13 @@ def test_category_lines_show_their_weighted_share_of_rstar(page: Page):
     open_table(page)
 
     # Width = share of R* ÷ 4: P adds 0.30 × 75 = 22.5, RRS adds 0.20 × (100 − 45) = 11.
-    expect(table_row(page, "P")).to_have_text(re.compile(r"75\s*100\s*5.6 px \(adds 22.5 to R\*\)$"))
-    expect(table_row(page, "RRS")).to_have_text(re.compile(r"45\s*100\s*2.8 px \(adds 11 to R\*\)$"))
+    expect(table_row(page, "P")).to_have_text(re.compile(r"75\s*100\s*5.6 px \(adds 22.5 to R\*\)"))
+    expect(table_row(page, "RRS")).to_have_text(re.compile(r"45\s*100\s*2.8 px \(adds 11 to R\*\)"))
     expect(graph(page).get_by_role("link", name=re.compile(r"^Data risk: total 60 of 100, .* adds 24 to R\*\."))).to_be_visible()
 
     # The RRS switch changes only the subcategory lines.
     page.get_by_role("radio", name="Its score").check()
-    expect(table_row(page, "RRS")).to_have_text(re.compile(r"2.8 px \(adds 11 to R\*\)$"))
+    expect(table_row(page, "RRS")).to_have_text(re.compile(r"2.8 px \(adds 11 to R\*\)"))
 
 
 def test_one_na_subcategory_makes_its_category_and_rstar_na(page: Page):
@@ -96,7 +96,7 @@ def test_one_na_subcategory_makes_its_category_and_rstar_na(page: Page):
 
     expect(page.get_by_text(re.compile(r"^R\* is NA: 1 of 19 subcategories is NA, so its category"))).to_be_visible()
     open_table(page)
-    expect(table_row(page, "DIRS-4")).to_have_text(re.compile(r"NA\s*15\s*dashed \(NA\)$"))
+    expect(table_row(page, "DIRS-4")).to_have_text(re.compile(r"NA\s*15\s*dashed \(NA\)"))
 
 
 def test_repository_lines_show_risk_or_score(page: Page):
@@ -104,13 +104,13 @@ def test_repository_lines_show_risk_or_score(page: Page):
     open_table(page)
     row = table_row(page, "RRS-1")
     expect(page.get_by_role("radio", name="The risk it adds (points − score)")).to_be_checked()
-    expect(row).to_have_text(re.compile(r"1 px \(risk 0 = 25 − 25\)$"))
+    expect(row).to_have_text(re.compile(r"1 px \(risk 0 = 25 − 25\)"))
 
     page.get_by_role("radio", name="Its score").check()
 
     expect(page.get_by_role("radio", name="Its score")).to_be_checked()
     # The page redraws; the table stays open.
-    expect(row).to_have_text(re.compile(r"25\s*25\s*5 px$"))
+    expect(row).to_have_text(re.compile(r"25\s*25\s*5 px"))
 
 
 def test_a_subcategory_node_opens_its_card(page: Page):
@@ -145,3 +145,62 @@ def test_rstar_node_is_black_when_na_and_red_with_a_value(page: Page):
 
     expect(page.get_by_text(re.compile(r"^R\* is 65"))).to_be_visible()
     assert rstar_fill(page) == "rgb(198, 40, 40)"
+
+
+# ---------------------------------------------------------------- evidence nodes
+# Evidence nodes are hidden from screen readers (the same items are on the category pages, and the table gives
+# the counts), so the tests find them by test id.
+
+def evidence_switch(page: Page):
+    return page.get_by_role("switch", name="Show evidence nodes")
+
+
+def test_evidence_switch_shows_and_hides_the_evidence_nodes(page: Page, console_errors):
+    page.goto("/graph.html?dataset=ghcn-daily")
+    expect(evidence_switch(page)).to_have_attribute("aria-checked", "false")
+    expect(page.get_by_test_id("evidence-node")).to_have_count(0)
+
+    evidence_switch(page).click()
+
+    expect(evidence_switch(page)).to_have_attribute("aria-checked", "true")
+    expect(evidence_switch(page)).to_be_focused()
+    expect(page.get_by_test_id("evidence-node")).to_have_count(210)
+    expect(page.get_by_role("status")).to_have_text("Showing 210 evidence items; 127 set a score.")
+    expect(page).to_have_url(re.compile(r"\?dataset=ghcn-daily&evidence=on$"))
+
+    evidence_switch(page).click()
+
+    expect(evidence_switch(page)).to_have_attribute("aria-checked", "false")
+    expect(page.get_by_test_id("evidence-node")).to_have_count(0)
+    expect(page).to_have_url(re.compile(r"\?dataset=ghcn-daily$"))
+    assert console_errors == []
+
+
+def test_evidence_stays_on_when_the_repository_lines_change(page: Page):
+    page.goto("/graph.html?dataset=ghcn-daily&evidence=on")
+    expect(evidence_switch(page)).to_have_attribute("aria-checked", "true")
+
+    page.get_by_role("radio", name="Its score").check()
+
+    expect(evidence_switch(page)).to_have_attribute("aria-checked", "true")
+    expect(page.get_by_test_id("evidence-node")).to_have_count(210)
+
+
+def test_table_counts_the_evidence(page: Page):
+    page.goto("/graph.html?dataset=ghcn-daily")
+    open_table(page)
+
+    expect(table_row(page, "P-1")).to_contain_text("13: 2 for, 4 against, 7 context; 6 set the score")
+    expect(table_row(page, "P")).to_contain_text("44: 12 for, 14 against, 18 context; 23 set the score")
+
+
+def test_an_evidence_node_opens_its_card(page: Page):
+    page.goto("/graph.html?dataset=ghcn-daily&evidence=on")
+    p3_evidence = page.get_by_test_id("evidence-node").and_(page.locator('[data-sub="P-3"]'))
+    expect(p3_evidence).to_have_count(11)
+
+    # Any of P-3's evidence nodes opens the P-3 card; the first is as good as any.
+    p3_evidence.first.click()
+
+    expect(page).to_have_url(re.compile(r"/people-risk\.html\?dataset=ghcn-daily#P-3$"))
+    expect(page.get_by_role("button", name="Hide categorization for P-3")).to_have_attribute("aria-expanded", "true")

@@ -26,7 +26,15 @@ The drawing code is `assets/graph.js`; `app.js` passes it its helpers.
   score. The RRS line to R* is always its share of R*.
 - **Details:** hovering or focusing a node shows its title, score, the web evidence reason and evidence count;
   selecting a subcategory node opens its card, and a category node its page. "The graph as a table" lists every node,
-  its score and the line drawn, for screen readers and for checking the numbers.
+  its score, the line drawn and its evidence counts, for screen readers and for checking the numbers.
+- **Evidence nodes:** the "Show evidence nodes" switch (off by default; `graph.html?dataset=ghcn-daily&evidence=on`
+  opens with it on) adds one small node per evidence item, in a fan on the outer side of its subcategory node, joined
+  to it by a thin grey line. Shape shows the stance (circle for "for", diamond for "against", small grey ring for
+  context); filled means it sets the score (high or moderate confidence), outline only means low confidence. Hovering
+  a dot shows its stance, confidence, repository and the start of its text; clicking it opens its card. Hovering or
+  focusing a subcategory node dims the other dots. The dots are not tab stops and are hidden from screen readers;
+  the table's Evidence column gives the counts. They are read from the category JSON in the browser, so
+  `build_data.py` doesn't change. Plan: `notes/score-graph-evidence-nodes-plan.md`.
 - Below 660 px wide the graph keeps a readable size and scrolls sideways.
 
 ## Chosen scores
