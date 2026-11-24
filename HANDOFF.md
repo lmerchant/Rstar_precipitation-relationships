@@ -1,7 +1,7 @@
 # Handoff
 
 Notes for the next session: what the project is for, where things stand, and what to do next.
-Last updated 2026-11-23. Update this file before compacting a session and at the end of every session
+Last updated 2026-11-24. Update this file before compacting a session and at the end of every session
 (see CLAUDE.md).
 
 ## Goal
@@ -34,8 +34,8 @@ PERSIANN-CDR Daily are waiting on supplemental research, and CoCoRaHS is a new d
 | Feedback on the first pass | `docs/claude_feedback/first_pass_to_categorize.md`. All answered (see Open questions) |
 | Categorization rules | `docs/claude_feedback/rstar-categorization-decisions.md`, the master copy the user edits (2026-11-23). All its changes are applied. No Word copies are kept in the repo (they went out of sync); the user makes one with pandoc when needed |
 | Categorization viewer | Done: static site in `app/` (landing page with R* scores and key, plus 4 category pages with card scores, "Your score" radios and a category score panel) |
-| e2e tests | 82 pass (41 tests × Firefox and WebKit, 2026-11-24; score choices in `app/e2e/test_scores.py`, saving in `app/e2e/test_save.py`), Python Playwright. The empty-subcategory test now empties RRS-2 by intercepting `rstar-data.js`. Avoid `all_text_contents()`: it crashes this page in Playwright's Firefox |
-| Final graph app | Not started |
+| e2e tests | 104 pass (52 tests × Firefox and WebKit, 2026-11-24; score choices in `app/e2e/test_scores.py`, saving in `app/e2e/test_save.py`, the score graph in `app/e2e/test_graph.py`), Python Playwright. The empty-subcategory test now empties RRS-2 by intercepting `rstar-data.js`. Avoid `all_text_contents()`: it crashes this page in Playwright's Firefox |
+| Score graph (weighted network graph) | First version built 2026-11-24: `app/graph.html` + `app/assets/graph.js` (see "The viewer"). Knowledge graph and information (evidence) nodes not started |
 | Query plans and templates | `notes/dataset-query-5-part-plan.md` (five parts per dataset) and `notes/archive-query-plan.md` (three kinds of repository, and a register of repositories). Templates in `Rstar_query_results/queries/` (see Research queries) |
 | Guide for sharing | `docs/rstar-query-templates-guide.md` (2026-11-23): the query design, files, how to adapt it to other climate data, and starter prompts. Written for a friend of the user who will get the files in a new GitHub repo the user is making |
 
@@ -193,6 +193,18 @@ Plan: `notes/app-categorization-viewer-plan.md`. Details: `app/README.md`.
     definition changes.
   - **No research run names (2026-11-23):** evidence items no longer show the run folder ("repository-pt7"); readers
     don't know the files. It is still in each item's `data-source` in the JSON.
+- **Score graph (2026-11-24):** `graph.html` ("Score graph" in the header, and "See the score graph →" on the landing
+  score panel) draws the chosen scores as a weighted network graph in plain SVG (`assets/graph.js`, no libraries; `app.js`
+  passes it its helpers through `window.RSTAR_GRAPH.render(ctx)`). R* in the middle, four category nodes in their own
+  colours (`--cat-p`, `--cat-d`, `--cat-dirs`, `--cat-rrs` in `styles.css`, checked with the dataviz palette validator;
+  P blue and RRS violet sit opposite because they are the hardest pair to tell apart), subcategory nodes in the parent's
+  colour. Line width = score ÷ 5 (subcategory) or the category's weighted share of R* ÷ 4 (category; the user chose the
+  weighted share over the total on 2026-11-24, so D's most is 10 px and DIRS's 2.5 px); 0 = 1 px; NA = black node,
+  dashed line. The R* node is black while NA and red (`--rstar-bg`) once every subcategory has a score (user's
+  request, 2026-11-24). A switch draws the RRS subcategory lines as risk (points − score, default) or score. Hover/focus tooltips, nodes link to their cards,
+  and "The graph as a table" gives the same data. The header nav's accessible name changed from "Categories" to
+  "Pages" (it now holds the graph link too). Choices taken from the user's notes; open design questions are in Next
+  steps.
 - **Viewing:** after each big change, give the user this command (CLAUDE.md):
   `cd /Users/claude/SIDE_WORK/NYCE_project/Rstar_precipitation-relationships/app && python3 -m http.server 3000 --bind 127.0.0.1`,
   then http://127.0.0.1:3000/.
@@ -246,6 +258,12 @@ adding it to the website, writing gap queries and adding new research. Follow it
    `scripts/analyze/collect_rstar_scores.py` to turn a folder of saved files into a CSV. The user is telling the
    colleague about the format changes (`notes/rstar-json-format-changes.md`). The viewer plan also
    lists confidence filters and a side-by-side dataset view as later ideas.
-7. **Design the network graph and knowledge graph app** from `docs/ideas/rstar_relationship_graph/rstar_graphs.md`. An NA
-   score is drawn in black with the value NA.
+7. **Score graph: review the first version with the user,** then the next pieces from
+   `docs/ideas/rstar_relationship_graph/rstar_graphs.md` and `docs/ideas/R Precip dashboard.md`:
+   - questions the notes left open (category lines now show their weighted share of R*, decided 2026-11-24): whether
+     RRS should default to risk or score; whether lines should be red for risk rather than the category
+     colour (the notes say both);
+   - information (evidence) nodes around each subcategory node, thick or thin by whether they come from another dataset;
+   - two datasets side by side, and expert / workshop / participant versions of the same graph;
+   - the separate knowledge graph (dataset, repository, people and instrument connections from the metadata files).
 8. **Keep the e2e tests passing in both browsers** as the viewer changes.
