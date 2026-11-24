@@ -1,7 +1,8 @@
 # Plan: R* categorization viewer (app/)
 
 A static website for reading the R* categorizations in a local browser.
-Written 2026-11-22. Covers the first version only; the network and knowledge graph app comes later.
+Written 2026-11-22. Covers the first version only; the network and knowledge graph app comes later. The weighted network graph was added on 2026-11-24 as `app/graph.html` (see `app/README.md` and
+`notes/score-graph-evidence-nodes-plan.md`); the knowledge graph is still to come.
 
 ## Constraints
 

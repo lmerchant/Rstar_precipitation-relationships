@@ -20,8 +20,15 @@ with 19 subcategories in all.
    - each subcategory is worth 0 or a fixed number of points, or NA when the evidence doesn't settle it (then the
      category total and R* are NA too, and a person decides).
 
-The user is still deciding what the final app will be. GHCN-Daily is categorized; GPCP Daily, IMERG Late Run and
+The weighted network graph of a dataset's R* scores is built (`app/graph.html`, 2026-11-24) and the user likes it;
+the knowledge graph of dataset relationships is not started. GHCN-Daily is categorized; GPCP Daily, IMERG Late Run and
 PERSIANN-CDR Daily are waiting on supplemental research, and CoCoRaHS is a new dataset not yet researched.
+
+**Last session (2026-11-24), in order:** renamed the site "R* Scores"; built the score graph page; made category lines
+show their weighted share of R*; made the R* node red once it has a value; added evidence nodes behind an on/off
+switch; coloured evidence green "for" and red "against"; added "Raw total" and "<Category> contribution" rows to the
+category pages' score panel; made the category pages' stance tags green/red and the confidence badges purple
+(high) / amber (moderate) / blue (low). All committed on `develop`.
 
 ## Where things stand
 
@@ -33,9 +40,9 @@ PERSIANN-CDR Daily are waiting on supplemental research, and CoCoRaHS is a new d
 | CoCoRaHS (new dataset, id `cocorahs`) | Six queries written 2026-11-23, none run. Needs a `datasets_metadata/json/` file before categorizing |
 | Feedback on the first pass | `docs/claude_feedback/first_pass_to_categorize.md`. All answered (see Open questions) |
 | Categorization rules | `docs/claude_feedback/rstar-categorization-decisions.md`, the master copy the user edits (2026-11-23). All its changes are applied. No Word copies are kept in the repo (they went out of sync); the user makes one with pandoc when needed |
-| Categorization viewer | Done: static site in `app/` (landing page with R* scores and key, plus 4 category pages with card scores, "Your score" radios and a category score panel) |
+| Categorization viewer | Done: static site in `app/` (landing page with R* scores and key, 4 category pages with card scores, "Your score" radios and a score panel with raw total and contribution, and the score graph page) |
 | e2e tests | 116 pass (58 tests × Firefox and WebKit, 2026-11-24; score choices in `app/e2e/test_scores.py`, saving in `app/e2e/test_save.py`, the score graph in `app/e2e/test_graph.py`), Python Playwright. The empty-subcategory test now empties RRS-2 by intercepting `rstar-data.js`. Avoid `all_text_contents()`: it crashes this page in Playwright's Firefox |
-| Score graph (weighted network graph) | Built 2026-11-24: `app/graph.html` + `app/assets/graph.js` (see "The viewer"), with evidence nodes behind an on/off switch. Knowledge graph not started |
+| Score graph (weighted network graph) | Built 2026-11-24: `app/graph.html` + `app/assets/graph.js` (see "The score graph"), with evidence nodes behind an on/off switch. Knowledge graph not started |
 | Query plans and templates | `notes/dataset-query-5-part-plan.md` (five parts per dataset) and `notes/archive-query-plan.md` (three kinds of repository, and a register of repositories). Templates in `Rstar_query_results/queries/` (see Research queries) |
 | Guide for sharing | `docs/rstar-query-templates-guide.md` (2026-11-23): the query design, files, how to adapt it to other climate data, and starter prompts. Written for a friend of the user who will get the files in a new GitHub repo the user is making |
 
@@ -195,25 +202,9 @@ Plan: `notes/app-categorization-viewer-plan.md`. Details: `app/README.md`.
     definition changes.
   - **No research run names (2026-11-23):** evidence items no longer show the run folder ("repository-pt7"); readers
     don't know the files. It is still in each item's `data-source` in the JSON.
-- **Score graph (2026-11-24):** `graph.html` ("Score graph" in the header, and "See the score graph →" on the landing
-  score panel) draws the chosen scores as a weighted network graph in plain SVG (`assets/graph.js`, no libraries; `app.js`
-  passes it its helpers through `window.RSTAR_GRAPH.render(ctx)`). R* in the middle, four category nodes in their own
-  colours (`--cat-p`, `--cat-d`, `--cat-dirs`, `--cat-rrs` in `styles.css`, checked with the dataviz palette validator;
-  P blue and RRS violet sit opposite because they are the hardest pair to tell apart), subcategory nodes in the parent's
-  colour. Line width = score ÷ 5 (subcategory) or the category's weighted share of R* ÷ 4 (category; the user chose the
-  weighted share over the total on 2026-11-24, so D's most is 10 px and DIRS's 2.5 px); 0 = 1 px; NA = black node,
-  dashed line. The R* node is black while NA and red (`--rstar-bg`) once every subcategory has a score (user's
-  request, 2026-11-24). **Evidence nodes (2026-11-24):** a "Show evidence nodes" switch (`role="switch"`, off by default,
-  `&evidence=on` in the URL) adds one dot per evidence item (210 for GHCN-Daily, 127 set a score) in a fan outside each
-  subcategory node: green circle = for, red diamond = against (user's request, 2026-11-24; the category pages' stance
-  tags now use the same green and red, as solid tags; confidence badges and evidence borders changed to purple high,
-  amber moderate, blue low so green and red only mean stance), small grey ring = context; filled = sets the score, outline = low
-  confidence. Dots have hover tooltips, click through to the card, dim when another subcategory is hovered, aren't tab
-  stops, and the table has an Evidence column with the counts. Plan and open questions (gaps as nodes; how to mark
-  evidence from another dataset for thick lines): `notes/score-graph-evidence-nodes-plan.md`. A switch draws the RRS subcategory lines as risk (points − score, default) or score. Hover/focus tooltips, nodes link to their cards,
-  and "The graph as a table" gives the same data. The header nav's accessible name changed from "Categories" to
-  "Pages" (it now holds the graph link too). Choices taken from the user's notes; open design questions are in Next
-  steps.
+  - **Evidence tags (2026-11-24):** stance tags are solid green "For", solid red "Against", grey "Context". Confidence
+    badges and each item's left border are purple high, amber moderate, blue low (see Colours below).
+- **Header nav:** its accessible name is "Pages" (was "Categories"); it holds the 4 categories and "Score graph".
 - **Viewing:** after each big change, give the user this command (CLAUDE.md):
   `cd /Users/claude/SIDE_WORK/NYCE_project/Rstar_precipitation-relationships/app && python3 -m http.server 3000 --bind 127.0.0.1`,
   then http://127.0.0.1:3000/.
@@ -223,6 +214,46 @@ Plan: `notes/app-categorization-viewer-plan.md`. Details: `app/README.md`.
   - Each card's arrow is a `<button aria-expanded>` that controls a `role="region"` panel.
   - Headings go h1, then h2 (subcategory), then h3.
   - Coverage dots have screen-reader text.
+
+## The score graph (`app/graph.html`, built 2026-11-24)
+
+Draws the dataset's **chosen** scores (the same as the landing page, so it changes as scores are picked) as a weighted
+network graph in plain SVG. Reached from "Score graph" in the header and "See the score graph →" on the landing score
+panel. Code: `app/assets/graph.js` (no libraries); `app.js` passes it its helpers through
+`window.RSTAR_GRAPH.render(ctx)`. Evidence plan: `notes/score-graph-evidence-nodes-plan.md`. All design choices come
+from the user's notes (`docs/ideas/...`) or were decided with the user on 2026-11-24.
+
+- **Nodes:** R* in the middle, black while NA and red once every subcategory has a score. Four category nodes in their
+  own colours (P blue, D orange, DIRS aqua, RRS violet; P and RRS sit opposite because they are the hardest pair to tell
+  apart), each showing its raw total and "adds X" (its share of R*). Subcategory nodes in the parent's colour, showing
+  ID and score. NA nodes are black with a ring in the category colour.
+- **Line widths:** subcategory line = score ÷ 5 (35 → 7 px). Category line = its weighted share of R* ÷ 4 (the user
+  chose the share over the raw total), so D's most is 10 px, P 7.5, RRS 5, DIRS 2.5. A 0 is 1 px; NA is dashed.
+- **RRS switch:** "Repository resilience subcategory lines show" risk (points − score, default) or score. The RRS line to
+  R* is always its share, 0.20 × (100 − raw total).
+- **Evidence nodes:** the "Show evidence nodes" switch (`role="switch"`, off by default, `&evidence=on` in the URL)
+  adds one dot per evidence item (210 for GHCN-Daily, 127 set a score) in a fan outside each subcategory node, joined by
+  thin grey lines. Green circle = for, red diamond = against, small grey ring = context; filled = sets the score
+  (high/moderate), outline = low confidence. Dots have hover tooltips (stance, confidence, repository, first 200
+  characters), click through to the card, and dim while another subcategory node is hovered or focused. They are read
+  from the category JSON in the browser (`build_data.py` unchanged), are not tab stops and are hidden from screen
+  readers.
+- **Around it:** a summary sentence (R* value and triage tier, or how many subcategories are NA), a graph key, hover/focus
+  tooltips on nodes (subcategory and category nodes are links to their cards/pages), and "The graph as a table" (every
+  node, score, line drawn and evidence counts). Below 660 px wide the graph scrolls sideways.
+
+## Colours (`app/assets/styles.css`)
+
+Light and dark values for each; all text passes 4.5:1 and marks 3:1. Green and red mean **stance only**.
+
+| Token | Meaning |
+|---|---|
+| `--cat-p`, `--cat-d`, `--cat-dirs`, `--cat-rrs` | Category colours on the graph (checked with the dataviz palette validator) |
+| `--ev-for` (green), `--ev-against` (red), `--ev-on` | Evidence stance: graph dots and the category pages' solid stance tags |
+| `--conf-high` (purple), `--moderate` (amber), `--conf-low` (blue) | Confidence badges and evidence item borders |
+| `--rstar-bg` (red) | The R* node once it has a value |
+| `--na-bg` (black), `--na-border` | NA scores everywhere |
+| `--high`, `--low` | Still used for coverage dots (green = 4+ items) and the save form's error text; not for confidence |
 
 ## Tests
 
@@ -247,6 +278,19 @@ Plan: `notes/app-categorization-viewer-plan.md`. Details: `app/README.md`.
 - Use `trash`, never `rm`.
 - `Rstar_query_results` is a separate git repo (also on `develop`) for queries and research runs. Commit query files
   there and project files here, each in its own commit.
+- **Commit style:** one commit for the change (code, tests, README, notes), then a separate "Update handoff for ..."
+  commit for `HANDOFF.md`. Messages end with the Co-Authored-By line.
+
+**Tips from the 2026-11-24 session:**
+- **The `guard_bash` hook blocks any Bash command whose text contains `cat.key`** (it reads it as a key file). `app.js`
+  and `graph.js` use `cat.key` a lot, so for edits that include it, write a Python edit script to the scratchpad with
+  the Write tool and run the file, or use the Edit tool.
+- **Cached CSS:** `python3 -m http.server` lets the browser reuse old CSS/JS. After a style change, hard-refresh
+  (Cmd+Shift+R), or in the built-in browser run `fetch(<stylesheet href>, {cache: 'reload'})` then reload. Tell the user
+  to hard-refresh too.
+- **Screenshots right after a redraw** can catch the 0.15 s fade or dimming transitions and look washed out; zoom in, or
+  check computed styles with JavaScript.
+- **Auto mode** sometimes refuses a call sent in the same message as another; send it again on its own.
 
 ## Next steps
 
@@ -267,13 +311,13 @@ adding it to the website, writing gap queries and adding new research. Follow it
    `scripts/analyze/collect_rstar_scores.py` to turn a folder of saved files into a CSV. The user is telling the
    colleague about the format changes (`notes/rstar-json-format-changes.md`). The viewer plan also
    lists confidence filters and a side-by-side dataset view as later ideas.
-7. **Score graph: review the first version with the user,** then the next pieces from
+7. **Score graph: next pieces** (the user likes the current version), from
    `docs/ideas/rstar_relationship_graph/rstar_graphs.md` and `docs/ideas/R Precip dashboard.md`:
-   - questions the notes left open (category lines now show their weighted share of R*, decided 2026-11-24): whether
-     RRS should default to risk or score; whether lines should be red for risk rather than the category
-     colour (the notes say both);
-   - evidence nodes are built; still open: gaps as nodes, and an attribute marking evidence from another dataset
-     (for thick lines);
+   - still open from the notes: whether RRS lines should default to risk or score; whether score lines should be red
+     for risk rather than the category colour (the notes say both);
+   - evidence nodes: gaps as nodes (up to 3 per subcategory)? and an attribute in the categorize scripts marking
+     evidence that comes from another dataset (for the thick lines the notes ask for);
    - two datasets side by side, and expert / workshop / participant versions of the same graph;
    - the separate knowledge graph (dataset, repository, people and instrument connections from the metadata files).
+   - With the stance/confidence colour clash gone, the stance tags could go back to pale tints if the user prefers.
 8. **Keep the e2e tests passing in both browsers** as the viewer changes.
