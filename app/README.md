@@ -90,6 +90,20 @@ Then open http://127.0.0.1:3000/
 You can also open `app/index.html` straight from disk. The data is loaded with a `<script>` tag, not
 `fetch()`, so it works without a server.
 
+## Published site (GitHub Pages)
+
+The live site is https://lmerchant.github.io/Rstar_precipitation-relationships/, linked from
+https://lmerchant.github.io/.
+
+- `.github/workflows/pages.yml` publishes this `app/` folder (nothing else in the repo, and without `e2e/`,
+  `pytest.ini`, `requirements-dev.txt` and `scripts/`) each time `main` is pushed with changes under `app/`. It can also be run by hand from the repo's Actions tab.
+- There is no build on GitHub: rebuild `data/rstar-data.js` (below) and commit it before pushing.
+- The repo's Settings → Pages → Source must be "GitHub Actions".
+- To publish work from `develop`: `git switch main && git merge --ff-only develop && git push origin main`, then
+  `git switch develop`.
+- Each visitor's chosen scores and notes stay in their own browser (`localStorage`), and "Save your scores" downloads
+  to their own computer, so nothing is sent to GitHub.
+
 ## Update the data
 
 The pages read `data/rstar-data.js`, which is generated. Re-run the build after changing any of:

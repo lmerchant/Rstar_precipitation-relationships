@@ -45,3 +45,25 @@ blob-report/
 
 # The user's own idea notes: kept out of the shared repository
 docs/ideas/
+
+# Claude's project instructions and session handoff: kept on this computer only (the repo is public)
+CLAUDE.md
+HANDOFF.md
+
+# Working files for building the project, kept on this computer only (the repo is public).
+# Claude's plans, except the format changes meant for the colleague:
+notes/*
+!notes/rstar-json-format-changes.md
+# Claude's preview server settings:
+.claude/launch.json
+# Discussion records with Claude (the rules themselves, rstar-categorization-decisions.md, stay shared):
+docs/claude_feedback/first_pass_to_categorize.md
+docs/claude_feedback/why-rstar-categories-are-hard-to-apply.md
+docs/claude_feedback/why-rstar-categories-are-hard-to-apply_follow-up.md
+docs/claude_feedback/why-rstar-categories-chain.png
+# An early query, superseded by the templates:
+docs/example_starting_queries/
+# Research still to run (the *_categorization-gaps.md and *_coverage-gaps.md notes stay shared):
+datasets-gap-queries/*_gap-queries/
+datasets-gap-queries/supplemental-queries-run-sheet.md
+datasets-gap-queries/Rstar Precipitation Queries.md

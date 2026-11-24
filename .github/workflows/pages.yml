@@ -1,0 +1,48 @@
+# Publishes the R* Scores viewer (the app/ folder) to GitHub Pages:
+# https://lmerchant.github.io/Rstar_precipitation-relationships/
+#
+# Runs when main is pushed with changes under app/ (or to this file), or by hand from the Actions tab.
+# Needs Settings -> Pages -> Build and deployment -> Source: "GitHub Actions".
+# The app has no build step: app/data/rstar-data.js is committed, so rebuild it with
+# `python3 app/scripts/build_data.py` and commit before pushing.
+
+name: Publish app to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "app/**"
+      - ".github/workflows/pages.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# One deploy at a time; a newer push replaces a queued one but never cancels one already running.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/configure-pages@v5
+      # Copy the site without the developer files (tests, test settings, the data build script).
+      - name: Gather the site files
+        run: >
+          rsync -a
+          --exclude e2e/ --exclude pytest.ini --exclude requirements-dev.txt --exclude scripts/
+          app/ _site/
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: _site
+      - id: deployment
+        uses: actions/deploy-pages@v4
