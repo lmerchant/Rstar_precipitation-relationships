@@ -33,8 +33,8 @@ PERSIANN-CDR Daily are waiting on supplemental research, and CoCoRaHS is a new d
 | CoCoRaHS (new dataset, id `cocorahs`) | Six queries written 2026-11-23, none run. Needs a `datasets_metadata/json/` file before categorizing |
 | Feedback on the first pass | `docs/claude_feedback/first_pass_to_categorize.md`. All answered (see Open questions) |
 | Categorization rules | `docs/claude_feedback/rstar-categorization-decisions.md`, the master copy the user edits (2026-11-23). All its changes are applied. No Word copies are kept in the repo (they went out of sync); the user makes one with pandoc when needed |
-| Categorization viewer | Done: static site in `app/` (landing page with key and R* scores, plus 4 category pages with card scores) |
-| e2e tests | 46 pass (23 tests × Firefox and WebKit; rerun 2026-11-23 after the "What counts as evidence" change), Python Playwright. The empty-subcategory test now empties RRS-2 by intercepting `rstar-data.js`. Avoid `all_text_contents()`: it crashes this page in Playwright's Firefox |
+| Categorization viewer | Done: static site in `app/` (landing page with R* scores and key, plus 4 category pages with card scores, "Your score" radios and a category score panel) |
+| e2e tests | 80 pass (40 tests × Firefox and WebKit, 2026-11-23; score choices in `app/e2e/test_scores.py`, saving in `app/e2e/test_save.py`), Python Playwright. The empty-subcategory test now empties RRS-2 by intercepting `rstar-data.js`. Avoid `all_text_contents()`: it crashes this page in Playwright's Firefox |
 | Final graph app | Not started |
 | Query plans and templates | `notes/dataset-query-5-part-plan.md` (five parts per dataset) and `notes/archive-query-plan.md` (three kinds of repository, and a register of repositories). Templates in `Rstar_query_results/queries/` (see Research queries) |
 | Guide for sharing | `docs/rstar-query-templates-guide.md` (2026-11-23): the query design, files, how to adapt it to other climate data, and starter prompts. Written for a friend of the user who will get the files in a new GitHub repo the user is making |
@@ -160,10 +160,23 @@ Plan: `notes/app-categorization-viewer-plan.md`. Details: `app/README.md`.
   - **Re-run it after changing any of those inputs:**
     `python3 app/scripts/build_data.py`.
   - The pages load the data with a `<script>` tag, so they also work opened from disk.
-- **Pages:** `index.html` (dataset selector, a key to the tags and scoring, dataset details with the
-  producer-is-repository sentence, the R* score section with a "Score details" panel, and 4 category cards with
-  coverage chips), plus one page per category. On a category page each subcategory card shows its Description,
-  "What counts as evidence", its score and why, its status (RRS cards: the repositories), and opens to show the evidence.
+- **Pages:** `index.html` (dataset selector, dataset details with the producer-is-repository sentence, the R* score
+  section with a "Score details" panel, then the key to the tags and scoring, and 4 category cards with coverage
+  chips), plus one page per category. On a category page each subcategory card shows its Description,
+  "What counts as evidence", why the research gives its score, "Your score" radios (starting on the research score;
+  no research-score badge), its status (RRS cards: the
+  repositories), and opens to show the evidence. A panel beside the category description lists the chosen scores
+  and the category total.
+  - **Chosen scores (2026-11-23):** the radios offer full points, 0 or NA and start on the research score. Choices
+    are kept in `localStorage` (`rstar-chosen-scores-v1`, shaped `{"<dataset id>": {"P-1": 35, ...}}`) and the
+    category panel, landing totals and R* are worked out from them in `app.js` (`currentScores()`, same rule as
+    `build_data.py`). Details in `app/README.md`.
+  - **Notes and saving (2026-11-23):** each card has a "Your notes" box. The landing page's "Save your scores" panel
+    (name, email, role) downloads one JSON file per save in the colleague's form format
+    (`docs/json_output/example_rstar_json.json`) plus an `assessor` block; NA is `null`, notes go in
+    `justification`, `scoringMethod` is `""`. Plan and the user's answers: `notes/rstar-score-json-save-plan.md`;
+    changes to pass to the colleague: `notes/rstar-json-format-changes.md`; schema:
+    `app/schema/rstar-assessment.schema.json`.
   - Deep links work: `people-risk.html?dataset=ghcn-daily#P-3`.
   - **"What counts as evidence" (2026-11-23):** each subcategory in `rstar_definitions/` now has a
     `#### What counts as evidence` section, a reader's version of `#### How to find`. The site shows it in place of
@@ -219,9 +232,11 @@ adding it to the website, writing gap queries and adding new research. Follow it
    yet) and a `scripts/categorize/build_<id>.py`. Re-run `build_data.py` afterwards.
 4. **Research and categorize CoCoRaHS** from its run sheet; add its metadata file first.
 5. **Keep the repository register in `notes/archive-query-plan.md` current** when a new dataset names a new host.
-6. **Build the web form for final scores:** the research scores fill it in, NA items are marked as needing a
-   decision, and the user enters the final value. The viewer plan also lists confidence filters and a side-by-side
-   dataset view as later ideas.
+6. **Saving scores is built (download to the scorer's computer).** Still to do when wanted: "Load a saved file" to
+   carry on scoring, a server that collects files (the user wants to think about this later), and
+   `scripts/analyze/collect_rstar_scores.py` to turn a folder of saved files into a CSV. The user is telling the
+   colleague about the format changes (`notes/rstar-json-format-changes.md`). The viewer plan also
+   lists confidence filters and a side-by-side dataset view as later ideas.
 7. **Design the network graph and knowledge graph app** from `docs/rstar_relationship_graph/rstar_graphs.md` An NA
    score is drawn in black with the value NA.
 8. **Keep the e2e tests passing in both browsers** as the viewer changes.
