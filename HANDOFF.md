@@ -34,7 +34,7 @@ PERSIANN-CDR Daily are waiting on supplemental research, and CoCoRaHS is a new d
 | Feedback on the first pass | `docs/claude_feedback/first_pass_to_categorize.md`. All answered (see Open questions) |
 | Categorization rules | `docs/claude_feedback/rstar-categorization-decisions.md`, the master copy the user edits (2026-11-23). All its changes are applied. No Word copies are kept in the repo (they went out of sync); the user makes one with pandoc when needed |
 | Categorization viewer | Done: static site in `app/` (landing page with R* scores and key, plus 4 category pages with card scores, "Your score" radios and a category score panel) |
-| e2e tests | 114 pass (57 tests × Firefox and WebKit, 2026-11-24; score choices in `app/e2e/test_scores.py`, saving in `app/e2e/test_save.py`, the score graph in `app/e2e/test_graph.py`), Python Playwright. The empty-subcategory test now empties RRS-2 by intercepting `rstar-data.js`. Avoid `all_text_contents()`: it crashes this page in Playwright's Firefox |
+| e2e tests | 116 pass (58 tests × Firefox and WebKit, 2026-11-24; score choices in `app/e2e/test_scores.py`, saving in `app/e2e/test_save.py`, the score graph in `app/e2e/test_graph.py`), Python Playwright. The empty-subcategory test now empties RRS-2 by intercepting `rstar-data.js`. Avoid `all_text_contents()`: it crashes this page in Playwright's Firefox |
 | Score graph (weighted network graph) | Built 2026-11-24: `app/graph.html` + `app/assets/graph.js` (see "The viewer"), with evidence nodes behind an on/off switch. Knowledge graph not started |
 | Query plans and templates | `notes/dataset-query-5-part-plan.md` (five parts per dataset) and `notes/archive-query-plan.md` (three kinds of repository, and a register of repositories). Templates in `Rstar_query_results/queries/` (see Research queries) |
 | Guide for sharing | `docs/rstar-query-templates-guide.md` (2026-11-23): the query design, files, how to adapt it to other climate data, and starter prompts. Written for a friend of the user who will get the files in a new GitHub repo the user is making |
@@ -167,8 +167,10 @@ Plan: `notes/app-categorization-viewer-plan.md`. Details: `app/README.md`.
   chips), plus one page per category. On a category page each subcategory card shows its Description,
   "What counts as evidence", why the research gives its score, "Your score" radios (starting on the research score;
   no research-score badge), its status (RRS cards: the
-  repositories), and opens to show the evidence. A panel beside the category description lists the chosen scores
-  and the category total.
+  repositories), and opens to show the evidence. A panel beside the category description lists the chosen scores,
+  the "Raw total" (renamed from "Total", 2026-11-24) and below it the "<Category> contribution" row: what the
+  category adds to R* (weight × raw total; RRS 0.20 × (100 − raw total)), with the most it can add in the Points
+  column.
   - **Chosen scores (2026-11-23):** the radios offer full points, 0 or NA and start on the research score. The
     sentence above them states the implied score, for example "Both “for” and “against” web evidence (high or
     moderate): score = NA" (was "needs a decision"; the user's colleague is reviewing whether "score = NA" reads as
