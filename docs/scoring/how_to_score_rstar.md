@@ -78,7 +78,7 @@ Score sets for the subcategories of the major category People Risk where p_1 rep
 
 p_1 = {0,35}
 p_2 = {0,25}
-p_3 = {0,20}
+p_3 = {0,25}
 p_4 = {0,15}
 
 p_total = p_1 + p_2 + p_3 + p_4
@@ -118,9 +118,9 @@ DIRS-# can only have score values in the following sets and the min score is alw
 Score sets for the subcategories of the major category Dependent infrastructure resilience where dirs_1 represents the score of subcategory DIRS-1, etc. And dirs_total represents the total score of the Dependent infrastructure resilience major category.
 
 dirs_1 = {0,25}
-dirs_2 = {0,20}
+dirs_2 = {0,25}
 dirs_3 = {0,20}
-dirs_4 = {0,20}
+dirs_4 = {0,15}
 dirs_5 = {0,15}
 
 dirs_total = dirs_1 + dirs_2 + dirs_3 + dirs_4 + dirs_5

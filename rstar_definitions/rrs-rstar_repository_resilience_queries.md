@@ -2,7 +2,7 @@
 
 ## Repository resilience defined
 
-Robustness of the hosting institution’s data infrastructure: governance stability, redundancy, backup arrangements, distributed replication, and track record through prior funding disruptions.
+Robustness of the hosting institution’s data infrastructure: governance stability, redundancy, backup arrangements, distributed replication, and track record through prior funding disruptions. Because higher resilience means lower risk, it enters the formula inverted. A score of 80 on RRS becomes a contribution of 4 to R*, correctly rewarding well-governed repositories while flagging fragile ones.
 
 RRS covers each repository that holds a copy of the dataset, judged as an institution: its redundancy, integrity checks, disaster recovery, funding and track record. "For" means the repository is resilient. A repository serves the dataset in its original format with its metadata: the archive of record (the parent), its copies and mirrors (children) and the producer's own site count; volunteer snapshots and third-party reformatted copies don't. RRS gives one pooled verdict across all of them.
 
