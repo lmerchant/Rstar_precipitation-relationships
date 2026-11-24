@@ -149,7 +149,7 @@ def test_subcategory_with_no_evidence_says_so(page: Page):
 
 
 def test_dataset_without_categorization_says_so(page: Page):
-    page.goto("/data-risk.html?dataset=gpcp-daily")
+    page.goto("/data-risk.html?dataset=persiann-cdr-daily")
 
     expect(page.get_by_text("Not categorized yet for this dataset")).to_have_count(5)
     toggle(page, "D-1").click()

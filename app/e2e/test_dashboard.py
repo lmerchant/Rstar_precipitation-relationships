@@ -67,8 +67,8 @@ def test_rstar_link_is_on_the_card_not_in_its_panel(page: Page):
 def test_cards_say_when_a_dataset_has_no_rstar_scores_yet(page: Page):
     page.goto("/")
 
-    expect(card(page, "gpcp-daily").get_by_role("link", name="R* scores")).to_be_visible()
-    expect(card(page, "gpcp-daily").get_by_text("Not categorized yet")).to_be_visible()
+    expect(card(page, "persiann-cdr-daily").get_by_role("link", name="R* scores")).to_be_visible()
+    expect(card(page, "persiann-cdr-daily").get_by_text("Not categorized yet")).to_be_visible()
     expect(card(page, "imerg-late-run").get_by_text("R* scores: NA")).to_be_visible()
     expect(card(page, "imerg-late-run").get_by_role("link", name="R* scores")).to_have_count(0)
 

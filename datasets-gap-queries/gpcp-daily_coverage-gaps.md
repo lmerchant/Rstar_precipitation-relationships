@@ -1,5 +1,9 @@
 # GPCP Daily: what the research didn't search, by subcategory
 
+> **Superseded 2026-11-24:** GPCP Daily is now categorized. See
+> [gpcp-daily_categorization-gaps.md](gpcp-daily_categorization-gaps.md) for what is still open. This note is kept as
+> the record of what the pt7 and A2 gap runs were meant to fill.
+
 - **Dataset:** GPCP Daily: 1DD V1.3 (NOAA CDR at NCEI, DOI 10.7289/V5RX998Z) and V3.x Daily (V3.3 CDR C01726 at NCEI;
   V3.2 and V3.3 at NASA GES DISC).
 - **Checked:** 2026-11-23, by a coverage check of the six GPCP runs and the shared NCEI, NASA satellite and GHCN-Daily

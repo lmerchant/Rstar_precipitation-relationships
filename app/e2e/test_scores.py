@@ -174,7 +174,7 @@ def test_landing_reset_clears_every_category_after_asking(page: Page):
 
 
 def test_dataset_without_categorization_has_no_choices(page: Page):
-    page.goto("/people-risk.html?dataset=gpcp-daily")
+    page.goto("/people-risk.html?dataset=persiann-cdr-daily")
 
     expect(page.get_by_role("radio")).to_have_count(0)
     expect(page.get_by_role("complementary")).to_have_count(0)

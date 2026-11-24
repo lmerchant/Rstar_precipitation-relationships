@@ -45,12 +45,12 @@ def test_subcategory_chip_opens_that_card(page: Page):
 def test_switching_dataset_updates_links_and_details(page: Page):
     page.goto("/scores.html?dataset=ghcn-daily")
 
-    page.get_by_role("combobox", name="Dataset").select_option("gpcp-daily")
+    page.get_by_role("combobox", name="Dataset").select_option("persiann-cdr-daily")
 
-    expect(page).to_have_url(re.compile(r"\?dataset=gpcp-daily$"))
+    expect(page).to_have_url(re.compile(r"\?dataset=persiann-cdr-daily$"))
     expect(page.get_by_text("This dataset has no categorization file yet.")).to_be_visible()
     nav = page.get_by_role("navigation", name="Pages")
-    expect(nav.get_by_role("link", name="Data risk")).to_have_attribute("href", "data-risk.html?dataset=gpcp-daily")
+    expect(nav.get_by_role("link", name="Data risk")).to_have_attribute("href", "data-risk.html?dataset=persiann-cdr-daily")
 
 
 def test_landing_has_a_key_to_the_tags_and_scores(page: Page):
@@ -91,4 +91,4 @@ def test_landing_says_when_producer_and_repository_are_the_same(page: Page):
     page.get_by_role("combobox", name="Dataset").select_option("gpcp-daily")
 
     expect(page.get_by_text("The producer and repository are the same organization")).to_have_count(0)
-    expect(page.get_by_role("region", name=re.compile(r"^R\* score for"))).to_have_count(0)
+    expect(page.get_by_role("region", name=re.compile(r"^R\* score for GPCP Daily"))).to_be_visible()

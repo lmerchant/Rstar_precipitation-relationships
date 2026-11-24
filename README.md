@@ -36,7 +36,7 @@ If any subcategory is NA, its group and R* are NA too. Point values and the full
 | Dataset | State |
 |---|---|
 | GHCN-Daily (Global Historical Climatology Network – Daily) | Categorized and on the site |
-| GPCP Daily (Global Precipitation Climatology Project, V3.3) | Researched; waiting on more research before categorizing |
+| GPCP Daily (Global Precipitation Climatology Project, V3.3) | Categorized and on the site (first pass) |
 | IMERG Late Run (GPM IMERG Late, V07) | Researched; waiting on more research before categorizing |
 | PERSIANN-CDR Daily | Researched; waiting on more research before categorizing |
 
