@@ -54,6 +54,8 @@ HANDOFF.md
 # Claude's plans, except the format changes meant for the colleague:
 notes/*
 !notes/rstar-json-format-changes.md
+# Claude's steps for categorizing a dataset (shared so the process can be repeated):
+!notes/categorize-dataset-instructions.md
 # Claude's preview server settings:
 .claude/launch.json
 # Discussion records with Claude (the rules themselves, rstar-categorization-decisions.md, stay shared):
