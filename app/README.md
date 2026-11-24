@@ -23,8 +23,14 @@ https://lmerchant.github.io/precip_workshop_dashboard/ are left as they were). P
 
 - **Pages:** `index.html` (cards, search, filters), `overview.html?id=<id>` (dataset overview),
   `dataset.html?id=<id>[&part=<N>]` (dataset web research), `archive.html?id=<id>` (archive and instrument threat
-  pages). They keep the dashboard's own look (`assets/dashboard/dashboard.css`, IBM Plex fonts from Google Fonts);
-  the R* pages keep theirs (`assets/styles.css`). One look for the whole site is the next step.
+  pages), styled by `assets/dashboard/dashboard.css` (IBM Plex fonts from Google Fonts).
+- **One look for the whole site (2026-11-24):** the R* pages load `dashboard.css` first, for the dashboard's frame
+  (navy `.dashboard`, the `.dashboard-header` band, the white `.content-panel`, the footer and the fonts), then
+  `assets/styles.css`, which styles their own parts in the dashboard's colours: square corners, grey-blue cards with
+  the teal rule under them (category and subcategory cards), white sections with the teal rule on top, and mono
+  capitals for small labels. The R* header (`renderHeader()` in `assets/app.js`) uses the dashboard's header pieces:
+  "← Back to dashboard" and a label row, "R* Scores" with the dataset picker, a rule, and the page links as tabs (the
+  current page's tab is white). The site is light only now, like the dashboard (the R* pages' dark theme was dropped).
 - **Code:** `assets/dashboard/` (`dashboard.js` for `index.html`, `shared.js` for all four, plus `overview.js`,
   `dataset.js`, `dataset-search.js`, `archive.js`, `markdown.js`).
 - **Data:** `data/datasets.json` (the cards; field list in `notes/dashboard/dashboard-design-notes.md`),
@@ -201,7 +207,7 @@ Firefox loads Homebrew's `libnss3` instead of its own and fails with "Symbol not
 | `assets/app.js` | Renders the R* pages from `window.RSTAR_DATA` |
 | `assets/dashboard/` | The dashboard pages' scripts and stylesheet (`dashboard.css`) |
 | `assets/graph.js` | Draws the weighted network graph on `graph.html` (SVG, no libraries) |
-| `assets/styles.css` | Styles, with light and dark themes that follow the system setting |
+| `assets/styles.css` | The R* pages' own styles, in the dashboard's colours (light only); loaded after `assets/dashboard/dashboard.css` |
 | `data/rstar-data.js` | Generated R* data. Don't edit it by hand |
 | `data/*.json`, `content/` | The dashboard's data and page text (see "Dashboard") |
 | `scripts/build_data.py` | Builds `data/rstar-data.js` (Python standard library only) |

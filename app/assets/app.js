@@ -363,6 +363,11 @@
   function renderHeader() {
     const current = body.dataset.category;
     const nav = el("nav", { class: "cat-nav", "aria-label": "Pages" }, [
+      el("a", {
+        href: withDataset("scores.html"),
+        "aria-current": body.dataset.page === "scores" ? "page" : null,
+        text: "R* score",
+      }),
       ...DATA.categories.map((c) =>
         el("a", { href: withDataset(c.page), "aria-current": c.key === current ? "page" : null, text: c.title })
       ),
@@ -390,16 +395,22 @@
       history.replaceState(null, "", url);
       render();
     });
+    // Laid out like the dashboard's header band (assets/dashboard/dashboard.css): a label row, the site name, a
+    // rule, then the page links.
     header.replaceChildren(
-      el("div", { class: "container" }, [
+      el("div", { class: "header-top" }, [
         el("a", { class: "back-link", href: dashboardHref() }, [
           el("span", { "aria-hidden": "true", text: "← " }),
           "Back to dashboard",
         ]),
+        el("span", { class: "header-label", text: "Precipitation workshop / R* scores" }),
+      ]),
+      el("div", { class: "rstar-bar" }, [
         el("a", { class: "brand", href: withDataset("scores.html") }, [el("span", { text: "R*" }), " Scores"]),
-        nav,
         el("div", { class: "dataset-picker" }, [el("label", { for: "dataset-select", text: "Dataset" }), select]),
-      ])
+      ]),
+      el("div", { class: "header-divider" }),
+      nav
     );
   }
 
