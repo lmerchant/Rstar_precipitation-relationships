@@ -1,4 +1,4 @@
-"""Landing page: reach every category, see the dataset, jump to a subcategory."""
+"""R* score page (scores.html): reach every category, see the dataset, jump to a subcategory."""
 import re
 
 from playwright.sync_api import Page, expect
@@ -7,7 +7,7 @@ CATEGORIES = ["People risk", "Data risk", "Dependent infrastructure resilience",
 
 
 def test_landing_links_to_all_four_categories(page: Page, console_errors):
-    page.goto("/index.html")
+    page.goto("/scores.html")
 
     expect(page.get_by_role("heading", level=1, name="R* Scores")).to_be_visible()
     expect(page).to_have_title("R* Scores")
@@ -17,14 +17,14 @@ def test_landing_links_to_all_four_categories(page: Page, console_errors):
 
 
 def test_landing_shows_the_selected_dataset(page: Page):
-    page.goto("/index.html?dataset=ghcn-daily")
+    page.goto("/scores.html?dataset=ghcn-daily")
 
     expect(page.get_by_role("heading", name="GHCN-D: Global Historical Climatology Network Daily", exact=True)).to_be_visible()
     expect(page.get_by_role("combobox", name="Dataset")).to_have_value("ghcn-daily")
 
 
 def test_category_link_opens_the_category_page(page: Page):
-    page.goto("/index.html?dataset=ghcn-daily")
+    page.goto("/scores.html?dataset=ghcn-daily")
 
     page.get_by_role("link", name="Open Data risk →").click()
 
@@ -33,7 +33,7 @@ def test_category_link_opens_the_category_page(page: Page):
 
 
 def test_subcategory_chip_opens_that_card(page: Page):
-    page.goto("/index.html?dataset=ghcn-daily")
+    page.goto("/scores.html?dataset=ghcn-daily")
 
     page.get_by_role("link", name=re.compile(r"^P-3 \(\d+ evidence items")).click()
 
@@ -43,7 +43,7 @@ def test_subcategory_chip_opens_that_card(page: Page):
 
 
 def test_switching_dataset_updates_links_and_details(page: Page):
-    page.goto("/index.html?dataset=ghcn-daily")
+    page.goto("/scores.html?dataset=ghcn-daily")
 
     page.get_by_role("combobox", name="Dataset").select_option("gpcp-daily")
 
@@ -54,7 +54,7 @@ def test_switching_dataset_updates_links_and_details(page: Page):
 
 
 def test_landing_has_a_key_to_the_tags_and_scores(page: Page):
-    page.goto("/index.html?dataset=ghcn-daily")
+    page.goto("/scores.html?dataset=ghcn-daily")
 
     key = page.get_by_role("region", name="How to read the tags and scores")
     expect(key.get_by_role("table", name="Tags on each evidence item")).to_contain_text("For, Against, Context")
@@ -63,7 +63,7 @@ def test_landing_has_a_key_to_the_tags_and_scores(page: Page):
 
 
 def test_landing_shows_rstar_and_category_scores(page: Page):
-    page.goto("/index.html?dataset=ghcn-daily")
+    page.goto("/scores.html?dataset=ghcn-daily")
 
     scores = page.get_by_role("region", name=re.compile(r"^R\* score for GHCN-D"))
     expect(scores.get_by_text("Repository resilience", exact=True)).to_be_visible()
@@ -84,7 +84,7 @@ def test_landing_shows_rstar_and_category_scores(page: Page):
 
 
 def test_landing_says_when_producer_and_repository_are_the_same(page: Page):
-    page.goto("/index.html?dataset=ghcn-daily")
+    page.goto("/scores.html?dataset=ghcn-daily")
 
     expect(page.get_by_text("The producer and repository are the same organization")).to_be_visible()
 

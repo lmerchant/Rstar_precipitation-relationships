@@ -76,7 +76,7 @@ def test_saved_file_has_the_forms_shape_and_the_choices(page: Page, console_erro
 
 
 def test_components_match_the_example_form(page: Page):
-    page.goto("/index.html?dataset=ghcn-daily")
+    page.goto("/scores.html?dataset=ghcn-daily")
     fill_assessor(page)
 
     _, data = save(page)
@@ -95,7 +95,7 @@ def test_components_match_the_example_form(page: Page):
 
 
 def test_full_scores_give_rstar_and_triage_tier(page: Page):
-    page.goto("/index.html?dataset=ghcn-daily")
+    page.goto("/scores.html?dataset=ghcn-daily")
     set_all_full_points(page)
     expect(page.get_by_text("NA values are included")).to_have_count(0)
     fill_assessor(page)
@@ -112,13 +112,13 @@ def test_full_scores_give_rstar_and_triage_tier(page: Page):
 
 
 def test_landing_says_when_na_values_are_included(page: Page):
-    page.goto("/index.html?dataset=ghcn-daily")
+    page.goto("/scores.html?dataset=ghcn-daily")
 
     expect(page.get_by_text(re.compile(r"^NA values are included: 17 of 19 subcategories are NA\."))).to_be_visible()
 
 
 def test_save_needs_a_name(page: Page):
-    page.goto("/index.html?dataset=ghcn-daily")
+    page.goto("/scores.html?dataset=ghcn-daily")
     downloads = []
     page.on("download", lambda d: downloads.append(d))
 
@@ -132,7 +132,7 @@ def test_save_needs_a_name(page: Page):
 
 
 def test_name_is_remembered_and_last_save_is_shown(page: Page):
-    page.goto("/index.html?dataset=ghcn-daily")
+    page.goto("/scores.html?dataset=ghcn-daily")
     expect(page.get_by_text("Not saved yet from this browser.")).to_be_visible()
     fill_assessor(page, role="Workshop participant")
 
@@ -143,7 +143,7 @@ def test_name_is_remembered_and_last_save_is_shown(page: Page):
 
     page.goto("/data-risk.html?dataset=ghcn-daily")
     radio(page, "D-1", "30").check()
-    page.goto("/index.html?dataset=ghcn-daily")
+    page.goto("/scores.html?dataset=ghcn-daily")
 
     expect(page.get_by_label("Your name (required)")).to_have_value("Jane Smith")
     expect(page.get_by_text(re.compile(r"You have changes since then\.$"))).to_be_visible()

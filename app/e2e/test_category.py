@@ -157,12 +157,12 @@ def test_dataset_without_categorization_says_so(page: Page):
     expect(panel(page, "D-1")).to_have_text(re.compile(r"has not been categorized yet\.$"))
 
 
-def test_breadcrumb_returns_to_landing_with_dataset(page: Page):
+def test_breadcrumb_returns_to_the_score_page_with_dataset(page: Page):
     page.goto("/people-risk.html?dataset=ghcn-daily")
 
     page.get_by_role("navigation", name="Breadcrumb").get_by_role("link", name="All categories").click()
 
-    expect(page).to_have_url(re.compile(r"/index\.html\?dataset=ghcn-daily$"))
+    expect(page).to_have_url(re.compile(r"/scores\.html\?dataset=ghcn-daily$"))
 
 
 def test_phone_width_has_no_sideways_scroll(page: Page):

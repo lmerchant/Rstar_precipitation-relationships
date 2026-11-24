@@ -37,7 +37,7 @@ def table_row(page: Page, node: str):
 
 
 def test_header_links_to_the_graph(page: Page, console_errors):
-    page.goto("/index.html?dataset=ghcn-daily")
+    page.goto("/scores.html?dataset=ghcn-daily")
 
     page.get_by_role("navigation", name="Pages").get_by_role("link", name="Score graph").click()
 
@@ -50,7 +50,7 @@ def test_header_links_to_the_graph(page: Page, console_errors):
 
 
 def test_landing_score_panel_links_to_the_graph(page: Page):
-    page.goto("/index.html?dataset=ghcn-daily")
+    page.goto("/scores.html?dataset=ghcn-daily")
 
     page.get_by_role("link", name="See the score graph →").click()
 

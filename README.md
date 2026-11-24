@@ -58,7 +58,10 @@ person's call. That is what the site is for.
 
 ## The website
 
-- **Landing page:** the dataset's details, its R* score, a key to the tags, and the four groups.
+- **Dashboard (landing page):** one card per dataset with search and filters; each card opens to the dataset's
+  details and links to its overview, its web research and its R* scores. Archive and instrument pages hold the
+  research on the repositories and instruments.
+- **R* score page:** the dataset's details, its R* score, a key to the tags, and the four groups.
 - **Group pages:** one card per subcategory with its definition, what counts as evidence, the evidence and gaps, and
   "Your score" and "Your notes".
 - **Score graph:** the scores as a weighted network graph, with R* in the middle, optionally with a dot for every
@@ -83,6 +86,7 @@ Then open http://127.0.0.1:3000/. Details, tests and how to rebuild the data are
 | [data-rstar-query-results/](data-rstar-query-results/) | The web research: one folder per run, with the query, the answer and a research record. `about-datasets/` for the datasets, `archives/` for repositories, `instruments/` for instruments |
 | [data-rstar-categories/](data-rstar-categories/) | The categorization of each dataset: one JSON file per dataset with every evidence item, gap and score |
 | [scripts/categorize/](scripts/categorize/) | The script per dataset that holds the sorted evidence and writes its categorization |
+| [scripts/dashboard/](scripts/dashboard/) | Scripts that copy the research and metadata into the dashboard's pages |
 | [datasets_metadata/](datasets_metadata/) | Details about each dataset: names, DOIs, producers and repositories |
 | [datasets-gap-queries/](datasets-gap-queries/) | For each dataset, what the research never covered, by subcategory |
 | [docs/](docs/) | The scoring rules, the categorization format and rules, the saved-file format, and how-to guides |

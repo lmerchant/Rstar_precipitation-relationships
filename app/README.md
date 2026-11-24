@@ -1,6 +1,11 @@
-# R* categorization viewer
+# R* Scores site
 
-A static site titled "R* Scores" for reading the R* categorizations of each dataset and choosing its scores. It has a landing page with
+A static site for the precipitation datasets. Its landing page (`index.html`) is the **dataset dashboard**: one card
+per dataset, with search, filters and a detail panel, plus each dataset's overview, web research and archive pages
+(see "Dashboard" below). Each card's panel has an **R* scores** link to that dataset's R* pages.
+
+The R* pages are for reading the R* categorizations of each dataset and choosing its scores. They have a score page
+(`scores.html`) with
 the dataset's R* score (total, four category scores and a "Score details" panel), a key to the tags and scoring, and
 the four categories, and one page per category. On a category page, each subcategory card shows its description,
 "What counts as evidence" text, why the research evidence gives the score it does, "Your score" radio buttons
@@ -10,10 +15,41 @@ adds to R*: 0.40 × raw total for D, 0.30 × for P, 0.10 × for DIRS, 0.20 × (1
 total is NA). A score graph page draws the dataset's R* scores as a weighted
 network graph.
 
+## Dashboard (`index.html`, moved here 2026-11-24)
+
+Moved from the separate `precip_workshop_dashboard` project (its repo and test site at
+https://lmerchant.github.io/precip_workshop_dashboard/ are left as they were). Plan and decisions:
+`notes/dashboard-landing-merge-plan.md`; the dashboard's own design notes and how-tos are in `notes/dashboard/`.
+
+- **Pages:** `index.html` (cards, search, filters), `overview.html?id=<id>` (dataset overview),
+  `dataset.html?id=<id>[&part=<N>]` (dataset web research), `archive.html?id=<id>` (archive and instrument threat
+  pages). They keep the dashboard's own look (`assets/dashboard/dashboard.css`, IBM Plex fonts from Google Fonts);
+  the R* pages keep theirs (`assets/styles.css`). One look for the whole site is the next step.
+- **Code:** `assets/dashboard/` (`dashboard.js` for `index.html`, `shared.js` for all four, plus `overview.js`,
+  `dataset.js`, `dataset-search.js`, `archive.js`, `markdown.js`).
+- **Data:** `data/datasets.json` (the cards; field list in `notes/dashboard/dashboard-design-notes.md`),
+  `data/archives.json`, `data/archive_links.json`, `data/dataset_pages.json`, and the page text in `content/`. These
+  are **fetched**, so the dashboard pages need a web server (the R* pages still open from disk).
+- **Dataset ids** are the same everywhere: the folder names in `data-rstar-categories/datasets/` (`ghcn-daily`,
+  `gpcp-daily`, `imerg-late-run`, `persiann-cdr-daily`). The old dashboard's ids (`ghcn-d`, ...) were changed when it
+  moved.
+- **R* scores link:** `index.html` also loads `data/rstar-data.js`. A dataset in it gets an "R* scores" link to
+  `scores.html?dataset=<id>` ("(not categorized yet)" when it has no categorization file); one not in it (IMERG for
+  now) shows "R* scores: NA".
+- **Dashboard state in the URL:** `q` (search), `category` and `coverage` (filters) and `open` (open cards). Every
+  link off the dashboard carries them, including through the R* pages (`withDataset()` in `assets/app.js`), so each
+  page's "Back to dashboard" link returns to the dashboard as it was, with that dataset's card open and focused.
+- **Scripts** (run from the project folder): `scripts/dashboard/import_dataset_overviews.py` (overview pages from
+  `datasets_metadata/json/`), `import_dataset_pages.py` (web research pages from `data-rstar-query-results/about-datasets/`,
+  parts listed in `data/dataset_pages.json`), `import_archive_page.py` (one archive or instrument page) and
+  `sort_datasets.py` (re-sort the cards after adding or renaming a dataset). The research pages now on the site were
+  made from older copies of the runs; re-running `import_dataset_pages.py` would need `dataset_pages.json` updated
+  for the newer runs first (for example GHCN-Daily's parts 3 to 9).
+
 ## Score graph (`graph.html`)
 
-A weighted network graph of one dataset's chosen scores (the same scores as the landing page, so it changes as scores
-are chosen). Reached from "Score graph" in the header or "See the score graph →" in the landing page's score panel.
+A weighted network graph of one dataset's chosen scores (the same scores as the score page, so it changes as scores
+are chosen). Reached from "Score graph" in the header or "See the score graph →" in the score page's score panel.
 The drawing code is `assets/graph.js`; `app.js` passes it its helpers.
 
 - **Nodes:** R* in the middle (black while it is NA, red once every subcategory has a score); the four category nodes (P, D, DIRS, RRS), each in its own colour (blue, orange, aqua,
@@ -42,9 +78,9 @@ The drawing code is `assets/graph.js`; `app.js` passes it its helpers.
 ## Chosen scores
 
 Each card's "Your score" radios offer full points, 0 or NA, and start on the research score. A choice updates the
-category panel at once, and the landing page's category totals, R* and "Score details" (which shows only the chosen
+category panel at once, and the score page's category totals, R* and "Score details" (which shows only the chosen
 scores; the web evidence score and its reason are on the category page cards). Above the radios, each card states the score the web evidence implies and why, for example
-"Both “for” and “against” web evidence (high or moderate): score = NA". "Reset scores" in a category's panel clears only that category's choices. The landing page's "Reset scores",
+"Both “for” and “against” web evidence (high or moderate): score = NA". "Reset scores" in a category's panel clears only that category's choices. The score page's "Reset scores",
 next to "Score details", clears every category's choices for the dataset after asking. Neither clears notes.
 
 On the site (GitHub Pages or any address), each person's browser keeps its own choices: a first visit starts from the
@@ -60,7 +96,7 @@ in that browser and on that address (a page opened from disk keeps its own set).
 
 ## Saving scores to a file
 
-The landing page's **Save your scores** panel takes the scorer's name (required), email and role (expert, workshop
+The score page's **Save your scores** panel takes the scorer's name (required), email and role (expert, workshop
 participant or workshop group), and **Save scores to a file** downloads one JSON file, for example
 `ghcn-daily_rstar_jane-smith_2026-11-23T232937Z.json`. Each save is a new file. The panel shows a note when NA values
 are included and says when there are changes since the last save.
@@ -87,8 +123,8 @@ cd /Users/claude/SIDE_WORK/NYCE_project/Rstar_precipitation-relationships/app &&
 
 Then open http://127.0.0.1:3000/
 
-You can also open `app/index.html` straight from disk. The data is loaded with a `<script>` tag, not
-`fetch()`, so it works without a server.
+The R* pages (`scores.html`, the category pages and `graph.html`) also open straight from disk: their data is loaded
+with a `<script>` tag, not `fetch()`. The dashboard pages fetch their JSON, so they need the server.
 
 ## Published site (GitHub Pages)
 
@@ -110,7 +146,7 @@ The pages read `data/rstar-data.js`, which is generated. Re-run the build after 
 
 - `rstar_definitions/*.md` (titles, descriptions, "What counts as evidence" text, which is the reader's version of
   the "How to find" search instructions and is the one the site shows; the first paragraph of a "... defined"
-  section is the short definition on the landing page, and any later paragraphs show only on the category page)
+  section is the short definition on the score page, and any later paragraphs show only on the category page)
 - `data-rstar-categories/datasets/<dataset>/*.json` (the categorizations)
 - `docs/scoring/how_to_score_rstar.md` (point values and group weights)
 - `docs/json_output/example_rstar_json.json` (the saved file's `formula` and `framework` blocks)
@@ -157,21 +193,25 @@ Firefox loads Homebrew's `libnss3` instead of its own and fails with "Symbol not
 
 | Path | What it is |
 |---|---|
-| `index.html` | Landing page: dataset details and the four category cards |
+| `index.html` | Landing page: the dataset dashboard (`assets/dashboard/dashboard.js`) |
+| `overview.html`, `dataset.html`, `archive.html` | Dashboard pages: dataset overview, dataset web research, archive and instrument pages |
+| `scores.html` | R* score page: dataset details, R* score, save panel, key and the four category cards |
 | `graph.html` | Score graph page (`assets/graph.js` draws it) |
 | `people-risk.html`, `data-risk.html`, `dependent-infrastructure.html`, `repository-resilience.html` | Category pages (thin shells; `assets/app.js` fills them) |
-| `assets/app.js` | Renders all pages from `window.RSTAR_DATA` |
+| `assets/app.js` | Renders the R* pages from `window.RSTAR_DATA` |
+| `assets/dashboard/` | The dashboard pages' scripts and stylesheet (`dashboard.css`) |
 | `assets/graph.js` | Draws the weighted network graph on `graph.html` (SVG, no libraries) |
 | `assets/styles.css` | Styles, with light and dark themes that follow the system setting |
-| `data/rstar-data.js` | Generated data. Don't edit it by hand |
+| `data/rstar-data.js` | Generated R* data. Don't edit it by hand |
+| `data/*.json`, `content/` | The dashboard's data and page text (see "Dashboard") |
 | `scripts/build_data.py` | Builds `data/rstar-data.js` (Python standard library only) |
-| `e2e/` | Playwright tests: `conftest.py` (test server), `test_landing.py`, `test_category.py`, `test_scores.py`, `test_save.py`, `test_graph.py` |
+| `e2e/` | Playwright tests: `conftest.py` (test server), `test_dashboard.py`, `test_scores_page.py`, `test_category.py`, `test_scores.py`, `test_save.py`, `test_graph.py` |
 | `pytest.ini`, `requirements-dev.txt` | Test settings (Firefox and WebKit) and pinned test tools |
 
 ## Using it
 
 - **Dataset selector** (top right): switches the dataset. The choice is kept in the URL (`?dataset=ghcn-daily`).
-- **Subcategory chips** on the landing page jump to that card. The dot shows coverage: green for 4 or more
+- **Subcategory chips** on the score page jump to that card. The dot shows coverage: green for 4 or more
   evidence items, amber for 1–3, a hollow circle for none, and grey for not categorized.
 - **Cards**: click anywhere on a card's header, or the arrow button, to open it. Expand all and Collapse all
   are above the list.

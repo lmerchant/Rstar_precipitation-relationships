@@ -1,6 +1,6 @@
 {
   "schema_version": "0.1",
-  "id": "imerg-late-run-v07",
+  "id": "imerg-late-run",
   "source": {
     "file": "markdown/imerg-late-run_dataset-metadata.md",
     "section": "ChatGPT answer",
@@ -13,7 +13,7 @@
     ]
   },
   "dashboard": {
-    "id": "imerg-late-run-v07",
+    "id": "imerg-late-run",
     "name": "IMERG Late Run V07: Integrated Multi-satellitE Retrievals for GPM",
     "data_archive": "NASA GES DISC; NASA PPS",
     "precipitation_basis": "Satellite (passive microwave + IR); climatological gauge adjustment",

@@ -81,7 +81,7 @@ def test_arrow_keys_move_between_choices(page: Page):
 
 
 def test_choices_show_on_the_landing_page_and_after_going_back(page: Page):
-    page.goto("/index.html?dataset=ghcn-daily")
+    page.goto("/scores.html?dataset=ghcn-daily")
     page.get_by_role("link", name="Open People risk →").click()
     for sub_id, value in [("P-1", "35"), ("P-2", "25"), ("P-3", "25"), ("P-4", "0")]:
         choices(page, sub_id).get_by_role("radio", name=value, exact=True).check()
@@ -100,7 +100,7 @@ def test_choices_show_on_the_landing_page_and_after_going_back(page: Page):
 
 
 def test_rstar_is_worked_out_when_every_score_is_chosen(page: Page):
-    page.goto("/index.html?dataset=ghcn-daily")
+    page.goto("/scores.html?dataset=ghcn-daily")
     page.evaluate(
         """key => {
             const all = {};
@@ -147,7 +147,7 @@ def test_category_reset_keeps_other_categories(page: Page):
 
 
 def test_landing_reset_clears_every_category_after_asking(page: Page):
-    page.goto("/index.html?dataset=ghcn-daily")
+    page.goto("/scores.html?dataset=ghcn-daily")
     scores = page.get_by_role("region", name=re.compile(r"^R\* score for GHCN-D"))
     reset = scores.get_by_role("button", name="Reset scores")
     expect(reset).to_be_disabled()
@@ -156,7 +156,7 @@ def test_landing_reset_clears_every_category_after_asking(page: Page):
     page.get_by_label("Your notes for P-1").fill("Kept after a reset")
     page.goto("/data-risk.html?dataset=ghcn-daily")
     choices(page, "D-1").get_by_role("radio", name="0", exact=True).check()
-    page.goto("/index.html?dataset=ghcn-daily")
+    page.goto("/scores.html?dataset=ghcn-daily")
     expect(scores).to_contain_text("You changed 2 of 19")
 
     page.once("dialog", lambda d: d.dismiss())
@@ -181,7 +181,7 @@ def test_dataset_without_categorization_has_no_choices(page: Page):
 
 
 def test_key_comes_after_the_score_section(page: Page):
-    page.goto("/index.html?dataset=ghcn-daily")
+    page.goto("/scores.html?dataset=ghcn-daily")
 
     headings = page.locator("main section > h2")
     expect(headings).to_have_text([

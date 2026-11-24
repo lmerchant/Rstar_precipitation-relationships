@@ -1,13 +1,13 @@
 {
   "schema_version": "0.1",
-  "id": "ghcn-d",
+  "id": "ghcn-daily",
   "source": {
     "file": "markdown/ghcn-daily_dataset-metadata.md",
     "section": "ChatGPT answer",
     "converted": "2026-11-21"
   },
   "dashboard": {
-    "id": "ghcn-d",
+    "id": "ghcn-daily",
     "name": "GHCN-D: Global Historical Climatology Network Daily",
     "data_archive": "NOAA NCEI",
     "precipitation_basis": "Gauge-based",
@@ -42,7 +42,7 @@
         "role": "alternative"
       }
     ],
-    "about_url": "dataset.html?id=ghcn-d"
+    "about_url": "dataset.html?id=ghcn-daily"
   },
   "identification": {
     "full_name": "Global Historical Climatology Network – Daily",

@@ -1,6 +1,6 @@
 {
   "schema_version": "0.1",
-  "id": "noaa-ncei-persiann-cdr-v1r1",
+  "id": "persiann-cdr-daily",
   "source": {
     "file": "markdown/persiann-cdr-daily_dataset-metadata.md",
     "section": "ChatGPT answer",
@@ -13,7 +13,7 @@
     ]
   },
   "dashboard": {
-    "id": "noaa-ncei-persiann-cdr-v1r1",
+    "id": "persiann-cdr-daily",
     "name": "PERSIANN-CDR v1r1 Daily",
     "data_archive": "NOAA NCEI",
     "precipitation_basis": "Geostationary IR + GPCP gauge adjustment",
@@ -58,7 +58,7 @@
         "role": "alternative"
       }
     ],
-    "about_url": "dataset.html?id=noaa-ncei-persiann-cdr-v1r1"
+    "about_url": "dataset.html?id=persiann-cdr-daily"
   },
   "identification": {
     "full_name": "Precipitation Estimation from Remotely Sensed Information using Artificial Neural Networks – Climate Data Record",

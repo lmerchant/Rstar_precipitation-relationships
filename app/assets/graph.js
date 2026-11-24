@@ -122,7 +122,7 @@
 
     const intro = [
       el("nav", { class: "breadcrumb", "aria-label": "Breadcrumb" }, [
-        el("a", { href: ctx.withDataset("index.html"), text: "All categories" }),
+        el("a", { href: ctx.withDataset("scores.html"), text: "All categories" }),
         " / Score graph",
       ]),
       el("h1", { text: "R* score graph" }),

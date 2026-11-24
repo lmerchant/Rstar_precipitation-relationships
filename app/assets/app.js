@@ -37,9 +37,30 @@
   let dataset =
     DATA.datasets.find((d) => d.id === params.get("dataset")) || categorized[0] || DATA.datasets[0];
 
+  // The dashboard's (index.html) search, filters and open cards. They ride along on every R* link, so "Back to
+  // dashboard" returns to it as it was. Same names as DASHBOARD_PARAMS in assets/dashboard/shared.js.
+  const DASHBOARD_PARAMS = ["q", "category", "coverage", "open"];
+
+  function dashboardParams() {
+    const kept = new URLSearchParams();
+    for (const k of DASHBOARD_PARAMS) if (params.get(k)) kept.set(k, params.get(k));
+    return kept;
+  }
+
   function withDataset(href) {
     const [path, hash] = href.split("#");
-    return `${path}?dataset=${encodeURIComponent(dataset.id)}${hash ? "#" + hash : ""}`;
+    const p = dashboardParams();
+    p.set("dataset", dataset.id);
+    return `${path}?${p}${hash ? "#" + hash : ""}`;
+  }
+
+  // The dashboard with this dataset's card open (added to any already open) and scrolled to.
+  function dashboardHref() {
+    const p = dashboardParams();
+    const open = new Set((p.get("open") || "").split(",").filter(Boolean));
+    open.add(dataset.id);
+    p.set("open", [...open].sort().join(","));
+    return `index.html?${p}#dataset-${encodeURIComponent(dataset.id)}`;
   }
 
   function weightLabel(cat) {
@@ -371,7 +392,11 @@
     });
     header.replaceChildren(
       el("div", { class: "container" }, [
-        el("a", { class: "brand", href: withDataset("index.html") }, [el("span", { text: "R*" }), " Scores"]),
+        el("a", { class: "back-link", href: dashboardHref() }, [
+          el("span", { "aria-hidden": "true", text: "← " }),
+          "Back to dashboard",
+        ]),
+        el("a", { class: "brand", href: withDataset("scores.html") }, [el("span", { text: "R*" }), " Scores"]),
         nav,
         el("div", { class: "dataset-picker" }, [el("label", { for: "dataset-select", text: "Dataset" }), select]),
       ])
@@ -1012,7 +1037,7 @@
 
     main.replaceChildren(
       el("nav", { class: "breadcrumb", "aria-label": "Breadcrumb" }, [
-        el("a", { href: withDataset("index.html"), text: "All categories" }),
+        el("a", { href: withDataset("scores.html"), text: "All categories" }),
         " / ",
         cat.title,
       ]),

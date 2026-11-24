@@ -1,6 +1,6 @@
 {
   "schema_version": "0.1",
-  "id": "gpcp-daily-v3-3",
+  "id": "gpcp-daily",
   "source": {
     "file": "markdown/gpcp-daily_dataset-metadata.md",
     "section": "ChatGPT answer",
@@ -13,7 +13,7 @@
     ]
   },
   "dashboard": {
-    "id": "gpcp-daily-v3-3",
+    "id": "gpcp-daily",
     "name": "GPCP Daily v3.3: Global Precipitation Climatology Project",
     "data_archive": "NOAA NCEI; NASA GES DISC",
     "precipitation_basis": "Satellite + gauges; constrained to GPCP monthly",
@@ -53,7 +53,7 @@
         "role": "alternative"
       }
     ],
-    "about_url": "dataset.html?id=gpcp-daily-v3-3"
+    "about_url": "dataset.html?id=gpcp-daily"
   },
   "identification": {
     "full_name": "NOAA Climate Data Record (CDR) of the Global Precipitation Climatology Project (GPCP) Daily Version 3.3",
