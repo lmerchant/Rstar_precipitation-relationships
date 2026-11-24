@@ -1,5 +1,10 @@
 # IMERG Late Run: what the research didn't search, by subcategory
 
+> **Categorized 2026-11-24 (first pass).** The open gaps are now in
+> [imerg-late-run_categorization-gaps.md](imerg-late-run_categorization-gaps.md). This note is kept as the record of
+> what the gap runs were meant to fill. Pt7's run covered only calibration, inputs, alternatives and copies; its
+> people half and the NASA GES DISC + PPS A2 run are still to do.
+
 - **Dataset:** IMERG Late Run, version V07 (V08 pending), from NASA's Precipitation Processing System (PPS), archived
   at NASA GES DISC.
 - **Checked:** 2026-11-23, by a coverage check of the six IMERG runs and the NASA and NOAA satellite runs, against the

@@ -69,8 +69,10 @@ def test_cards_say_when_a_dataset_has_no_rstar_scores_yet(page: Page):
 
     expect(card(page, "persiann-cdr-daily").get_by_role("link", name="R* scores")).to_be_visible()
     expect(card(page, "persiann-cdr-daily").get_by_text("Not categorized yet")).to_be_visible()
-    expect(card(page, "imerg-late-run").get_by_text("R* scores: NA")).to_be_visible()
-    expect(card(page, "imerg-late-run").get_by_role("link", name="R* scores")).to_have_count(0)
+    # IMERG Late Run was categorized on 2026-11-24, so its card links to its scores with no note.
+    expect(card(page, "imerg-late-run").get_by_role("link", name="R* scores")).to_be_visible()
+    expect(card(page, "imerg-late-run").get_by_text("Not categorized yet")).to_have_count(0)
+    expect(card(page, "imerg-late-run").get_by_text("R* scores: NA")).to_have_count(0)
 
 
 def test_back_to_dashboard_restores_search_filters_and_open_card(page: Page):
