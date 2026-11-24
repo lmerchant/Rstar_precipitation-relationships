@@ -205,7 +205,9 @@ Plan: `notes/app-categorization-viewer-plan.md`. Details: `app/README.md`.
   dashed line. The R* node is black while NA and red (`--rstar-bg`) once every subcategory has a score (user's
   request, 2026-11-24). **Evidence nodes (2026-11-24):** a "Show evidence nodes" switch (`role="switch"`, off by default,
   `&evidence=on` in the URL) adds one dot per evidence item (210 for GHCN-Daily, 127 set a score) in a fan outside each
-  subcategory node: green circle = for, red diamond = against (user's request, 2026-11-24), small grey ring = context; filled = sets the score, outline = low
+  subcategory node: green circle = for, red diamond = against (user's request, 2026-11-24; the category pages' stance
+  tags now use the same green and red, as solid tags; confidence badges and evidence borders changed to purple high,
+  amber moderate, blue low so green and red only mean stance), small grey ring = context; filled = sets the score, outline = low
   confidence. Dots have hover tooltips, click through to the card, dim when another subcategory is hovered, aren't tab
   stops, and the table has an Evidence column with the counts. Plan and open questions (gaps as nodes; how to mark
   evidence from another dataset for thick lines): `notes/score-graph-evidence-nodes-plan.md`. A switch draws the RRS subcategory lines as risk (points − score, default) or score. Hover/focus tooltips, nodes link to their cards,
