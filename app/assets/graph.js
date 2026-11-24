@@ -203,8 +203,8 @@
 
     const STANCE_WORDS = { for: "For", against: "Against", context: "Context" };
 
-    // One evidence node: a circle (for), a diamond (against) or a small grey ring (context). Filled when it
-    // sets the score; outline only when it doesn't (low confidence).
+    // One evidence node: a green circle (for), a red diamond (against) or a small grey ring (context). Filled
+    // when it sets the score; outline only when it doesn't (low confidence).
     function evidenceDot(p, e, sub, href) {
       const cls = `g-ev ${e.stance}${e.sets || e.stance === "context" ? "" : " hollow"}`;
       const d = EV_R + 1;
@@ -462,9 +462,9 @@
       el("li", {}, [el("span", { class: "g-key-dot rstar", "aria-hidden": "true" }), "Red R*: every subcategory has a score"]),
       ...(showEvidence
         ? [
-            el("li", {}, [swatch('<circle cx="18" cy="7" r="5" class="k-ev"/>'), "Evidence “for” that sets the score"]),
-            el("li", {}, [swatch('<polygon points="18,1 24,7 18,13 12,7" class="k-ev"/>'), "Evidence “against” that sets the score"]),
-            el("li", {}, [swatch('<circle cx="11" cy="7" r="4.25" class="k-ev hollow"/><polygon points="25,1.5 30.5,7 25,12.5 19.5,7" class="k-ev hollow"/>'), "Outline only: low confidence, doesn't set the score"]),
+            el("li", {}, [swatch('<circle cx="18" cy="7" r="5" class="k-ev for"/>'), "Green circle: evidence “for” that sets the score"]),
+            el("li", {}, [swatch('<polygon points="18,1 24,7 18,13 12,7" class="k-ev against"/>'), "Red diamond: evidence “against” that sets the score"]),
+            el("li", {}, [swatch('<circle cx="11" cy="7" r="4.25" class="k-ev hollow for"/><polygon points="25,1.5 30.5,7 25,12.5 19.5,7" class="k-ev hollow against"/>'), "Outline only: low confidence, doesn't set the score"]),
             el("li", {}, [swatch('<circle cx="18" cy="7" r="3.5" class="k-ev context"/>'), "Small grey ring: context, doesn't set the score"]),
           ]
         : []),

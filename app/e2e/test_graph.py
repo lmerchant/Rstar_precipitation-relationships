@@ -204,3 +204,18 @@ def test_an_evidence_node_opens_its_card(page: Page):
 
     expect(page).to_have_url(re.compile(r"/people-risk\.html\?dataset=ghcn-daily#P-3$"))
     expect(page.get_by_role("button", name="Hide categorization for P-3")).to_have_attribute("aria-expanded", "true")
+
+
+def test_for_evidence_is_green_and_against_evidence_is_red(page: Page):
+    page.emulate_media(color_scheme="light")
+    page.goto("/graph.html?dataset=ghcn-daily&evidence=on")
+    nodes = page.get_by_test_id("evidence-node")
+    expect(nodes).to_have_count(210)
+
+    # The colour is what this test is about, so it reads the marks' fills (shape: circle for, diamond against).
+    fills = nodes.evaluate_all(
+        """dots => dots.map(d => d.querySelector('.g-ev'))
+              .filter(m => !m.classList.contains('hollow') && !m.classList.contains('context'))
+              .map(m => [m.tagName, getComputedStyle(m).fill])"""
+    )
+    assert {tuple(f) for f in fills} == {("circle", "rgb(29, 122, 70)"), ("polygon", "rgb(198, 40, 40)")}

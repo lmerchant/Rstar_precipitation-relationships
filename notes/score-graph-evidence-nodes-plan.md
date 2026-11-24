@@ -4,7 +4,8 @@ Written 2026-11-24. Adds the "information nodes" from `docs/ideas/rstar_relation
 score graph (`app/graph.html`, `app/assets/graph.js`): one small node per evidence item, around its subcategory
 node, with a switch to show or hide them. **Built 2026-11-24** with an on/off switch (the user's choice over a
 three-step slider). As built, the rings are 13 px apart (dots 5.5 px) at 48, 61, 74, 87 and 100 px, so rings 1–3 hold
-about 18 dots; the switch is also kept in the URL (`&evidence=on`).
+about 18 dots; the switch is also kept in the URL (`&evidence=on`). Later the same day the user asked for stance
+colours instead of the category colour: "for" dots are green and "against" diamonds red, filled or outlined.
 
 ## What the data gives us
 
