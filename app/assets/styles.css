@@ -17,9 +17,13 @@
   --low: #a23a3a;
   --low-bg: #f9e3e3;
   --empty: #8a94a3;
+  /* Confidence badges and evidence borders: purple high, amber moderate, blue low. Not green or red, which mean
+     "for" and "against" (user's choice, 2026-11-24). Badge text 6.1:1 (purple) and 5.3:1 (blue) on its tint. */
+  --conf-high: #6b3fa0;
+  --conf-high-bg: #efe7f8;
+  --conf-low: #1f5fae;
+  --conf-low-bg: #e3ecf8;
   --evidence-bg: #f6faff;
-  --against: #6b3fa0;
-  --against-bg: #efe7f8;
   --na-bg: #000000;
   --na-text: #ffffff;
   --na-border: #000000;
@@ -34,9 +38,11 @@
   --rstar-bg: #c62828;
   --rstar-border: #8e1c1c;
   --rstar-text: #ffffff;
-  /* Evidence nodes on the score graph: green for "for", red for "against" (5.4:1 and 5.6:1 on white). */
+  /* Stance colours, on the score graph's evidence nodes and the evidence tags: green "for", red "against"
+     (5.4:1 and 5.6:1 on white). The tags are solid, like the graph's filled dots. */
   --ev-for: #1d7a46;
   --ev-against: #c62828;
+  --ev-on: #ffffff; /* text on a solid stance tag: 5.4:1 on green, 5.6:1 on red */
   --shadow: 0 1px 2px rgba(20, 30, 45, 0.06), 0 2px 8px rgba(20, 30, 45, 0.05);
   --radius: 10px;
   --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
@@ -62,9 +68,11 @@
     --low: #f0a0a0;
     --low-bg: #3e2224;
     --empty: #7d8796;
+    --conf-high: #c9a8f0; /* 7.1:1 on its tint */
+    --conf-high-bg: #2f2540;
+    --conf-low: #7fb0ec; /* 5.7:1 */
+    --conf-low-bg: #22324a;
     --evidence-bg: #1e2633;
-    --against: #c9a8f0;
-    --against-bg: #2f2540;
     --na-bg: #000000;
     --na-text: #ffffff;
     --na-border: #e6eaf0;
@@ -79,6 +87,7 @@
     --rstar-text: #ffffff;
     --ev-for: #4cc38a; /* 7.3:1 on the dark surface */
     --ev-against: #f07070; /* 5.6:1 */
+    --ev-on: #0b1420; /* 8.4:1 on green, 6.4:1 on red */
     --shadow: none;
   }
 }
@@ -187,19 +196,19 @@ h2 { font-size: 1.2rem; margin: 0 0 8px; }
 .sub-panel h3:first-child { margin-top: 0; }
 .sub-panel ul { margin: 0; padding-left: 0; list-style: none; }
 .sub-panel ul.evidence li { position: relative; padding: 10px 12px 10px 14px; margin-bottom: 8px; background: var(--evidence-bg); border-radius: 8px; border-left: 4px solid var(--border); max-width: 90ch; }
-.sub-panel ul.evidence li[data-confidence="high"] { border-left-color: var(--high); }
+.sub-panel ul.evidence li[data-confidence="high"] { border-left-color: var(--conf-high); }
 .sub-panel ul.evidence li[data-confidence="moderate"] { border-left-color: var(--moderate); }
-.sub-panel ul.evidence li[data-confidence="low"] { border-left-color: var(--low); }
+.sub-panel ul.evidence li[data-confidence="low"] { border-left-color: var(--conf-low); }
 .sub-panel ul.gaps li { padding: 4px 0 4px 22px; position: relative; max-width: 90ch; color: var(--muted); }
 .sub-panel ul.gaps li::before { content: "?"; position: absolute; left: 0; top: 4px; width: 16px; height: 16px; border-radius: 50%; border: 1.5px solid var(--empty); font: 700 0.7rem/13px var(--font); text-align: center; color: var(--empty); }
 .item-meta { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
 .badge { font-size: 0.74rem; font-weight: 600; border-radius: 999px; padding: 1px 8px; }
-.badge.high { color: var(--high); background: var(--high-bg); }
+.badge.high { color: var(--conf-high); background: var(--conf-high-bg); }
 .badge.moderate { color: var(--moderate); background: var(--moderate-bg); }
-.badge.low { color: var(--low); background: var(--low-bg); }
+.badge.low { color: var(--conf-low); background: var(--conf-low-bg); }
 .stance { font-size: 0.74rem; font-weight: 700; border-radius: 999px; padding: 0 8px; border: 1px solid currentColor; }
-.stance.for { color: var(--accent); background: var(--accent-soft); }
-.stance.against { color: var(--against); background: var(--against-bg); }
+.stance.for { color: var(--ev-on); background: var(--ev-for); border-color: var(--ev-for); }
+.stance.against { color: var(--ev-on); background: var(--ev-against); border-color: var(--ev-against); }
 .stance.context { color: var(--muted); background: var(--surface-2); }
 .stance-summary { margin: 0 0 8px; font-size: 0.85rem; color: var(--muted); max-width: 90ch; }
 .panel-empty { margin: 0; color: var(--muted); font-style: italic; }

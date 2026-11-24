@@ -162,5 +162,8 @@ Firefox loads Homebrew's `libnss3` instead of its own and fails with "Symbol not
 - **Cards**: click anywhere on a card's header, or the arrow button, to open it. Expand all and Collapse all
   are above the list.
 - **Deep links**: `people-risk.html?dataset=ghcn-daily#P-3` opens P-3 directly.
-- **Evidence items** show a stance tag, a confidence badge and (RRS) the repository. The research run each came
+- **Evidence items** show a stance tag, a confidence badge and (RRS) the repository. Stance tags use the score
+  graph's colours: solid green "For", solid red "Against" and a grey "Context" (`--ev-for`, `--ev-against`). Confidence
+  badges, and each item's left border, are purple for high, amber for moderate and blue for low (`--conf-high`,
+  `--conf-low`), so green and red only ever mean the stance. The research run each came
   from stays in the JSON's `data-source` but isn't shown. Links open in a new tab.
