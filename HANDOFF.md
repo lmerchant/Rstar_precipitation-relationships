@@ -14,7 +14,7 @@ with 19 subcategories in all.
 2. That research is sorted into the 19 subcategories as evidence (`data-rstar-categories/`).
 3. Each subcategory gets a score from its evidence (full points, 0 or NA); a person decides the NA ones.
 4. The final app in `app/` shows a weighted network graph and/or knowledge graph of R* scores and dataset
-   relationships. Ideas are in `docs/rstar_relationship_graph/rstar_graphs.md`; the scoring formula and point values are in
+   relationships. Ideas are in `docs/ideas/rstar_relationship_graph/rstar_graphs.md` and `docs/ideas/R Precip dashboard.md` (the user's notes, kept out of git); the scoring formula and point values are in
    `docs/scoring/how_to_score_rstar.md` (which `app/scripts/build_data.py` reads):
    - R* = 0.40 D + 0.30 P + 0.20 (100 − RRS) + 0.10 DIRS;
    - each subcategory is worth 0 or a fixed number of points, or NA when the evidence doesn't settle it (then the
@@ -34,7 +34,7 @@ PERSIANN-CDR Daily are waiting on supplemental research, and CoCoRaHS is a new d
 | Feedback on the first pass | `docs/claude_feedback/first_pass_to_categorize.md`. All answered (see Open questions) |
 | Categorization rules | `docs/claude_feedback/rstar-categorization-decisions.md`, the master copy the user edits (2026-11-23). All its changes are applied. No Word copies are kept in the repo (they went out of sync); the user makes one with pandoc when needed |
 | Categorization viewer | Done: static site in `app/` (landing page with R* scores and key, plus 4 category pages with card scores, "Your score" radios and a category score panel) |
-| e2e tests | 80 pass (40 tests × Firefox and WebKit, 2026-11-23; score choices in `app/e2e/test_scores.py`, saving in `app/e2e/test_save.py`), Python Playwright. The empty-subcategory test now empties RRS-2 by intercepting `rstar-data.js`. Avoid `all_text_contents()`: it crashes this page in Playwright's Firefox |
+| e2e tests | 82 pass (41 tests × Firefox and WebKit, 2026-11-24; score choices in `app/e2e/test_scores.py`, saving in `app/e2e/test_save.py`), Python Playwright. The empty-subcategory test now empties RRS-2 by intercepting `rstar-data.js`. Avoid `all_text_contents()`: it crashes this page in Playwright's Firefox |
 | Final graph app | Not started |
 | Query plans and templates | `notes/dataset-query-5-part-plan.md` (five parts per dataset) and `notes/archive-query-plan.md` (three kinds of repository, and a register of repositories). Templates in `Rstar_query_results/queries/` (see Research queries) |
 | Guide for sharing | `docs/rstar-query-templates-guide.md` (2026-11-23): the query design, files, how to adapt it to other climate data, and starter prompts. Written for a friend of the user who will get the files in a new GitHub repo the user is making |
@@ -167,7 +167,12 @@ Plan: `notes/app-categorization-viewer-plan.md`. Details: `app/README.md`.
   no research-score badge), its status (RRS cards: the
   repositories), and opens to show the evidence. A panel beside the category description lists the chosen scores
   and the category total.
-  - **Chosen scores (2026-11-23):** the radios offer full points, 0 or NA and start on the research score. Choices
+  - **Chosen scores (2026-11-23):** the radios offer full points, 0 or NA and start on the research score. The
+    sentence above them states the implied score, for example "Both “for” and “against” web evidence (high or
+    moderate): score = NA" (was "needs a decision"; the user's colleague is reviewing whether "score = NA" reads as
+    the score implied by the web evidence). The panel's button is "Reset scores". On-screen text says "web evidence
+    score" for the research score. Each person's browser keeps their choices between visits (the user chose this over
+    starting fresh each visit; the site will be on GitHub Pages, one form per person). Choices
     are kept in `localStorage` (`rstar-chosen-scores-v1`, shaped `{"<dataset id>": {"P-1": 35, ...}}`) and the
     category panel, landing totals and R* are worked out from them in `app.js` (`currentScores()`, same rule as
     `build_data.py`). Details in `app/README.md`.
@@ -237,6 +242,6 @@ adding it to the website, writing gap queries and adding new research. Follow it
    `scripts/analyze/collect_rstar_scores.py` to turn a folder of saved files into a CSV. The user is telling the
    colleague about the format changes (`notes/rstar-json-format-changes.md`). The viewer plan also
    lists confidence filters and a side-by-side dataset view as later ideas.
-7. **Design the network graph and knowledge graph app** from `docs/rstar_relationship_graph/rstar_graphs.md` An NA
+7. **Design the network graph and knowledge graph app** from `docs/ideas/rstar_relationship_graph/rstar_graphs.md`. An NA
    score is drawn in black with the value NA.
 8. **Keep the e2e tests passing in both browsers** as the viewer changes.
