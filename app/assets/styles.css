@@ -294,7 +294,8 @@ h3 { color: var(--text); }
 .graph-panel { margin: 0 0 16px; background: var(--surface); border: 1px solid var(--border); border-top: 4px solid var(--card-rule); border-radius: var(--radius); padding: 14px 18px; box-shadow: var(--shadow); }
 .graph-controls { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 24px; margin: 0 0 8px; }
 .graph-controls .graph-options { margin: 0; }
-.graph-ev-control { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; }
+/* Own row, so the switch stays put whether or not the "Showing N evidence items" status is shown. */
+.graph-ev-control { flex-basis: 100%; display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; }
 .graph-ev-status { margin: 0; font-size: 0.85rem; color: var(--muted); }
 .graph-ev-status:empty { display: none; }
 .graph-note { margin: 8px 0 0; font-size: 0.85rem; color: var(--muted); max-width: 90ch; }
