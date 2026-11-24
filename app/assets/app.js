@@ -82,12 +82,17 @@
     "not-public": "Not public",
     "not-searched": "Not searched",
   };
+  // The score the web evidence implies, and why. "score = 35" uses the subcategory's full points.
   const BASIS_TEXT = {
-    "for-only": "High or moderate “for” evidence and no “against” evidence: full points.",
-    "against-only": "High or moderate “against” evidence and no “for” evidence: 0.",
-    both: "Both “for” and “against” evidence (high or moderate): needs a decision.",
-    none: "No high or moderate “for” or “against” evidence: needs a decision.",
+    "for-only": (pts) => `High or moderate “for” web evidence and no “against” web evidence: score = ${pts ?? "full points"}`,
+    "against-only": () => "High or moderate “against” web evidence and no “for” web evidence: score = 0",
+    both: () => "Both “for” and “against” web evidence (high or moderate): score = NA",
+    none: () => "No high or moderate “for” or “against” web evidence: score = NA",
   };
+
+  function basisText(basis, points) {
+    return BASIS_TEXT[basis] ? BASIS_TEXT[basis](points) : "";
+  }
 
   function isNA(v) {
     return v === "NA" || v === null || v === undefined;
@@ -443,7 +448,7 @@
     const tables = DATA.categories.map((cat) =>
       el("table", { class: "score-table" }, [
         el("caption", {}, [cat.title, " · total ", scoreValue(s.groups[cat.key].total, "small")]),
-        el("thead", {}, el("tr", {}, ["Subcategory", "Statement", "Points", "Research", "Score"].map((h) => el("th", { scope: "col", text: h })))),
+        el("thead", {}, el("tr", {}, ["Subcategory", "Statement", "Points", "Web evidence", "Score"].map((h) => el("th", { scope: "col", text: h })))),
         el(
           "tbody",
           {},
@@ -453,7 +458,7 @@
               el("th", { scope: "row" }, el("a", { href: withDataset(`${cat.page}#${sub.id}`), text: sub.id })),
               el("td", { text: sub.title }),
               el("td", { text: sub.points != null ? String(sub.points) : "—" }),
-              el("td", { title: BASIS_TEXT[e.basis] || "" }, scoreValue(e.score, "small")),
+              el("td", { title: basisText(e.basis, sub.points) }, scoreValue(e.score, "small")),
               el("td", {}, scoreValue(s.subcategories[sub.id], "small")),
             ]);
           })
@@ -482,7 +487,7 @@
       el("p", {
         class: "score-intro",
         text:
-          "Each subcategory starts with the score worked out from the web research. After reading its evidence on " +
+          "Each subcategory starts with the score worked out from the web research evidence. After reading it on " +
           "the category page, you can set it to full points, 0 or NA; your choices are saved in this browser. NA " +
           "marks a score that still needs a decision.",
       }),
@@ -490,8 +495,8 @@
         class: "score-intro changed-count",
         text:
           changed === 0
-            ? "All scores are the research scores."
-            : `You changed ${changed} of ${Object.keys(s.subcategories).length} subcategory scores from the research scores.`,
+            ? "All scores are the web evidence scores."
+            : `You changed ${changed} of ${Object.keys(s.subcategories).length} subcategory scores from the web evidence scores.`,
       }),
       el("div", { class: "score-row" }, tiles),
       btn,
@@ -729,14 +734,15 @@
     card.classList.toggle("is-open", open);
   }
 
-  // Why the research evidence gives the score the radios start on.
+  // The score the web evidence implies and why; the radios start on that score.
   function scoreWhy(s) {
     const e = subScore(s.id);
-    if (!e || !BASIS_TEXT[e.basis]) return null;
-    return el("p", { class: "score-why", id: `score-why-${s.id}`, text: BASIS_TEXT[e.basis] });
+    const text = e ? basisText(e.basis, s.points) : "";
+    if (!text) return null;
+    return el("p", { class: "score-why", id: `score-why-${s.id}`, text });
   }
 
-  // "Your score": radio buttons for full points, 0 and NA. Starts on the research score.
+  // "Your score": radio buttons for full points, 0 and NA. Starts on the web evidence score.
   function scoreChoice(sub) {
     if (!dataset.scores) return null;
     const current = chosenScore(sub);
@@ -804,7 +810,7 @@
     const totalCell = el("td");
     const changedNote = el("p", { class: "cat-scores-note" });
     const live = el("p", { class: "sr-only", "aria-live": "polite" });
-    const resetBtn = el("button", { class: "btn small", type: "button", text: "Reset to research scores" });
+    const resetBtn = el("button", { class: "btn small", type: "button", text: "Reset scores" });
 
     function update(announce) {
       const s = currentScores();
@@ -822,8 +828,8 @@
       const changed = cat.subcategories.filter((sub) => chosenScore(sub) !== researchScore(sub.id)).length;
       changedNote.textContent =
         changed === 0
-          ? "All are the research scores."
-          : `${changed} changed from the research score${changed === 1 ? "" : "s"}.`;
+          ? "All are the web evidence scores."
+          : `${changed} changed from the web evidence score${changed === 1 ? "" : "s"}.`;
       resetBtn.disabled = changed === 0;
       if (announce) live.textContent = `${cat.title} total: ${isNA(g.total) ? "NA" : g.total} of ${g.max_points}.`;
     }
@@ -834,7 +840,7 @@
       if (elsewhere > 0 && !window.confirm(`This also resets ${elsewhere} choice${elsewhere === 1 ? "" : "s"} in other categories for ${dataset.name}. Continue?`)) return;
       clearChoices();
       syncChoices();
-      live.textContent = `Reset to the research scores. ${live.textContent}`;
+      live.textContent = `Reset to the web evidence scores. ${live.textContent}`;
     });
 
     refreshCategoryPanel = () => update(true);

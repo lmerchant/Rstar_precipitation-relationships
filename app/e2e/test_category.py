@@ -63,9 +63,10 @@ def test_each_card_says_why_the_research_scored_it(page: Page):
     page.goto("/repository-resilience.html?dataset=ghcn-daily")
 
     rrs2 = page.get_by_role("listitem").filter(has=page.get_by_role("heading", name=re.compile(r"^RRS-2 ")))
-    expect(rrs2.get_by_text(re.compile(r"“against” evidence and no “for” evidence: 0"))).to_be_visible()
+    expect(rrs2.get_by_text("High or moderate “against” web evidence and no “for” web evidence: score = 0", exact=True)).to_be_visible()
     rrs1 = page.get_by_role("listitem").filter(has=page.get_by_role("heading", name=re.compile(r"^RRS-1 ")))
-    expect(rrs1.get_by_text(re.compile(r"Both “for” and “against” evidence"))).to_be_visible()
+    expect(rrs1.get_by_text("Both “for” and “against” web evidence (high or moderate): score = NA", exact=True)).to_be_visible()
+    expect(page.get_by_text("needs a decision")).to_have_count(0)
     # The research score itself shows only as the radio the card starts on, not as a badge.
     expect(page.get_by_text(re.compile(r"^Research score"))).to_have_count(0)
 

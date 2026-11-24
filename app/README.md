@@ -11,8 +11,12 @@ subcategory's chosen score and the category total.
 
 Each card's "Your score" radios offer full points, 0 or NA, and start on the research score. A choice updates the
 category panel at once, and the landing page's category totals, R* and "Score details" (which shows both the research
-and the chosen score). "Reset to research scores" clears the dataset's choices (it asks first if other categories
-have choices too).
+and the chosen score). Above the radios, each card states the score the web evidence implies and why, for example
+"Both “for” and “against” web evidence (high or moderate): score = NA". "Reset scores" clears the dataset's choices (it asks first if other categories have choices too).
+
+On the site (GitHub Pages or any address), each person's browser keeps its own choices: a first visit starts from the
+web evidence scores, and a returning person sees the choices they left until they click "Reset scores" (decided
+2026-11-23).
 
 Each card also has a **Your notes** box for inside knowledge or reasons for the score.
 

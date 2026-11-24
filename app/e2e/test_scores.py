@@ -27,8 +27,14 @@ def test_radios_start_on_the_research_score(page: Page, console_errors):
     expect(rrs2.get_by_role("radio", name="20", exact=True)).not_to_be_checked()
     expect(rrs2.get_by_role("radio", name="0", exact=True)).to_be_checked()
     expect(choices(page, "RRS-1").get_by_role("radio", name="NA", exact=True)).to_be_checked()
-    expect(rrs2).to_have_accessible_description(re.compile(r"“against” evidence and no “for” evidence: 0"))
+    expect(rrs2).to_have_accessible_description(re.compile(r"“against” web evidence and no “for” web evidence: score = 0$"))
     assert console_errors == []
+
+
+def test_radio_labels_are_only_the_values(page: Page):
+    page.goto("/people-risk.html?dataset=ghcn-daily")
+
+    expect(choices(page, "P-1").locator("label")).to_have_text(["35", "0", "NA"])
 
 
 def test_choosing_scores_updates_the_category_total(page: Page):
@@ -41,7 +47,7 @@ def test_choosing_scores_updates_the_category_total(page: Page):
 
     expect(total(page, "People risk scores")).to_have_text(re.compile(r"Total\s*100\s*75"))
     expect(panel.get_by_role("row", name=re.compile(r"^P-2 "))).to_have_text(re.compile(r"P-2\s*25\s*0"))
-    expect(panel).to_contain_text("4 changed from the research scores.")
+    expect(panel).to_contain_text("4 changed from the web evidence scores.")
 
     choices(page, "P-4").get_by_role("radio", name="NA", exact=True).check()
 
@@ -105,7 +111,7 @@ def test_rstar_is_worked_out_when_every_score_is_chosen(page: Page):
 
 def test_reset_returns_to_the_research_scores(page: Page):
     page.goto("/repository-resilience.html?dataset=ghcn-daily")
-    reset = score_panel(page, "Repository resilience scores").get_by_role("button", name="Reset to research scores")
+    reset = score_panel(page, "Repository resilience scores").get_by_role("button", name="Reset scores")
     expect(reset).to_be_disabled()
 
     choices(page, "RRS-2").get_by_role("radio", name="20", exact=True).check()
@@ -124,11 +130,11 @@ def test_reset_asks_before_clearing_other_categories(page: Page):
     choices(page, "D-1").get_by_role("radio", name="0", exact=True).check()
 
     page.once("dialog", lambda d: d.dismiss())
-    score_panel(page, "Data risk scores").get_by_role("button", name="Reset to research scores").click()
+    score_panel(page, "Data risk scores").get_by_role("button", name="Reset scores").click()
     expect(choices(page, "D-1").get_by_role("radio", name="0", exact=True)).to_be_checked()
 
     page.once("dialog", lambda d: d.accept())
-    score_panel(page, "Data risk scores").get_by_role("button", name="Reset to research scores").click()
+    score_panel(page, "Data risk scores").get_by_role("button", name="Reset scores").click()
     expect(choices(page, "D-1").get_by_role("radio", name="NA", exact=True)).to_be_checked()
 
 
