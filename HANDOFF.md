@@ -34,7 +34,7 @@ PERSIANN-CDR Daily are waiting on supplemental research, and CoCoRaHS is a new d
 | Feedback on the first pass | `docs/claude_feedback/first_pass_to_categorize.md`. All answered (see Open questions) |
 | Categorization rules | `docs/claude_feedback/rstar-categorization-decisions.md`, the master copy the user edits (2026-11-23). All its changes are applied. No Word copies are kept in the repo (they went out of sync); the user makes one with pandoc when needed |
 | Categorization viewer | Done: static site in `app/` (landing page with R* scores and key, plus 4 category pages with card scores, "Your score" radios and a category score panel) |
-| e2e tests | 112 pass (56 tests × Firefox and WebKit, 2026-11-24; score choices in `app/e2e/test_scores.py`, saving in `app/e2e/test_save.py`, the score graph in `app/e2e/test_graph.py`), Python Playwright. The empty-subcategory test now empties RRS-2 by intercepting `rstar-data.js`. Avoid `all_text_contents()`: it crashes this page in Playwright's Firefox |
+| e2e tests | 114 pass (57 tests × Firefox and WebKit, 2026-11-24; score choices in `app/e2e/test_scores.py`, saving in `app/e2e/test_save.py`, the score graph in `app/e2e/test_graph.py`), Python Playwright. The empty-subcategory test now empties RRS-2 by intercepting `rstar-data.js`. Avoid `all_text_contents()`: it crashes this page in Playwright's Firefox |
 | Score graph (weighted network graph) | Built 2026-11-24: `app/graph.html` + `app/assets/graph.js` (see "The viewer"), with evidence nodes behind an on/off switch. Knowledge graph not started |
 | Query plans and templates | `notes/dataset-query-5-part-plan.md` (five parts per dataset) and `notes/archive-query-plan.md` (three kinds of repository, and a register of repositories). Templates in `Rstar_query_results/queries/` (see Research queries) |
 | Guide for sharing | `docs/rstar-query-templates-guide.md` (2026-11-23): the query design, files, how to adapt it to other climate data, and starter prompts. Written for a friend of the user who will get the files in a new GitHub repo the user is making |
@@ -203,7 +203,7 @@ Plan: `notes/app-categorization-viewer-plan.md`. Details: `app/README.md`.
   dashed line. The R* node is black while NA and red (`--rstar-bg`) once every subcategory has a score (user's
   request, 2026-11-24). **Evidence nodes (2026-11-24):** a "Show evidence nodes" switch (`role="switch"`, off by default,
   `&evidence=on` in the URL) adds one dot per evidence item (210 for GHCN-Daily, 127 set a score) in a fan outside each
-  subcategory node: circle = for, diamond = against, small grey ring = context; filled = sets the score, outline = low
+  subcategory node: green circle = for, red diamond = against (user's request, 2026-11-24), small grey ring = context; filled = sets the score, outline = low
   confidence. Dots have hover tooltips, click through to the card, dim when another subcategory is hovered, aren't tab
   stops, and the table has an Evidence column with the counts. Plan and open questions (gaps as nodes; how to mark
   evidence from another dataset for thick lines): `notes/score-graph-evidence-nodes-plan.md`. A switch draws the RRS subcategory lines as risk (points − score, default) or score. Hover/focus tooltips, nodes link to their cards,
