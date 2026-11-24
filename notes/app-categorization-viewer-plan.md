@@ -6,7 +6,7 @@ Written 2026-11-22. Covers the first version only; the network and knowledge gra
 ## Constraints
 
 - **Opens straight from disk.** You open `app/index.html` by double-clicking it (`file://`), with no server. Browsers block `fetch()` of local JSON files on `file://`. So a build script turns the JSON and markdown into one JavaScript data file that the pages load with a plain `<script>` tag.
-- **The sources stay where they are.** The definitions stay in `rstar_definitions/*.md`, the categorizations in `data-rstar-categories/datasets/<dataset>/*.json`, the weights in `docs/rstar_relationship_graph/rstar_graphs.md`, and the dataset names in `datasets_metadata/json/`. Re-run the build script after any of them change.
+- **The sources stay where they are.** The definitions stay in `rstar_definitions/*.md`, the categorizations in `data-rstar-categories/datasets/<dataset>/*.json`, the point values and weights in `docs/scoring/how_to_score_rstar.md`, and the dataset names in `datasets_metadata/json/`. Re-run the build script after any of them change.
 - **No dependencies.** Plain HTML, CSS and JavaScript, plus Python's standard library for the build step. Nothing to install.
 
 ## Files
