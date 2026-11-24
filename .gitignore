@@ -42,3 +42,6 @@ blob-report/
 
 # Word copies made with pandoc from the Markdown docs (kept out so they never go out of sync)
 *.docx
+
+# The user's own idea notes: kept out of the shared repository
+docs/ideas/
