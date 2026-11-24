@@ -160,6 +160,8 @@ Plan: `notes/app-categorization-viewer-plan.md`. Details: `app/README.md`.
   - **Re-run it after changing any of those inputs:**
     `python3 app/scripts/build_data.py`.
   - The pages load the data with a `<script>` tag, so they also work opened from disk.
+- **Title:** the site is titled "R* Scores" (header, landing h1 and page titles; renamed from "R* categorizations"
+  2026-11-24). The "Score details" tables show only the person's chosen scores.
 - **Pages:** `index.html` (dataset selector, dataset details with the producer-is-repository sentence, the R* score
   section with a "Score details" panel, then the key to the tags and scoring, and 4 category cards with coverage
   chips), plus one page per category. On a category page each subcategory card shows its Description,
@@ -170,7 +172,9 @@ Plan: `notes/app-categorization-viewer-plan.md`. Details: `app/README.md`.
   - **Chosen scores (2026-11-23):** the radios offer full points, 0 or NA and start on the research score. The
     sentence above them states the implied score, for example "Both “for” and “against” web evidence (high or
     moderate): score = NA" (was "needs a decision"; the user's colleague is reviewing whether "score = NA" reads as
-    the score implied by the web evidence). The panel's button is "Reset scores". On-screen text says "web evidence
+    the score implied by the web evidence). The panel's button is "Reset scores" and resets only that
+    category; a second "Reset scores" beside "Score details" on the landing page resets all categories (it asks
+    first). Notes are never reset. On-screen text says "web evidence
     score" for the research score. Each person's browser keeps their choices between visits (the user chose this over
     starting fresh each visit; the site will be on GitHub Pages, one form per person). Choices
     are kept in `localStorage` (`rstar-chosen-scores-v1`, shaped `{"<dataset id>": {"P-1": 35, ...}}`) and the
