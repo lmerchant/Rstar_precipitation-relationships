@@ -1,9 +1,10 @@
-"""Build the GPCP Daily R* categorization JSON (first pass, 2026-11-24).
+"""Build the GPCP Daily R* categorization JSON (first pass 2026-11-24; pt7 Run 2 added the same day).
 
 Hand-sorted evidence from every answer file in data-rstar-query-results/ that bears on GPCP Daily
 (1DD V1.3, the NOAA CDR at NCEI, and V3.x Daily, from NASA MEaSUREs at GES DISC with a V3.3 CDR copy at NCEI):
-- the seven about-datasets/gpcp-daily runs (about-pt1, qc-formats-pt2, people-pt3, funding-news-pt4,
-  inputs-pt5, satellites-pt6 and the gap run people-production-pt7);
+- the eight about-datasets/gpcp-daily runs (about-pt1, qc-formats-pt2, people-pt3, funding-news-pt4,
+  inputs-pt5, satellites-pt6 and the two gap runs of the pt7 query: people-production-pt7 and
+  calibration-copies-pt7, its Run 2 on calibration, alternatives and copies);
 - the two archives/noaa-ncei runs (A1 threats, A2 resilience; the A2 run covers GPCP Daily by name);
 - instruments/nasa-satellites and instruments/noaa-satellites (GPM, Aqua, DMSP, POES, S-NPP, GOES);
 - for NCEI-wide and NODD facts only, the GHCN-Daily repository runs pt7 and pt9.
@@ -31,7 +32,8 @@ PT4 = "2026-11-20_gpcp-daily-funding-news-pt4"
 PT5 = "2026-11-20_gpcp-daily-inputs-pt5"
 PT6 = "2026-11-20_gpcp-daily-satellites-pt6"
 PT7 = "2026-11-24_gpcp-daily-people-production-pt7"
-NCEI = "2026-11-17_noaa-ncei-threats"
+PT7B = "2026-11-24_gpcp-daily-calibration-copies-pt7"  # Run 2 of the pt7 query: calibration, alternatives, copies
+NCEI ="2026-11-17_noaa-ncei-threats"
 NCEI_A2 = "2026-11-23_A2_Rstar_query-noaa_ncei"
 NASA_SAT = "2026-11-18_nasa-satellite-precip-threats"
 NOAA_SAT = "2026-11-18_noaa-satellite-precip-threats"
@@ -127,6 +129,32 @@ AWS_SPONSOR = "https://aws.amazon.com/opendata/open-data-sponsorship-program/"
 GOOGLE_PD = "https://docs.cloud.google.com/bigquery/public-data"
 AWS_S3 = "https://docs.aws.amazon.com/AmazonS3/latest/userguide/DataDurability.html"
 NODD_2019 = "https://www.noaa.gov/media-release/cloud-platforms-unleash-full-potential-of-noaa-s-environmental-data"
+# Added from calibration-copies-pt7 (Run 2)
+C01567 = "https://www.ncei.noaa.gov/metadata/geoportal/rest/metadata/item/gov.noaa.ncdc:C01567/html"
+OSPO_F17 = "https://ospo.noaa.gov/data/messages/2026/03/MSG_20260326_1733.html"
+NSIDC_SSMIS = "https://nsidc.org/data/user-resources/data-announcements/user-notice-ssmis-processing-will-now-continue-through-september-2026"
+AFA_DMSP = "https://airandspaceforces.com/space-force-legacy-weather-sats-2028-replacements"
+GPM_WSFM = "https://gpm.nasa.gov/data/news/new-wsf-m1-mwi-nrt-files-available"
+CSU_FCDR = "https://rain.atmos.colostate.edu/FCDR/"
+SR26_CALL = "https://assets.science.nasa.gov/content/dam/science/esd/earth-science-division/senior-reviews/2026/2026%20ESD%20Senior%20Review%20Call%20for%20Proposals_DRAFT20251219.pdf"
+SR26 = "https://science.nasa.gov/earth-science/senior-review-2026/"
+PMM23 = "https://science.nasa.gov/science-research/earth-science/summary-of-the-2023-precipitation-measurement-mission-science-team-meeting/"
+NTRS_GPM = "https://ntrs.nasa.gov/citations/20240004796"
+NTRS_AOS = "https://ntrs.nasa.gov/citations/20230007913"
+IPWG26 = "https://ipwg12.imgw.pl/wp-content/uploads/2026/07/S3.4-BEHRANGI-IPWG2026.pdf"
+AQUA23 = "https://assets.science.nasa.gov/content/dam/science/missions/aqua/AquaStatus_November.pdf"
+AQUA_PAGE = "https://science.nasa.gov/mission/aqua/"
+CMORPH = "https://www.ncei.noaa.gov/products/climate-data-records/precipitation-cmorph"
+PERSIANN = "https://www.ncei.noaa.gov/products/climate-data-records/precipitation-persiann"
+MSWEP = "https://www.gloh2o.org/mswep/"
+CHIRPS = "https://www.chc.ucsb.edu/data/chirps"
+GPCC_DWD = "https://www.dwd.de/EN/ourservices/gpcc/gpcc.html"
+V08_REPRO = "https://www.earthdata.nasa.gov/data/alerts-outages/gpm-version-08-reprocessing"
+HESS26 = "https://hess.copernicus.org/articles/30/3399/2026/"
+CDS_API = "https://cds.climate.copernicus.eu/api/catalogue/v1/collections/satellite-precipitation"
+ESGF = "https://esgf-node.ornl.gov/proxy/search?project=obs4MIPs&query=GPCP&type=Dataset&format=application%2Fsolr%2Bjson&limit=30"
+UMD_GP = "https://essic.umd.edu/globalprecipitation/"
+GSFC_BACKUP = "https://meso.gsfc.nasa.gov/pub/gpcp-v3/"
 
 # ---------------------------------------------------------------- People risk
 P1 = [
@@ -205,6 +233,8 @@ D2 = [
     (H, PT1, f"GPCP Daily is served by several organizations: NCEI (HTTPS, and V3.3 from its open-data bucket), NOAA's NODD copies on AWS and Google, NASA GES DISC (V3.2 and V3.3, Earthdata Cloud), NCAR GDEX ([d728007]({GDEX7}), [d728009]({GDEX9})) and Copernicus CDS ([CDS]({CDS_PAGE})). Each version has at least two.", "A"),
     (L, NCEI_A2, f"GPCP Daily also has a copy in NCEI's own `climatedatarecords` cloud bucket, with year folders 1998–2025 ([NCEI archive S3]({CDR_BUCKET})); its region and number of copies were not seen.", "A"),
     (M, PT3, "GES DISC serves V3.3 from NASA Earthdata Cloud in AWS us-west-2 (CMR). No source describes its backup or failover.", "C"),
+    (M, PT7B, f"Outside NOAA, 1DD V1.3's copies are stale: NCAR GDEX holds it to 2024-11-01 ([GDEX d728007]({GDEX7})) and Copernicus CDS to March 2024 ([CDS]({CDS_PAGE})); the GSFC backup folder was unreachable ([GSFC]({GSFC_BACKUP})). V1.3's current data are held only by NCEI and its NODD copies.", "F"),
+    (M, PT7B, f"V3.3 Daily is current off NASA's systems: Copernicus CDS (Europe) holds it through 2025-12-31, the same end as GES DISC's record, updated twice a year (catalogue updated 2026-10-06; [CDS catalogue]({CDS_API})), and ESGF obs4MIPs holds a reformatted copy (v20260220) at two US DOE sites, ORNL and NERSC ([ESGF]({ESGF})).", "A"),
 ]
 D2_GAPS = [
     ("U", "GES DISC's storage and backup design (no NASA repository run yet)."),
@@ -245,19 +275,28 @@ D5_GAPS = [
 
 # ---------------------------------------------------------------- Dependent infrastructure resilience
 DIRS1 = [
-    (H, PT1, f"1DD V1.3 is calibrated by microwave: each month its IR threshold is set so IR \"cold\" coverage matches SSM/I–SSMIS rain frequency, from DMSP F17 SSMIS alone since 2009 ([C-ATBD]({CATBD})). The RSS SSMIS CDR the C-ATBD names \"extends from 1987–2023\" ([NCEI]({RSS_CDR})), so the current calibration feed is undocumented, and DoD's DMSP delivery to NOAA changed on October 1, 2026 ([OSPO]({OSPO_SSMIS})).", "F"),
+    (H, PT1, f"1DD V1.3 is calibrated by microwave: each month its IR threshold is set so IR \"cold\" coverage matches SSM/I–SSMIS rain frequency, from DMSP F17 SSMIS alone since 2009 ([C-ATBD]({CATBD})). DoD's DMSP delivery to NOAA changed on October 1, 2026 ([OSPO]({OSPO_SSMIS})).", "F"),
+    (M, PT7B, f"Which SSMIS feed calibrates 1DD now is not published. The 2017 code README names only \"RSS SSMIS files\" ([NCEI code package]({SRC_TAR})); NCEI's record for the RSS V8 SSMIS CDR has data \"through July 31, 2025\" and status \"Complete\" ([NCEI C01567]({C01567})). No GPCP, NCEI or GES DISC page says what replaced it. (NCEI's product page still says the CDR \"extends from 1987–2023\" ([NCEI]({RSS_CDR})); the metadata record is newer.)", "F"),
+    (H, PT7B, f"The F17 feed itself is disrupted: FNMOC's PolarProd ended and from October 1, 2026 DMSP files go \"directly to NCCF\" under new names, with the F-17 and F-18 scan products in BUFR and HDF to \"be discontinued\" ([NOAA OSPO]({OSPO_SSMIS})). F-17 was out for 4 days (21–25 March 2026), traced to FNMOC, and F-16 and F-18 also had outages ([NOAA OSPO, Mar 2026]({OSPO_F17})).", "F"),
+    (M, PT7B, f"No funded reference is named for after GPM. GPM is in the 2026 Senior Review (FY2027–29), but no GPM outcome was found ([NASA Senior Review]({SR26}); [call]({SR26_CALL})); its fuel lasts to December 2027 counting fuel alone, with the end forecast for \"the late 2020's\" ([NASA PMM, 2024]({PMM23}); [NTRS]({NTRS_GPM})). NASA wants GPM to overlap with AOS for cross-calibration ([NTRS, 2023]({NTRS_AOS})), and a GSFC white paper says JAXA's PMM, which lacks 19–37 GHz radiometer channels, \"may be insufficient\" as the next reference ([NASA GSFC, 2026]({PRECIP_WP})).", "F"),
+    (M, PT7B, f"Who keeps the SSMIS intercalibration behind 1DD is not published. NASA PPS (X-CAL) has intercalibrated the new WSF-M1 MWI into GPM's near-real-time files since 12 Aug 2026 ([GPM]({GPM_WSFM})), and CSU says its SSM/I–SSMIS FCDR continues but names no version, funding or reference sensor ([CSU]({CSU_FCDR})). Neither is on 1DD's documented input list.", "C"),
     (H, PT5, f"GridSat-B1's calibration source, HIRS all-sky data, \"ceased in 2024\"; V3.3 was \"paused at March 2024 while NCEI is developing a new calibration procedure for the GridSat IR input\" ([V3.3 Release Notes]({RELNOTES})) for more than a year, until GridSat was recalibrated with VIIRS VGAC ([GridSat C-ATBD Rev 2]({GRIDSAT})).", "F"),
     (M, NASA_SAT, f"V3.x rests on IMERG, which uses GPM's GMI, calibrated to the DPR-GMI combined product, as the calibrator \"for all the other satellite precipitation estimates\" ([IMERG ATBD]({IMERG_ATBD})). GPM has no funding of its own after FY2026 in the FY2026 and FY2027 requests, and a NASA white paper says its successor PMM \"may be insufficient to serve as the next reference\" ([NASA GSFC, 2026]({PRECIP_WP})).", "F"),
     (M, PT2, "Some calibration is done by the input producers: RSS quality-controls and intercalibrates the SSM/I data V1.3 uses, and GPCC quality-controls the gauges. V3.x's own step (histogram-matching TOVS/AIRS to IMERG) is done in-house.", "C"),
 ]
 DIRS1_GAPS = [
-    ("S", "Which SSMIS feed calibrates 1DD now, and whether it survives FNMOC's October 2026 change."),
-    ("S", "How IMERG, and so V3.x, would be calibrated after GPM."),
+    ("S", "Which SSMIS feed calibrates 1DD since the RSS V8 CDR ended (2025-07-31), and whether it survives FNMOC's October 2026 change. The GPCP team at Goddard (Code 612) and NCEI's CDR program hold it; ask the GES DISC or NCEI help desk."),
+    ("S", "How IMERG, and so V3.x, would be calibrated after GPM, and GPM's 2026 Senior Review outcome (not yet posted)."),
+    ("S", "Who maintains the SSMIS intercalibration 1DD relies on."),
 ]
 
 DIRS2 = [
     (H, PT5, f"DMSP SSMIS, 1DD V1.3's only microwave input since 2009 (F17), is more than a decade past expected end of life. DoD set data cutoffs for June 30 and then July 31, 2025, extended sharing to September 2026, and now plans to run DMSP to \"no earlier than 2028\" ([Senators' letter, Oct 2026]({DMSP_LETTER})); delivery changed on October 1, 2026, with outages in June 2026 ([NASA Earthdata]({DMSP_EARTHDATA})).", "F"),
     (H, PT5, f"Aqua AIRS, the only sounder in both families' high latitudes since 2002–2003, is on a drifting satellite: a May 2025 plan ended its science on August 26, 2026, with passivation November 4, 2026 ([Aqua status]({AQUA})); AIRS was still operating on October 30, 2026 ([AIRS weekly report]({AIRS_WEEKLY})).", "F"),
+    (H, PT7B, f"AIRS is past its planned end and degrading: a 2023 plan set instrument shutdown for 26 Aug 2026 and passivation for 4 Nov 2026 ([NASA Aqua, 2023]({AQUA23})). AIRS was \"healthy\" on 30 Oct 2026, but since 4 Oct 2026 its L1B files carry an advisory about telemetry out-of-limit flags caused by Aqua's orbital drift ([JPL AIRS report]({AIRS_WEEKLY})).", "F"),
+    (M, PT7B, f"The 2026 Senior Review recommended that Aqua continue into FY2027 ([NASA Aqua]({AQUA_PAGE})). That extends AIRS by about a year on a drifting satellite; it does not remove the risk.", "C"),
+    (M, PT7B, f"DMSP's end date is in conflict: DoD, via NSIDC, said SSMIS processing continues \"through the retirement of the DMSP mission, which is expected in September 2026\", with gaps since spring 2025 ([NSIDC, 2025]({NSIDC_SSMIS})); a press report says the FY2026 NDAA keeps DMSP running \"no earlier than 2028\" ([Air & Space Forces, Aug 2026]({AFA_DMSP})). Either way F17, 1DD's only microwave sensor, is at the end of its life.", "F"),
+    (M, PT7B, f"GPM Core's end is near: its fuel lasts to December 2027 counting fuel alone, with the end forecast for \"the late 2020's\" ([NASA PMM, 2024]({PMM23}); [NTRS]({NTRS_GPM})), and no 2026 Senior Review outcome for GPM was found ([NASA Senior Review]({SR26})).", "F"),
     (M, NOAA_SAT, f"Microwave satellites inside IMERG, which feeds V3.x, have been lost: NOAA-15, -18 and -19 (data ended June 16, 2025; [NESDIS]({POES})), Suomi NPP ATMS (November 2, 2026; [NESDIS]({SNPP})) and AMSR2's near-real-time feed (September 2026; [OSPO]({AMSR2})).", "F"),
     (H, NASA_SAT, f"GPM Core, IMERG's anchor, is past its 3-year prime mission; NASA's 2023 review extended it \"through FY 2026\" ([NASA]({SR2023})), the FY2026 and FY2027 requests give it $0 on its own line after FY2026, and the 2026 Senior Review result is not published. IMERG documents estimate its data to December 2029, and PMM's launch is about March 2030.", "F"),
     (H, NOAA_SAT, f"Geostationary IR (GOES, Meteosat, Himawari) is working; GAO projects a gap in the spare from October 2032 to early 2033 ([GAO-26-107739]({GAO_GEO})). No current threat to GPCP's IR.", "C"),
@@ -265,14 +304,16 @@ DIRS2 = [
     (M, PT5, f"GPCC's gauge analysis (via the monthly) shows no funding cut or station loss; it merged its products into Monthly V2025 ([EGU26-12777]({EGU_GPCC})).", "C"),
 ]
 DIRS2_GAPS = [
-    ("P", "Whether DoD's SSMIS data still reach NOAA and NCEI after September 30, 2026 (a CLASS notice was seen only as a search summary)."),
-    ("S", "Aqua's actual end-of-science date."),
+    ("S", "DMSP's actual end date (September 2026 or \"no earlier than 2028\"); no DoD page settles it. FNMOC's notice shows deliveries going on past September 2026."),
+    ("S", "Aqua's actual end-of-science date (continued into FY2027 by the 2026 Senior Review)."),
 ]
 
 DIRS3 = [
     (H, PT5, f"IMERG V07 Final, V3.3's main input in 55°N–S, ended at September 2025; V3.3 used IMERG Late for October–December 2025 ([V3.3 Daily ATBD]({ATBD33})). V08 Final slipped to \"fall 2026\" and was not out by November 20, 2026 ([NASA GPM]({IMERG_V08})), and all L3 GPROF V08 data were recalled on October 1, 2026 ([NASA Earthdata]({GPROF_RECALL})). V3.3 cannot be extended until V08 Final ships.", "F"),
     (H, PT5, f"The GridSat-B1 IR record paused V3.3 for more than a year (from March or September 2024) until NCEI recalibrated it; V3.3 resumed with no notice, its files extended through 2025 between February and May 2026 ([NASA CMR]({CMR_LATEST})).", "F"),
-    (M, PT5, "1DD V1.3's SSMIS feed is undocumented since the RSS CDR it names ended in 2023, and FNMOC's October 1, 2026 delivery change renamed files and dropped some products.", "F"),
+    (M, PT7B, f"1DD V1.3's SSMIS feed is undocumented since the RSS V8 SSMIS CDR it names ended at July 31, 2025 ([NCEI C01567]({C01567})). FNMOC's October 1, 2026 change sends DMSP files directly to NCCF under new names and drops the F-17 and F-18 BUFR and HDF scan products ([NOAA OSPO]({OSPO_SSMIS})).", "F"),
+    (H, PT7B, f"The SSMIS supply has already broken: F-17 data were out for 4 days (21–25 March 2026) because of FNMOC, and F-16 and F-18 also had outages ([NOAA OSPO, Mar 2026]({OSPO_F17})).", "F"),
+    (M, PT7B, f"UMD makes the GPCP Monthly Interim CDR, \"sponsored by NOAA NCEI\", with summaries to October 2026 ([UMD ESSIC]({UMD_GP})); the daily is scaled to the monthly.", "C"),
     (H, PT5, "Aqua AIRS estimates, the high-latitude input for both families, end with Aqua (science end planned August 2026; still operating October 30, 2026).", "F"),
     (L, PT4, "A search summary says NCEI's preliminary GPCP Monthly catalog for 2025 ends at February 2025; the run could not verify it.", "F"),
     (M, PT5, f"CPC's merged IR, 1DD's IR source and IMERG's since 2000, has daily files to November 20, 2026 ([GES DISC]({MERGIR})). CPC moved under the Weather Prediction Center in March 2025 ([Axios]({AXIOS_CPC})), with no tie to the IR product.", "C"),
@@ -285,6 +326,7 @@ DIRS3_GAPS = [
 
 DIRS4 = [
     (M, PT3, f"1DD V1.3 relies on outside processing for its IR: CPC's GPCP Geostationary Satellite Precipitation Data Centre makes the 3-hourly IR histograms, \"processed and provided by Pingping Xie\" ([C-ATBD]({CATBD}); [CPC]({CPC_GSPDC})); TOVS data were \"obtained directly from Joel Susskind\" (GSFC).", "F"),
+    (H, PT7B, f"V3.x's high-latitude AIRS/TOVS precipitation estimates are made outside the GPCP team: the NASA/GSFC Sounder Research Team supplies them ([V3.3 Daily ATBD, rev. 12 Jun 2026]({ATBD33})).", "F"),
     (M, PT3, f"The producers compute it on their own systems: NCEI's records say the analysis runs on \"moderate-sized workstations at the University of Maryland\" ([NCEI C01726]({C01726})), and Huffman's bio says V3 is \"computed at Goddard\".", "A"),
     (L, PT7, "Inference: NCEI holds no Operational Algorithm Description, which suggests GPCP Daily never reached Full Operational Capability, so NCEI does not run it and depends on UMD and Goddard to produce it.", "F"),
     (M, PT7, "No source names the computers either version runs on (Code 612 workstations or NASA's NCCS).", "C"),
@@ -299,10 +341,15 @@ DIRS5 = [
     (M, NASA_SAT, "No NASA statement was found on how IMERG would be calibrated after GPM; JAXA's PMM is the only planned GPM-class radar, and it may not serve as the reference alone.", "F"),
     (M, PT6, "V3.x gets about 30 microwave satellites through IMERG, many overlapping (for 2023–2025: GPM, F16–F18, AMSR2, MetOp-B/C and ATMS on three satellites), so losing one degrades it rather than stopping it.", "A"),
     (M, PT5, f"Successors exist or are planned: WSF-M1's data are operational to NOAA from July 2026 ([OSPO]({OSPO_WSFM})), and GPCP V4 (mid 2027 target) plans WSF-M MWI in place of SSMIS and AVHRR in place of TOVS/AIRS ([V3.3 Daily ATBD]({ATBD33})). Neither is in V1.3 or V3.3 now.", "C"),
+    (M, PT7B, f"No written contingency exists for losing F17 or AIRS. 1DD V1.3 has no such document, and the V3.3 Daily ATBD says days without TOVS or AIRS data are \"set to missing\" outside 55°N–S ([V3.3 Daily ATBD]({ATBD33})).", "F"),
+    (M, PT7B, f"When an input stopped, V3.3 used a stand-in: IMERG Late for October–December 2025 and GPROF V07 for December 2025, after IMERG V07 Final ended ([V3.3 Daily ATBD]({ATBD33})).", "A"),
+    (M, PT7B, f"Other datasets could replace GPCP Daily in part: CMORPH CDR (global, 8 km, 1998–present; [NCEI]({CMORPH})), PERSIANN-CDR (60°S–60°N, 0.25°, 1982–present; [NCEI]({PERSIANN})), MSWEP (global, 0.1°, 1979–present, commercial terms; [GloH2O]({MSWEP})), CHIRPS (land only, 50°S–50°N; [UCSB]({CHIRPS})), GPCC Full Data Daily (land only, 1982–2019; [DWD]({GPCC_DWD})) and IMERG Final (V08 reprocessing began 9 March 2026; [Earthdata]({V08_REPRO})). None is an independent, global, gauge-calibrated daily record on GPCP's terms, and IMERG shares GPCP's GMI calibration.", "A"),
+    (M, PT7B, f"In a 2026 test of 24 daily datasets, MSWEP V2.8 scored best and IMERG Final V7 did not beat GPCP V3.2 ([HESS, 2026]({HESS26})).", "C"),
+    (M, PT7B, f"Behrangi's 2026 slides say the team is switching from TOVS/AIRS to AVHRR, with V4 targeted for mid-2027 ([Behrangi, IPWG 2026]({IPWG26})).", "C"),
 ]
 DIRS5_GAPS = [
-    ("U", "Other datasets that could stand in for GPCP Daily, and how much of it each could replace."),
-    ("S", "A 1DD contingency plan if F17 or AIRS stops."),
+    ("S", "How much of GPCP Daily each substitute could replace; the IMERG, GSMaP and ERA5 producer pages were not read."),
+    ("S", "A 1DD contingency plan if F17 or AIRS stops (none found)."),
 ]
 
 # ---------------------------------------------------------------- Repository resilience
@@ -313,10 +360,16 @@ RRS1 = [
     (M, NCEI_A2, f"Nothing published says the NODD copies are checked against NCEI's archive; the bucket listing shows only S3 ETags ([AWS listing]({AWS_LIST})).", "A", NODD),
     (M, PT1, "The copies are not all current: GDEX holds V1.3 to 2024-11-01 and V3.2; CDS holds v1.3 only to March 2024; which version the NODD buckets hold is not confirmed.", "A", "NSF NCAR GDEX, Copernicus CDS, AWS and Google Cloud (NODD)"),
     (L, NCEI_A2, f"NCEI's own `climatedatarecords` bucket holds a GPCP Daily copy (1998–2025) separate from NODD ([NCEI archive S3]({CDR_BUCKET})); its region and copies are unknown.", "C", NCEI_R),
+    (M, PT7B, f"Copernicus CDS (ECMWF, Europe) holds V3.3 Daily through 2025-12-31, the same end as NASA's own record, updated twice a year (catalogue updated 2026-10-06; [CDS catalogue]({CDS_API})). With GES DISC that gives V3.3 two current copies on two continents.", "F", CDS),
+    (M, PT7B, f"The other outside copies are behind: GDEX holds 1DD V1.3 only to 2024-11-01, about two years behind ([GDEX d728007]({GDEX7})), and V3.2 Daily to 2021-10-01, superseded by V3.3 ([GDEX d728009]({GDEX9})); CDS holds V1.3 only to March 2024.", "A", "NSF NCAR GDEX, Copernicus CDS"),
+    (M, PT7B, f"ESGF obs4MIPs holds V3.3 Daily (version v20260220) at two US DOE sites, ORNL and NERSC, and V1.3 (v20180519, to 2016-12-31) at NASA NCCS only ([ESGF]({ESGF})). obs4MIPs files are rewritten to CMIP conventions, so it is filed here as a reformatted copy, not a repository (a categorizing call).", "C", "ESGF obs4MIPs (not a repository)"),
+    (M, PT7B, f"The GSFC backup folder ([meso.gsfc.nasa.gov]({GSFC_BACKUP})) was unreachable and has no Wayback captures, and gpcp.umd.edu now points to a UMD page with monthly summaries only ([UMD ESSIC]({UMD_GP})); neither shows a Daily copy.", "C", "NASA GSFC, UMD ESSIC (not repositories)"),
 ]
 RRS1_GAPS = [
     ("U", "How many copies GES DISC keeps, and where (no NASA repository run)."),
     ("P", "NCEI's production AWS regions and copy count after the move."),
+    ("S", "Which version the NODD buckets hold and whether it is current (asked in pt7 Run 2, not answered)."),
+    ("S", "The GSFC backup folder's contents (unreachable); ESGF V3.3's last file date (its file search failed)."),
 ]
 
 RRS2 = [
@@ -325,7 +378,8 @@ RRS2 = [
     (M, GH_RRS, f"AWS says S3 \"regularly\" verifies stored data with checksums, with no frequency ([AWS]({AWS_S3})); no NOAA or provider document says the NODD copy is verified against NCEI's.", "C", NODD),
 ]
 RRS2_GAPS = [
-    ("U", "Checksum practice at GES DISC, GDEX and CDS."),
+    ("U", "Checksum practice at GES DISC."),
+    ("S", "Checksum practice at GDEX and CDS: neither copy's page shows checksums (pt7 Run 2)."),
     ("P", "NCEI's SOP 60-6-015."),
 ]
 
