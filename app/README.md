@@ -139,7 +139,7 @@ with a `<script>` tag, not `fetch()`. The dashboard pages fetch their JSON, so t
 The live site is https://lmerchant.github.io/Rstar_precipitation-relationships/, linked from
 https://lmerchant.github.io/.
 
-- `.github/workflows/pages.yml` publishes this `app/` folder (nothing else in the repo, and without `e2e/`,
+- `.github/workflows/pages.yml` (a `build` job that uploads the site, then a `deploy` job) publishes this `app/` folder (nothing else in the repo, and without `e2e/`,
   `pytest.ini`, `requirements-dev.txt` and `scripts/`) each time `main` is pushed with changes under `app/`. It can also be run by hand from the repo's Actions tab.
 - There is no build on GitHub: rebuild `data/rstar-data.js` (below) and commit it before pushing.
 - The repo's Settings → Pages → Source must be "GitHub Actions".

@@ -20,18 +20,20 @@ permissions:
   contents: read
   pages: write
   id-token: write
+  actions: read # lets deploy-pages list this run's artifacts
 
 # One deploy at a time; a newer push replaces a queued one but never cancels one already running.
 concurrency:
   group: pages
   cancel-in-progress: false
 
+# Two jobs, like GitHub's starter Pages workflows. With the upload and the deploy in one job, deploy-pages@v5
+# sometimes looked for the "github-pages" artifact a moment after upload-pages-artifact@v5 finished, found 0 and
+# failed ("No artifacts named github-pages were found", 2026-11-24). A separate deploy job starts only after the
+# build job, and its upload, have finished.
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v7
       - uses: actions/configure-pages@v6
@@ -44,5 +46,13 @@ jobs:
       - uses: actions/upload-pages-artifact@v5
         with:
           path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
       - id: deployment
         uses: actions/deploy-pages@v5
