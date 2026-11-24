@@ -186,18 +186,29 @@ function aboutHref(url, datasetId) {
   return `${url}&${p}`;
 }
 
-// The "R* scores" line of a panel. A dataset in the R* data (data/rstar-data.js, built by
-// app/scripts/build_data.py; same dataset ids as datasets.json) links to its R* score page,
-// carrying the dashboard state like the other two links; one not categorized yet says so. A dataset
-// that isn't in the R* data at all shows NA.
+// The "R* scores" block on the right half of a card's header. A dataset in the R* data
+// (data/rstar-data.js, built by app/scripts/build_data.py; same dataset ids as datasets.json) links to
+// its R* score page, carrying the dashboard state like the panel's links; one not categorized yet says
+// so under the link. A dataset that isn't in the R* data at all shows "R* scores: NA", not a link.
+// The link sits above the title button's click area (see .card-rstar in dashboard.css), so clicking it
+// follows the link instead of opening the card.
 function rstarScoresHtml(datasetId) {
   const e = escapeHtml;
   const entry = ((window.RSTAR_DATA || {}).datasets || []).find(d => d.id === datasetId);
-  if (!entry) return "<strong>R* scores:</strong> NA";
+  if (!entry) {
+    return `
+      <div class="card-rstar">
+        <p class="card-rstar-na">R* scores: NA</p>
+        <p class="card-rstar-note">Not scored yet</p>
+      </div>`;
+  }
   const url = `scores.html?dataset=${encodeURIComponent(datasetId)}`;
-  const link = `<a class="dataset-about-link" data-about="${e(url)}" data-dataset="${e(datasetId)}"
-                 href="${e(aboutHref(url, datasetId))}">R* scores</a>`;
-  return entry.categorizations ? link : `${link} (not categorized yet)`;
+  return `
+      <div class="card-rstar">
+        <a class="dataset-about-link card-rstar-link" data-about="${e(url)}" data-dataset="${e(datasetId)}"
+           href="${e(aboutHref(url, datasetId))}">R* scores<span class="card-rstar-arrow" aria-hidden="true"> →</span></a>
+        ${entry.categorizations ? "" : '<p class="card-rstar-note">Not categorized yet</p>'}
+      </div>`;
 }
 
 function endpointsHtml(endpoints) {
@@ -247,6 +258,7 @@ function cardHtml(ds) {
         <span class="tag tag-neutral">${e(shortPeriod(r[COL.period]))}</span>
         ${ds.cdr ? '<span class="tag tag-cdr">NOAA CDR</span>' : ""}
       </div>
+${rstarScoresHtml(ds.id)}
       <svg class="expand-icon" viewBox="0 0 24 24" aria-hidden="true">
         <g class="icon-open"><line x1="12" y1="4" x2="12" y2="20"/><line x1="4" y1="12" x2="20" y2="12"/></g>
         <polyline class="icon-close" points="5,15 12,8 19,15"/>
@@ -266,7 +278,6 @@ function cardHtml(ds) {
             ? `<a class="dataset-about-link" data-about="${e(r[COL.about])}" data-dataset="${e(ds.id)}"
                  href="${e(aboutHref(r[COL.about], ds.id))}">Dataset web research</a>`
             : "<strong>Dataset web research:</strong> NA"}</p>
-          <p class="details-description">${rstarScoresHtml(ds.id)}</p>
 
           <h5 class="details-heading details-subheading">Update status</h5>
           <p class="details-description">${e(r[COL.update] || "NA")}</p>

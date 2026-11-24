@@ -330,6 +330,60 @@ body {
 .dataset-header {
   position: relative;
   padding: 22px 24px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  column-gap: 32px;
+}
+
+/* Left half: label, title, description and tags. */
+.dataset-header > :not(.card-rstar) {
+  grid-column: 1;
+}
+
+/* Right half: the "R* scores" link (dashboard.js rstarScoresHtml). It sits
+   above the title button's ::after, which covers the whole header, so a
+   click on it follows the link instead of opening the card. */
+.card-rstar {
+  grid-column: 2;
+  grid-row: 1 / span 4;
+  align-self: center;
+  position: relative;
+  z-index: 1;
+  padding: 6px 56px 6px 28px;   /* right: clear of the expand icon */
+  border-left: 1px solid var(--steel-blue);
+}
+
+.card-rstar-link,
+.card-rstar-na {
+  font-size: 28px;
+  font-weight: 600;
+  line-height: 1.2;
+  margin: 0;
+}
+
+.card-rstar-link {
+  color: var(--link-text);      /* 5.1:1 on the card, 4.2:1 on its hover colour (large text needs 3:1) */
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 5px;
+}
+
+.card-rstar-link:hover {
+  color: var(--link-hover);
+}
+
+.card-rstar-na {
+  color: var(--deep-ocean);
+}
+
+.card-rstar-note {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: var(--dataset-label-text);
+  margin: 8px 0 0;
 }
 
 .dataset-header:hover,
@@ -1090,6 +1144,22 @@ body {
 
   .dataset-header {
     padding: 18px 16px;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  /* One column: the R* link goes under the tags. */
+  .card-rstar {
+    grid-column: 1;
+    grid-row: auto;
+    margin-top: 16px;
+    padding: 14px 0 0;
+    border-left: none;
+    border-top: 1px solid var(--steel-blue);
+  }
+
+  .card-rstar-link,
+  .card-rstar-na {
+    font-size: 24px;
   }
 
   .expand-icon {

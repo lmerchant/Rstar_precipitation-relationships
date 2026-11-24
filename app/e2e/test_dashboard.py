@@ -44,11 +44,9 @@ def test_search_and_filter_narrow_the_cards_and_stay_in_the_url(page: Page):
     expect(page).to_have_url(re.compile(r"\?q=persiann&category=satellite$"))
 
 
-def test_card_opens_and_links_to_its_rstar_scores(page: Page):
+def test_card_links_to_its_rstar_scores_without_opening(page: Page):
     page.goto("/")
 
-    toggle(page, "ghcn-daily").click()
-    expect(toggle(page, "ghcn-daily")).to_have_attribute("aria-expanded", "true")
     card(page, "ghcn-daily").get_by_role("link", name="R* scores", exact=True).click()
 
     expect(page).to_have_url(re.compile(r"/scores\.html\?dataset=ghcn-daily&open=ghcn-daily$"))
@@ -56,10 +54,21 @@ def test_card_opens_and_links_to_its_rstar_scores(page: Page):
     expect(page.get_by_role("combobox", name="Dataset")).to_have_value("ghcn-daily")
 
 
-def test_cards_say_when_a_dataset_has_no_rstar_scores_yet(page: Page):
-    page.goto("/?open=gpcp-daily,imerg-late-run")
+def test_rstar_link_is_on_the_card_not_in_its_panel(page: Page):
+    page.goto("/")
 
-    expect(card(page, "gpcp-daily").get_by_text("R* scores (not categorized yet)")).to_be_visible()
+    toggle(page, "ghcn-daily").click()
+
+    expect(toggle(page, "ghcn-daily")).to_have_attribute("aria-expanded", "true")
+    expect(card(page, "ghcn-daily").locator(".dataset-header").get_by_role("link", name="R* scores")).to_be_visible()
+    expect(card(page, "ghcn-daily").locator(".dataset-details").get_by_role("link", name="R* scores")).to_have_count(0)
+
+
+def test_cards_say_when_a_dataset_has_no_rstar_scores_yet(page: Page):
+    page.goto("/")
+
+    expect(card(page, "gpcp-daily").get_by_role("link", name="R* scores")).to_be_visible()
+    expect(card(page, "gpcp-daily").get_by_text("Not categorized yet")).to_be_visible()
     expect(card(page, "imerg-late-run").get_by_text("R* scores: NA")).to_be_visible()
     expect(card(page, "imerg-late-run").get_by_role("link", name="R* scores")).to_have_count(0)
 

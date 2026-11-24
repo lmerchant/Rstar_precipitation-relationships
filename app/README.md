@@ -39,9 +39,11 @@ https://lmerchant.github.io/precip_workshop_dashboard/ are left as they were). P
 - **Dataset ids** are the same everywhere: the folder names in `data-rstar-categories/datasets/` (`ghcn-daily`,
   `gpcp-daily`, `imerg-late-run`, `persiann-cdr-daily`). The old dashboard's ids (`ghcn-d`, ...) were changed when it
   moved.
-- **R* scores link:** `index.html` also loads `data/rstar-data.js`. A dataset in it gets an "R* scores" link to
-  `scores.html?dataset=<id>` ("(not categorized yet)" when it has no categorization file); one not in it (IMERG for
-  now) shows "R* scores: NA".
+- **R* scores link:** `index.html` also loads `data/rstar-data.js`. Each card shows a large "R* scores →" link on
+  the right half of its header (under the tags at phone width), not in the panel (user's choice, 2026-11-24); it goes
+  to `scores.html?dataset=<id>` without opening the card ("Not categorized yet" under it when the dataset has no
+  categorization file). A dataset not in the R* data (IMERG for now) shows "R* scores: NA", not a link. The link sits
+  above the title button's whole-header click area (`.card-rstar` in `dashboard.css`).
 - **Dashboard state in the URL:** `q` (search), `category` and `coverage` (filters) and `open` (open cards). Every
   link off the dashboard carries them, including through the R* pages (`withDataset()` in `assets/app.js`), so each
   page's "Back to dashboard" link returns to the dashboard as it was, with that dataset's card open and focused.
