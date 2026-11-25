@@ -1,7 +1,7 @@
 # R* JSON: what the viewer's saved files change from the colleague's form
 
 Written 2026-11-23 for the user to pass on. The viewer saves one JSON file per save in the format of
-`docs/json_output/example_rstar_json.json`, with these differences. The full shape is in
+`rstar-pipeline/input/framework/assessment-form/example_rstar_json.json`, with these differences. The full shape is in
 `app/schema/rstar-assessment.schema.json`.
 
 ## Added

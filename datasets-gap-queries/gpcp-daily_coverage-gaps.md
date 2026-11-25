@@ -1,13 +1,13 @@
 # GPCP Daily: what the research didn't search, by subcategory
 
 > **Superseded 2026-11-24:** GPCP Daily is now categorized. See
-> [gpcp-daily_categorization-gaps.md](gpcp-daily_categorization-gaps.md) for what is still open. This note is kept as
+> [gpcp-daily_categorization-gaps.md](../rstar-pipeline/output/gaps-notes/gpcp-daily_categorization-gaps.md) for what is still open. This note is kept as
 > the record of what the pt7 and A2 gap runs were meant to fill.
 
 - **Dataset:** GPCP Daily: 1DD V1.3 (NOAA CDR at NCEI, DOI 10.7289/V5RX998Z) and V3.x Daily (V3.3 CDR C01726 at NCEI;
   V3.2 and V3.3 at NASA GES DISC).
 - **Checked:** 2026-11-23, by a coverage check of the six GPCP runs and the shared NCEI, NASA satellite and GHCN-Daily
-  pt7 runs, against the 19 subcategories. **Not a categorization:** nothing is in `data-rstar-categories/` yet.
+  pt7 runs, against the 19 subcategories. **Not a categorization:** nothing is in `rstar-pipeline/output/categories/` yet.
   Categorize once the gap runs below come back.
 - **Runs read:** `2026-11-19_gpcp-daily-about-pt1`, `2026-11-20_gpcp-daily-qc-formats-pt2`,
   `2026-11-20_gpcp-daily-people-pt3`, `2026-11-20_gpcp-daily-funding-news-pt4`, `2026-11-20_gpcp-daily-inputs-pt5`,
@@ -22,7 +22,7 @@
 | NASA GES DISC (Earthdata Cloud, AWS us-west-2) | V3.2, V3.3 | NASA A2 written; no A1 (NASA budget is in the IMERG runs) |
 | NSF NCAR GDEX, Copernicus CDS, GSFC backup FTP, obs4MIPs, Earth Engine, gpcp.umd.edu | various; some not confirmed | Copies only: checked in pt7 |
 
-> **Update 2026-11-23: the NCEI A2 run has come back** (`data-rstar-query-results/archives/noaa-ncei/2026-11-23_A2_Rstar_query-noaa_ncei`). It fills the NCEI side of D-2 and RRS-1, RRS-2, RRS-3 and RRS-5 below: no scheduled checksum checks (contradicts RRS-2); the CDR is archived in Asheville with an offsite tape copy only kilometres away, so RRS-1 isn't shown; no DR test is public (RRS-3); no loss reported since 2015 but 8% of Helene's ingest backlog unaccounted (RRS-5). GPCP Daily v1.3's maturity review (DSMR-00163) scores Data Integrity 3.5 with checksums only at ingest and on order; GPCP Daily also has a copy in NCEI's own `climatedatarecords` cloud bucket (low confidence). Rows marked "NCEI A2" still need the other hosts' runs.
+> **Update 2026-11-23: the NCEI A2 run has come back** (`rstar-pipeline/input/web-research/archives/noaa-ncei/2026-11-23_A2_Rstar_query-noaa_ncei`). It fills the NCEI side of D-2 and RRS-1, RRS-2, RRS-3 and RRS-5 below: no scheduled checksum checks (contradicts RRS-2); the CDR is archived in Asheville with an offsite tape copy only kilometres away, so RRS-1 isn't shown; no DR test is public (RRS-3); no loss reported since 2015 but 8% of Helene's ingest backlog unaccounted (RRS-5). GPCP Daily v1.3's maturity review (DSMR-00163) scores Data Integrity 3.5 with checksums only at ingest and on order; GPCP Daily also has a copy in NCEI's own `climatedatarecords` cloud bucket (low confidence). Rows marked "NCEI A2" still need the other hosts' runs.
 
 ## Summary
 

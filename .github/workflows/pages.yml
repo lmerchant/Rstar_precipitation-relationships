@@ -4,7 +4,7 @@
 # Runs when main is pushed with changes under app/ (or to this file), or by hand from the Actions tab.
 # Needs Settings -> Pages -> Build and deployment -> Source: "GitHub Actions".
 # The app has no build step: app/data/rstar-data.js is committed, so rebuild it with
-# `python3 app/scripts/build_data.py` and commit before pushing.
+# `python3 rstar-pipeline/processing/scripts/site-data/build_data.py` and commit before pushing.
 
 name: Publish app to GitHub Pages
 

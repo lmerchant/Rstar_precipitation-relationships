@@ -86,7 +86,7 @@ async function rstarQueryHtml(page) {
   }
 }
 
-// From the page's "record" file (written by scripts/import_archive_page.py
+// From the page's "record" file (written by rstar-pipeline/processing/scripts/dashboard/import_archive_page.py
 // from the research-record.json): the question asked and the
 // subquestions searched. Returns "" if the page has no record or it
 // can't be loaded.

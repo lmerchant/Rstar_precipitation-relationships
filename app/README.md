@@ -36,7 +36,7 @@ https://lmerchant.github.io/precip_workshop_dashboard/ are left as they were). P
 - **Data:** `data/datasets.json` (the cards; field list in `notes/dashboard/dashboard-design-notes.md`),
   `data/archives.json`, `data/archive_links.json`, `data/dataset_pages.json`, and the page text in `content/`. These
   are **fetched**, so the dashboard pages need a web server (the R* pages still open from disk).
-- **Dataset ids** are the same everywhere: the folder names in `data-rstar-categories/datasets/` (`ghcn-daily`,
+- **Dataset ids** are the same everywhere: the folder names in `rstar-pipeline/output/categories/` (`ghcn-daily`,
   `gpcp-daily`, `imerg-late-run`, `persiann-cdr-daily`). The old dashboard's ids (`ghcn-d`, ...) were changed when it
   moved.
 - **R* scores link:** `index.html` also loads `data/rstar-data.js`. Each card shows a large "R* scores →" link on
@@ -47,8 +47,8 @@ https://lmerchant.github.io/precip_workshop_dashboard/ are left as they were). P
 - **Dashboard state in the URL:** `q` (search), `category` and `coverage` (filters) and `open` (open cards). Every
   link off the dashboard carries them, including through the R* pages (`withDataset()` in `assets/app.js`), so each
   page's "Back to dashboard" link returns to the dashboard as it was, with that dataset's card open and focused.
-- **Scripts** (run from the project folder): `scripts/dashboard/import_dataset_overviews.py` (overview pages from
-  `datasets_metadata/json/`), `import_dataset_pages.py` (web research pages from `data-rstar-query-results/about-datasets/`,
+- **Scripts** (run from the project folder): `rstar-pipeline/processing/scripts/dashboard/import_dataset_overviews.py` (overview pages from
+  `rstar-pipeline/input/dataset-metadata/`), `import_dataset_pages.py` (web research pages from `rstar-pipeline/input/web-research/about-datasets/`,
   parts listed in `data/dataset_pages.json`), `import_archive_page.py` (one archive or instrument page) and
   `sort_datasets.py` (re-sort the cards after adding or renaming a dataset). The research pages now on the site were
   made from older copies of the runs; re-running `import_dataset_pages.py` would need `dataset_pages.json` updated
@@ -109,14 +109,14 @@ participant or workshop group), and **Save scores to a file** downloads one JSON
 `ghcn-daily_rstar_jane-smith_2026-11-23T232937Z.json`. Each save is a new file. The panel shows a note when NA values
 are included and says when there are changes since the last save.
 
-The file uses the format of a colleague's R* form (`docs/json_output/example_rstar_json.json`) plus an `assessor`
+The file uses the format of a colleague's R* form (`rstar-pipeline/input/framework/assessment-form/example_rstar_json.json`) plus an `assessor`
 block. NA is saved as `null`; notes go in each category's `justification` (`P-1: ...`); `scoringMethod` is `""`.
 `build_data.py` copies the example's `formula` and `framework` blocks into the data, and passes each dataset's DOI (or
 a data endpoint URL) as the identifier. The schema is `schema/rstar-assessment.schema.json`; the changes from the
 colleague's form are listed in `notes/rstar-json-format-changes.md`.
 
 Scores come from `data-score` on each subcategory's div in the category JSON (written by
-`scripts/categorize/rstar_common.py`); `scripts/build_data.py` adds the category totals and R*. A total is NA if any
+`rstar-pipeline/processing/scripts/categorize/rstar_common.py`); `scripts/build_data.py` adds the category totals and R*. A total is NA if any
 of its subcategories is NA, and R* is NA if any total is.
 
 The design plan is in [`notes/app-categorization-viewer-plan.md`](../notes/app-categorization-viewer-plan.md).
@@ -150,22 +150,23 @@ https://lmerchant.github.io/.
 
 ## Update the data
 
-The pages read `data/rstar-data.js`, which is generated. Re-run the build after changing any of:
+The pages read `data/rstar-data.js`, which is generated from the files in `rstar-pipeline/` (see
+`rstar-pipeline/README.md` for the whole process). Re-run the build after changing any of:
 
-- `rstar_definitions/*.md` (titles, descriptions, "What counts as evidence" text, which is the reader's version of
+- `rstar-pipeline/input/framework/definitions/*.md` (titles, descriptions, "What counts as evidence" text, which is the reader's version of
   the "How to find" search instructions and is the one the site shows; the first paragraph of a "... defined"
   section is the short definition on the score page, and any later paragraphs show only on the category page)
-- `data-rstar-categories/datasets/<dataset>/*.json` (the categorizations)
-- `docs/scoring/how_to_score_rstar.md` (point values and group weights)
-- `docs/json_output/example_rstar_json.json` (the saved file's `formula` and `framework` blocks)
-- `datasets_metadata/json/*_dataset-metadata.json` (dataset names and details)
+- `rstar-pipeline/output/categories/<dataset>/*.json` (the categorizations)
+- `rstar-pipeline/input/framework/how_to_score_rstar.md` (point values and group weights)
+- `rstar-pipeline/input/framework/assessment-form/example_rstar_json.json` (the saved file's `formula` and `framework` blocks)
+- `rstar-pipeline/input/dataset-metadata/*_dataset-metadata.json` (dataset names and details)
 
 ```bash
-python3 /Users/claude/SIDE_WORK/NYCE_project/Rstar_precipitation-relationships/app/scripts/build_data.py
+python3 /Users/claude/SIDE_WORK/NYCE_project/Rstar_precipitation-relationships/rstar-pipeline/processing/scripts/site-data/build_data.py
 ```
 
 A new dataset appears in the dataset selector as soon as its folder exists in
-`data-rstar-categories/datasets/`. It is marked "not categorized yet" until the folder has a JSON file.
+`rstar-pipeline/output/categories/`. It is marked "not categorized yet" until the folder has a JSON file.
 
 ## Tests (Playwright for Python)
 

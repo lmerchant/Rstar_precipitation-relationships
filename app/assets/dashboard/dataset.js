@@ -7,7 +7,7 @@
  *
  * The parts are listed in data/dataset_pages.json; their text is in
  * content/datasets/<id>/pt<N>.md and their questions in pt<N>.json, both
- * written by scripts/import_dataset_pages.py.
+ * written by rstar-pipeline/processing/scripts/dashboard/import_dataset_pages.py.
  *
  * The dashboard's own parameters (q, category, coverage, open) ride along
  * in the URL, so "Back to dashboard" returns to the same search and

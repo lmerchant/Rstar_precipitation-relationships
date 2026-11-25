@@ -29,7 +29,7 @@ high- and moderate-confidence evidence:
 - both, or neither: **NA**, and a person decides.
 
 If any subcategory is NA, its group and R* are NA too. Point values and the full rules are in
-[docs/scoring/how_to_score_rstar.md](docs/scoring/how_to_score_rstar.md).
+[rstar-pipeline/input/framework/how_to_score_rstar.md](rstar-pipeline/input/framework/how_to_score_rstar.md).
 
 ## Datasets
 
@@ -81,24 +81,19 @@ Then open http://127.0.0.1:3000/. Details, tests and how to rebuild the data are
 
 | Folder | What it holds |
 |---|---|
-| [app/](app/) | The website, its data build script (`app/scripts/build_data.py`) and its Playwright tests |
-| [rstar_definitions/](rstar_definitions/) | The definition of each group and subcategory, what counts as evidence, and how to search for it |
-| [data-rstar-query-results/](data-rstar-query-results/) | The web research: one folder per run, with the query, the answer and a research record. `about-datasets/` for the datasets, `archives/` for repositories, `instruments/` for instruments |
-| [data-rstar-categories/](data-rstar-categories/) | The categorization of each dataset: one JSON file per dataset with every evidence item, gap and score |
-| [scripts/categorize/](scripts/categorize/) | The script per dataset that holds the sorted evidence and writes its categorization |
-| [scripts/dashboard/](scripts/dashboard/) | Scripts that copy the research and metadata into the dashboard's pages |
-| [datasets_metadata/](datasets_metadata/) | Details about each dataset: names, DOIs, producers and repositories |
-| [datasets-gap-queries/](datasets-gap-queries/) | For each dataset, what the research never covered, by subcategory |
-| [docs/](docs/) | The scoring rules, the categorization format and rules, the saved-file format, and how-to guides |
+| [rstar-pipeline/](rstar-pipeline/) | **Everything needed to rebuild the site's data**, as input → processing → output. Its [README](rstar-pipeline/README.md) explains the layout and the steps, so the process can be repeated for another project |
+| [app/](app/) | The website and its Playwright tests. It reads only its own `app/data/` and `app/content/`, which the pipeline's scripts write |
+| [datasets-gap-queries/](datasets-gap-queries/) | Notes from planning the follow-up research for each dataset (a one-off step) |
 | [notes/](notes/) | Changes proposed to the saved-file format |
 
-Good places to start in `docs/`:
+Good places to start:
 
-- [docs/scoring/how_to_score_rstar.md](docs/scoring/how_to_score_rstar.md): point values and the scoring formula;
-- [docs/claude_feedback/rstar-categorization-decisions.md](docs/claude_feedback/rstar-categorization-decisions.md):
+- [rstar-pipeline/README.md](rstar-pipeline/README.md): how the folders fit together and the steps in order;
+- [rstar-pipeline/input/framework/how_to_score_rstar.md](rstar-pipeline/input/framework/how_to_score_rstar.md): point
+  values and the scoring formula;
+- [rstar-pipeline/input/framework/rstar-categorization-decisions.md](rstar-pipeline/input/framework/rstar-categorization-decisions.md):
   the rules for filing evidence;
-- [docs/create_rstar_node_files.md](docs/create_rstar_node_files.md): the categorization file format;
-- [docs/categorizing-web-searches_README.md](docs/categorizing-web-searches_README.md): how to categorize a dataset
-  and add it to the site;
-- [docs/rstar-query-templates-guide.md](docs/rstar-query-templates-guide.md): how the research queries are designed
-  and how to adapt them to other climate data.
+- [rstar-pipeline/processing/instructions/categorizing-web-searches_README.md](rstar-pipeline/processing/instructions/categorizing-web-searches_README.md):
+  how to categorize a dataset and add it to the site;
+- [rstar-pipeline/processing/research-queries/rstar-query-templates-guide.md](rstar-pipeline/processing/research-queries/rstar-query-templates-guide.md):
+  how the research queries are designed and how to adapt them to other climate data.

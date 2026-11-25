@@ -35,10 +35,10 @@ const COL = {
   doi: "doi",
   notes: "notes",
   // Address of the dataset's "Dataset web research" page (optional; set by
-  // scripts/import_dataset_pages.py). Without it the panel shows NA.
+  // rstar-pipeline/processing/scripts/dashboard/import_dataset_pages.py). Without it the panel shows NA.
   about: "about_url",
   // Address of the dataset's overview page (optional; set by
-  // scripts/import_dataset_overviews.py). Without it the panel shows NA.
+  // rstar-pipeline/processing/scripts/dashboard/import_dataset_overviews.py). Without it the panel shows NA.
   overview: "overview_url",
 };
 
@@ -187,7 +187,7 @@ function aboutHref(url, datasetId) {
 }
 
 // The "R* scores" block on the right half of a card's header. A dataset in the R* data
-// (data/rstar-data.js, built by app/scripts/build_data.py; same dataset ids as datasets.json) links to
+// (data/rstar-data.js, built by rstar-pipeline/processing/scripts/site-data/build_data.py; same dataset ids as datasets.json) links to
 // its R* score page, carrying the dashboard state like the panel's links; one not categorized yet says
 // so under the link. A dataset that isn't in the R* data at all shows "R* scores: NA", not a link.
 // The link sits above the title button's click area (see .card-rstar in dashboard.css), so clicking it

@@ -1,5 +1,5 @@
 /* R* categorization viewer: renders the landing page and the category pages
-   from window.RSTAR_DATA (built by app/scripts/build_data.py). */
+   from window.RSTAR_DATA (built by rstar-pipeline/processing/scripts/site-data/build_data.py). */
 (function () {
   "use strict";
 
@@ -10,7 +10,7 @@
 
   if (!DATA) {
     main.innerHTML =
-      '<p class="notice">No data found. Run <code>python3 app/scripts/build_data.py</code> ' +
+      '<p class="notice">No data found. Run <code>python3 rstar-pipeline/processing/scripts/site-data/build_data.py</code> ' +
       "from the project folder, then reload this page.</p>";
     return;
   }
@@ -95,7 +95,7 @@
   }
 
   // ------------------------------------------------------------- scores
-  // Scores come from data-score on each subcategory's div (docs/scoring/how_to_score_rstar.md);
+  // Scores come from data-score on each subcategory's div (rstar-pipeline/input/framework/how_to_score_rstar.md);
   // build_data.py adds the group totals and R*. "NA" means a person has to decide.
   const STATUS_LABELS = {
     found: "Found",
@@ -256,7 +256,7 @@
   }
 
   // ------------------------------------------------------- saved files
-  // One JSON file per save, in the format of the colleague's R* form (docs/json_output/example_rstar_json.json)
+  // One JSON file per save, in the format of the colleague's R* form (rstar-pipeline/input/framework/assessment-form/example_rstar_json.json)
   // plus an "assessor" block. NA is saved as null. Plan: notes/rstar-score-json-save-plan.md.
   const COMPONENT_ORDER = ["D", "P", "RRS", "DIRS"];
   const ROLES = [
@@ -1016,7 +1016,7 @@
     } else if (cov.status === "empty" && cov.gaps === 0) {
       panel.append(el("p", { class: "panel-empty", text: "The research had nothing relevant to this subcategory." }));
     } else {
-      // Our own generated HTML from data-rstar-categories/; not user input.
+      // Our own generated HTML from rstar-pipeline/output/categories/; not user input.
       panel.innerHTML = html;
       decoratePanel(panel);
     }

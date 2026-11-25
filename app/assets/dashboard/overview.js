@@ -1,7 +1,7 @@
 /* Dataset overview pages: overview.html?id=<dataset id>
  *
  * Shows everything in content/datasets/<id>/overview.json (copied from
- * the user's metadata JSON by scripts/import_dataset_overviews.py) as
+ * the user's metadata JSON by rstar-pipeline/processing/scripts/dashboard/import_dataset_overviews.py) as
  * sections: summary, people, time, space, instruments, data format,
  * versions, archives, access, related products and references. Empty
  * fields and sections are left out. Fields the page doesn't know yet are

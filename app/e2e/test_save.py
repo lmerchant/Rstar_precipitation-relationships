@@ -6,7 +6,8 @@ from pathlib import Path
 from playwright.sync_api import Page, expect
 
 ROOT = Path(__file__).resolve().parents[2]
-EXAMPLE = json.loads((ROOT / "docs" / "json_output" / "example_rstar_json.json").read_text(encoding="utf-8"))
+FORM = ROOT / "rstar-pipeline" / "input" / "framework" / "assessment-form" / "example_rstar_json.json"
+EXAMPLE = json.loads(FORM.read_text(encoding="utf-8"))
 TOP_KEYS = ["assessmentTimestamp", "dataset", "primaryDataCurator", "assessor", "rStarCompositeScore",
             "triageTier", "formula", "components", "framework"]
 

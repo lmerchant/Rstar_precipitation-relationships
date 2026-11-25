@@ -1,19 +1,19 @@
 # IMERG Late Run: what the research didn't search, by subcategory
 
 > **Categorized 2026-11-24 (first pass).** The open gaps are now in
-> [imerg-late-run_categorization-gaps.md](imerg-late-run_categorization-gaps.md). This note is kept as the record of
+> [imerg-late-run_categorization-gaps.md](../rstar-pipeline/output/gaps-notes/imerg-late-run_categorization-gaps.md). This note is kept as the record of
 > what the gap runs were meant to fill. Pt7's run covered only calibration, inputs, alternatives and copies; its
 > people half and the NASA GES DISC + PPS A2 run are still to do.
 
 - **Dataset:** IMERG Late Run, version V07 (V08 pending), from NASA's Precipitation Processing System (PPS), archived
   at NASA GES DISC.
 - **Checked:** 2026-11-23, by a coverage check of the six IMERG runs and the NASA and NOAA satellite runs, against the
-  19 subcategories. **Not a categorization:** nothing is in `data-rstar-categories/` yet (and there is no
+  19 subcategories. **Not a categorization:** nothing is in `rstar-pipeline/output/categories/` yet (and there is no
   `imerg-late-run/` folder). Categorize once the gap runs below come back.
 - **Runs read:** `2026-11-20_imerg-late-run-about-pt1`, `2026-11-21_imerg-late-run-processing-qc-pt2`,
   `2026-11-21_imerg-late-run-formats-people-pt3`, `2026-11-21_imerg-late-run-funding-pt4`,
   `2026-11-21_imerg-late-run-news-pt5`, `2026-11-21_imerg-late-run-inputs-pt6`.
-- **Rechecked 2026-11-23** after pt6 was copied into `data-rstar-query-results/about-datasets/imerg-late-run/` (its
+- **Rechecked 2026-11-23** after pt6 was copied into `rstar-pipeline/input/web-research/about-datasets/imerg-late-run/` (its
   answer, query and record; its `check-by-hand.md`, `left-out.md`, `sites-to-trust.md` and `method.md` are still only in
   `Rstar_query_results/web_search_results/`). Pt6's own gaps changed DIRS-1, DIRS-2, DIRS-3 and DIRS-4 below; see
   "What pt6 left open".

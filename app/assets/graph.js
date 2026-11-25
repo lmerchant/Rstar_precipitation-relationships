@@ -50,7 +50,7 @@
   function evidenceItems(html) {
     if (!html) return [];
     const tpl = document.createElement("template");
-    tpl.innerHTML = html; // our own generated HTML from data-rstar-categories/, not user input
+    tpl.innerHTML = html; // our own generated HTML from rstar-pipeline/output/categories/, not user input
     const items = [...tpl.content.querySelectorAll("ul.evidence > li")].map((li, i) => {
       const stance = STANCE_ORDER.includes(li.dataset.stance) ? li.dataset.stance : "context";
       const confidence = li.dataset.confidence || "low";

@@ -3,7 +3,7 @@
 - **Dataset:** PERSIANN-CDR Daily, a NOAA CDR (DOI 10.7289/V51V5BWQ, NCEI record C00854), made by UC Irvine's Center
   for Hydrometeorology and Remote Sensing (CHRS).
 - **Checked:** 2026-11-23, by a coverage check of the six PERSIANN-CDR runs and the shared NCEI, GHCN-Daily pt7 and
-  satellite runs, against the 19 subcategories. **Not a categorization:** nothing is in `data-rstar-categories/` yet.
+  satellite runs, against the 19 subcategories. **Not a categorization:** nothing is in `rstar-pipeline/output/categories/` yet.
   Categorize once the gap runs below come back.
 - **Runs read:** `2026-11-19_persiann-cdr-daily-about-pt1`, `2026-11-19_persiann-cdr-daily-qc-formats-pt2`,
   `2026-11-19_persiann-cdr-daily-about-pt3` (funding), `2026-11-19_persiann-cdr-daily-news-pt4`,
@@ -19,7 +19,7 @@
 | NODD on AWS (`s3://noaa-cdr-precip-persiann-pds/`), Google, Azure | Redistributors of NCEI's copy | In NCEI's A2; currency checked in pt7 |
 | IRI/LDEO Data Library; Data Rescue Project | Redistributors (IRI possibly frozen at September 2019) | Copies only: checked in pt7 |
 
-> **Update 2026-11-23: the NCEI A2 run has come back** (`data-rstar-query-results/archives/noaa-ncei/2026-11-23_A2_Rstar_query-noaa_ncei`). It fills the NCEI side of D-2 and RRS-1, RRS-2, RRS-3 and RRS-5 below: no scheduled checksum checks (contradicts RRS-2); the CDR is archived in Asheville with an offsite tape copy only kilometres away, so RRS-1 isn't shown; no DR test is public (RRS-3); no loss reported since 2015 but 8% of Helene's ingest backlog unaccounted (RRS-5). PERSIANN-CDR v1r1's maturity review (DSMR-00012) scores Data Integrity 3.5 with checksums only at ingest and on order. Rows marked "NCEI A2" still need the other hosts' runs.
+> **Update 2026-11-23: the NCEI A2 run has come back** (`rstar-pipeline/input/web-research/archives/noaa-ncei/2026-11-23_A2_Rstar_query-noaa_ncei`). It fills the NCEI side of D-2 and RRS-1, RRS-2, RRS-3 and RRS-5 below: no scheduled checksum checks (contradicts RRS-2); the CDR is archived in Asheville with an offsite tape copy only kilometres away, so RRS-1 isn't shown; no DR test is public (RRS-3); no loss reported since 2015 but 8% of Helene's ingest backlog unaccounted (RRS-5). PERSIANN-CDR v1r1's maturity review (DSMR-00012) scores Data Integrity 3.5 with checksums only at ingest and on order. Rows marked "NCEI A2" still need the other hosts' runs.
 
 ## Summary
 

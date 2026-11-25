@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "rstar-assessment.schema.json",
   "title": "R* assessment saved by the R* categorization viewer",
-  "description": "The colleague's R* form format (docs/json_output/example_rstar_json.json) with one added block, \"assessor\". A score of NA is saved as null, and so is any total, contribution, composite score or tier that depends on it.",
+  "description": "The colleague's R* form format (rstar-pipeline/input/framework/assessment-form/example_rstar_json.json) with one added block, \"assessor\". A score of NA is saved as null, and so is any total, contribution, composite score or tier that depends on it.",
   "type": "object",
   "required": ["assessmentTimestamp", "dataset", "primaryDataCurator", "assessor", "rStarCompositeScore",
                "triageTier", "formula", "components", "framework"],
