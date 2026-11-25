@@ -173,8 +173,8 @@ def test_landing_reset_clears_every_category_after_asking(page: Page):
     expect(page.get_by_label("Your notes for P-1")).to_have_value("Kept after a reset")
 
 
-def test_dataset_without_categorization_has_no_choices(page: Page):
-    page.goto("/people-risk.html?dataset=persiann-cdr-daily")
+def test_dataset_without_categorization_has_no_choices(page: Page, uncategorized):
+    page.goto(f"/people-risk.html?dataset={uncategorized}")
 
     expect(page.get_by_role("radio")).to_have_count(0)
     expect(page.get_by_role("complementary")).to_have_count(0)

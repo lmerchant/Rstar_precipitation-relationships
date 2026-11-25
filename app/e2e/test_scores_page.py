@@ -42,15 +42,15 @@ def test_subcategory_chip_opens_that_card(page: Page):
     expect(page.get_by_role("region", name=re.compile(r"^P-3 Critical undocumented knowledge"))).to_be_visible()
 
 
-def test_switching_dataset_updates_links_and_details(page: Page):
+def test_switching_dataset_updates_links_and_details(page: Page, uncategorized):
     page.goto("/scores.html?dataset=ghcn-daily")
 
-    page.get_by_role("combobox", name="Dataset").select_option("persiann-cdr-daily")
+    page.get_by_role("combobox", name="Dataset").select_option(uncategorized)
 
-    expect(page).to_have_url(re.compile(r"\?dataset=persiann-cdr-daily$"))
+    expect(page).to_have_url(re.compile(rf"\?dataset={uncategorized}$"))
     expect(page.get_by_text("This dataset has no categorization file yet.")).to_be_visible()
     nav = page.get_by_role("navigation", name="Pages")
-    expect(nav.get_by_role("link", name="Data risk")).to_have_attribute("href", "data-risk.html?dataset=persiann-cdr-daily")
+    expect(nav.get_by_role("link", name="Data risk")).to_have_attribute("href", f"data-risk.html?dataset={uncategorized}")
 
 
 def test_landing_has_a_key_to_the_tags_and_scores(page: Page):

@@ -122,8 +122,8 @@ def test_a_subcategory_node_opens_its_card(page: Page):
     expect(page.get_by_role("button", name="Hide categorization for P-3")).to_have_attribute("aria-expanded", "true")
 
 
-def test_uncategorized_dataset_has_no_graph(page: Page):
-    page.goto("/graph.html?dataset=persiann-cdr-daily")
+def test_uncategorized_dataset_has_no_graph(page: Page, uncategorized):
+    page.goto(f"/graph.html?dataset={uncategorized}")
 
     expect(page.get_by_text(re.compile(r"has no categorization file yet, so it has no scores to graph\."))).to_be_visible()
     expect(graph(page)).to_have_count(0)

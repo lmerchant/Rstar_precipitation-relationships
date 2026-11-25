@@ -1,4 +1,5 @@
 """Serve app/ on 127.0.0.1 for the e2e tests and point Playwright's base_url at it."""
+import json
 import os
 import socket
 import subprocess
@@ -43,6 +44,31 @@ def base_url():
     yield f"http://127.0.0.1:{port}"
     server.terminate()
     server.wait(timeout=5)
+
+
+# The dataset the "not categorized yet" tests treat as uncategorized. It is categorized for real, so the fake below is
+# what the tests exercise, and they keep working once every dataset has been categorized.
+UNCATEGORIZED = "gpcp-daily"
+
+
+@pytest.fixture
+def uncategorized(page):
+    """Serve the R* data with UNCATEGORIZED's categorization taken out, as build_data.py writes a dataset folder that
+    has no JSON file yet. Returns that dataset's id."""
+    def strip_categorization(route):
+        body = route.fetch().text()
+        body += (
+            "\n(function () {\n"
+            f"  const d = window.RSTAR_DATA.datasets.find((x) => x.id === {json.dumps(UNCATEGORIZED)});\n"
+            "  d.file = null;\n"
+            "  d.categorizations = null;\n"
+            "  d.scores = null;\n"
+            "})();\n"
+        )
+        route.fulfill(body=body, content_type="application/javascript")
+
+    page.route("**/data/rstar-data.js", strip_categorization)
+    return UNCATEGORIZED
 
 
 @pytest.fixture

@@ -148,8 +148,8 @@ def test_subcategory_with_no_evidence_says_so(page: Page):
     expect(panel(page, "RRS-2")).to_have_text("The research had nothing relevant to this subcategory.")
 
 
-def test_dataset_without_categorization_says_so(page: Page):
-    page.goto("/data-risk.html?dataset=persiann-cdr-daily")
+def test_dataset_without_categorization_says_so(page: Page, uncategorized):
+    page.goto(f"/data-risk.html?dataset={uncategorized}")
 
     expect(page.get_by_text("Not categorized yet for this dataset")).to_have_count(5)
     toggle(page, "D-1").click()
